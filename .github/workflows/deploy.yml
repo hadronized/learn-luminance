@@ -1,5 +1,8 @@
 name: Deploy to GitHub pages
-on: [pr]
+on:
+  push:
+    branches:
+      - master
 
 jobs:
   build-and-deploy:
@@ -14,7 +17,7 @@ jobs:
       - name: Build
         run: mdbook build
       - name: Deploy
-      - uses: maxheld83/ghpages@v0.2.1
+        uses: maxheld83/ghpages@v0.2.1
         env:
           BUILD_DIR: book
         with:
