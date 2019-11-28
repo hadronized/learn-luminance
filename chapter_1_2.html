@@ -1,0 +1,291 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Creating a window and preparing graphics code - Learn luminance</title>
+        
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "light" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div id="sidebar-scrollbox" class="sidebar-scrollbox">
+                <ol class="chapter"><li class="expanded affix "><a href="introduction.html">Introduction</a></li><li class="expanded affix "><a href="crate-setup.html">Crate setup</a></li><li class="expanded "><a href="chapter_1.html"><strong aria-hidden="true">1.</strong> Hello, World!</a></li><li><ol class="section"><li class="expanded "><a href="chapter_1_1.html"><strong aria-hidden="true">1.1.</strong> Getting started</a></li><li class="expanded "><a href="chapter_1_2.html" class="active"><strong aria-hidden="true">1.2.</strong> Creating a window and preparing graphics code</a></li><li class="expanded "><a href="chapter_1_3.html"><strong aria-hidden="true">1.3.</strong> Changing the background color</a></li></ol></li><li class="expanded "><a href="chapter_2.html"><strong aria-hidden="true">2.</strong> Your first triangle</a></li><li><ol class="section"><li class="expanded "><a href="chapter_2_1.html"><strong aria-hidden="true">2.1.</strong> What is a triangle?</a></li><li class="expanded "><a href="chapter_2_2.html"><strong aria-hidden="true">2.2.</strong> Shady triangle</a></li><li class="expanded "><a href="chapter_2_3.html"><strong aria-hidden="true">2.3.</strong> Rendering our triangle</a></li></ol></li><li class="expanded "><a href="chapter_3.html"><strong aria-hidden="true">3.</strong> Wavefront .obj loader</a></li><li><ol class="section"><li class="expanded "><a href="chapter_3_1.html"><strong aria-hidden="true">3.1.</strong> The Wavefront .obj format</a></li><li class="expanded "><a href="chapter_3_2.html"><strong aria-hidden="true">3.2.</strong> Defining our vertex type</a></li><li class="expanded "><a href="chapter_3_3.html"><strong aria-hidden="true">3.3.</strong> Loading an .obj object</a></li><li class="expanded "><a href="chapter_3_4.html"><strong aria-hidden="true">3.4.</strong> The shaders</a></li><li class="expanded "><a href="chapter_3_5.html"><strong aria-hidden="true">3.5.</strong> Altering the graphics pipeline</a></li><li class="expanded "><a href="chapter_3_6.html"><strong aria-hidden="true">3.6.</strong> Adding light</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar" class="menu-bar">
+                    <div id="menu-bar-sticky-container">
+                        <div class="left-buttons">
+                            <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                                <i class="fa fa-bars"></i>
+                            </button>
+                            <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                                <i class="fa fa-paint-brush"></i>
+                            </button>
+                            <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                                <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                            </ul>
+                            
+                            <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                                <i class="fa fa-search"></i>
+                            </button>
+                            
+                        </div>
+
+                        <h1 class="menu-title">Learn luminance</h1>
+
+                        <div class="right-buttons">
+                            <a href="print.html" title="Print this book" aria-label="Print this book">
+                                <i id="print-button" class="fa fa-print"></i>
+                            </a>
+                            
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h2><a class="header" href="#creating-a-window-and-preparing-graphics-code" id="creating-a-window-and-preparing-graphics-code">Creating a window and preparing graphics code</a></h2>
+<p>The first thing you want to do is to create a window. This is done via a type you can find in
+<a href="https://crates.io/crates/luminance-glfw">luminance-glfw</a>: <code>GlfwSurface</code>. A <em>graphics surface</em> is a common term yet a bit opaque describing
+a region of memory that accepts getting rendered into. In <a href="https://crates.io/crates/luminance">luminance</a>, it’s also responsible in
+handling all the events related to that surface.</p>
+<p>Creating a new <em>graphics surface</em> relies on several objects you need to decide values for:</p>
+<ul>
+<li>The dimensions of the surface. In our case, we will use a screen resolution of <em>960×540</em> just
+for the sake of the introduction. You create such dimensions with the <code>WindowDim::Windowed</code>
+variant.</li>
+<li>The title of the window. Whether it will get displayed depends on your compositor and window
+manager but pretty much all of them display the title in the top-level location of your window
+as a <em>window decoration property</em>. Titles are encoded as simple <code>&amp;str</code>.</li>
+<li>A set of options to tune the window and system-related features. For now, that last part is too
+advanced and we’ll stick to using the defaults. Use <code>WindowOpt::default()</code>.</li>
+</ul>
+<p>Getting a <code>GlfwSurface</code> might fail, so you need to handle when it fails.</p>
+<p>Once you get your surface, you can start playing with it. How depends on what kind of application
+you want to write. For a video game, a simulation, a demo or an animation program, the following
+<em>event-render</em> loop is enough. You ask for the event handler to check whether events have occurred
+and dequeue them all. Once you’re done, you render a frame, and you loop back.</p>
+<p>You quit the application if the window gets closed by the user or if they enter the <em>escape</em> key.</p>
+<pre><pre class="playpen"><code class="language-rust">use luminance_glfw::{Action, GlfwSurface, Key, Surface as _, WindowDim, WindowEvent, WindowOpt};
+use std::process::exit;
+
+fn main() {
+  // our graphics surface
+  let surface = GlfwSurface::new(
+    WindowDim::Windowed(960, 540),
+    &quot;Hello, world!&quot;,
+    WindowOpt::default()
+  );
+
+  match surface {
+    Ok(surface) =&gt; {
+      eprintln!(&quot;graphics surface created&quot;);
+      main_loop(surface);
+    }
+
+    Err(e) =&gt; {
+      eprintln!(&quot;cannot create graphics surface:\n{}&quot;, e);
+      exit(1);
+    }
+  }
+}
+
+fn main_loop(mut surface: GlfwSurface) {
+  'app: loop {
+    // handle events
+    for event in surface.poll_events() {
+      match event {
+        WindowEvent::Close | WindowEvent::Key(Key::Escape, _, Action::Release, _) =&gt; break 'app,
+        _ =&gt; ()
+      }
+    }
+
+    // rendering code goes here
+
+    // swap buffer chains
+    surface.swap_buffers();
+  }
+}
+</code></pre></pre>
+<p><a href="https://docs.rs/luminance-windowing/latest/luminance_windowing/trait.Surface.html#tymethod.poll_events"><code>Surface::poll_events</code></a> allows you to have a look whether you need to dequeue events. If no event
+is present in the event queue, that function exits immediately instead of blocking for an event.
+That allows you to keep maintaining a constant frame rate.</p>
+<p><a href="https://docs.rs/luminance-windowing/latest/luminance_windowing/trait.Surface.html#tymethod.swap_buffers"><code>Surface::swap_buffers</code></a> takes the graphics <em>back</em> buffer linked to your application and swaps it
+with the <em>front</em> buffer, which is the one exposed on your screen. That technique is commonly
+referred to as <a href="https://en.wikipedia.org/wiki/Multiple_buffering">double buffering</a>. With <a href="https://crates.io/crates/luminance">luminance</a>, all the renders must eventually end up in the
+<em>back</em> buffer so that they get swapped at the end of the main loop. It’s important to notice — and
+you will see in future tutorials — that you don’t necessarily have to make your renders <em>directly</em>
+into the back buffer. More on that later… ;)</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="chapter_1_1.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="chapter_1_3.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a href="chapter_1_1.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a href="chapter_1_3.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+        
+        
+        <script type="text/javascript">
+            window.playpen_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>

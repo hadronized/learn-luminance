@@ -1,0 +1,1731 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Learn luminance</title>
+        
+        <meta name="robots" content="noindex" />
+        
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "light" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div id="sidebar-scrollbox" class="sidebar-scrollbox">
+                <ol class="chapter"><li class="expanded affix "><a href="introduction.html">Introduction</a></li><li class="expanded affix "><a href="crate-setup.html">Crate setup</a></li><li class="expanded "><a href="chapter_1.html"><strong aria-hidden="true">1.</strong> Hello, World!</a></li><li><ol class="section"><li class="expanded "><a href="chapter_1_1.html"><strong aria-hidden="true">1.1.</strong> Getting started</a></li><li class="expanded "><a href="chapter_1_2.html"><strong aria-hidden="true">1.2.</strong> Creating a window and preparing graphics code</a></li><li class="expanded "><a href="chapter_1_3.html"><strong aria-hidden="true">1.3.</strong> Changing the background color</a></li></ol></li><li class="expanded "><a href="chapter_2.html"><strong aria-hidden="true">2.</strong> Your first triangle</a></li><li><ol class="section"><li class="expanded "><a href="chapter_2_1.html"><strong aria-hidden="true">2.1.</strong> What is a triangle?</a></li><li class="expanded "><a href="chapter_2_2.html"><strong aria-hidden="true">2.2.</strong> Shady triangle</a></li><li class="expanded "><a href="chapter_2_3.html"><strong aria-hidden="true">2.3.</strong> Rendering our triangle</a></li></ol></li><li class="expanded "><a href="chapter_3.html"><strong aria-hidden="true">3.</strong> Wavefront .obj loader</a></li><li><ol class="section"><li class="expanded "><a href="chapter_3_1.html"><strong aria-hidden="true">3.1.</strong> The Wavefront .obj format</a></li><li class="expanded "><a href="chapter_3_2.html"><strong aria-hidden="true">3.2.</strong> Defining our vertex type</a></li><li class="expanded "><a href="chapter_3_3.html"><strong aria-hidden="true">3.3.</strong> Loading an .obj object</a></li><li class="expanded "><a href="chapter_3_4.html"><strong aria-hidden="true">3.4.</strong> The shaders</a></li><li class="expanded "><a href="chapter_3_5.html"><strong aria-hidden="true">3.5.</strong> Altering the graphics pipeline</a></li><li class="expanded "><a href="chapter_3_6.html"><strong aria-hidden="true">3.6.</strong> Adding light</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar" class="menu-bar">
+                    <div id="menu-bar-sticky-container">
+                        <div class="left-buttons">
+                            <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                                <i class="fa fa-bars"></i>
+                            </button>
+                            <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                                <i class="fa fa-paint-brush"></i>
+                            </button>
+                            <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                                <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                            </ul>
+                            
+                            <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                                <i class="fa fa-search"></i>
+                            </button>
+                            
+                        </div>
+
+                        <h1 class="menu-title">Learn luminance</h1>
+
+                        <div class="right-buttons">
+                            <a href="print.html" title="Print this book" aria-label="Print this book">
+                                <i id="print-button" class="fa fa-print"></i>
+                            </a>
+                            
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#learn-luminance" id="learn-luminance">Learn luminance</a></h1>
+<p>You’re here because you want to learn luminance. Here is the chapter summary.</p>
+<h2><a class="header" href="#everything-you-should-know-before-jumping-in" id="everything-you-should-know-before-jumping-in">Everything you should know before jumping in</a></h2>
+<p>Let’s just list everything you want to know before learning:</p>
+<ul>
+<li>The <a href="https://github.com/phaazon/luminance-rs">official GitHub repository</a></li>
+<li>The <a href="https://github.com/phaazon/luminance-rs/blob/master/luminance/examples/README.md">luminance examples</a>.
+Those are useful when you know what you are looking for and would like to see quickly how to do
+it with luminance, or just to have a rough idea of what’s supported.</li>
+<li>Spotted a bug? A performance issue? You need a feature that’s not already available? Shoot it
+<a href="https://github.com/phaazon/luminance-rs/issues">here</a>.</li>
+</ul>
+<h1><a class="header" href="#crate-setup" id="crate-setup">Crate setup</a></h1>
+<p>First thing first: this book is written against this following luminance crate setup:</p>
+<pre><code class="language-toml">luminance = &quot;0.37&quot;
+luminance-derive = &quot;0.5&quot;
+luminance-windowing = &quot;0.8&quot;
+luminance-glfw = &quot;0.11&quot;
+luminance-glutin = &quot;0.6&quot;
+</code></pre>
+<p>If you are using a version from crates.io that si more recent that this current book, feel free to
+ask via an <a href="https://github.com/phaazon/luminance-rs/issues">issue</a> to update the book! The goal is to keep it
+as updated as possible, but it might happen it lags a bit behind. Sorry for that.</p>
+<h1><a class="header" href="#introduction-to-luminance-for-newcomers" id="introduction-to-luminance-for-newcomers">Introduction to luminance for newcomers</a></h1>
+<p>Hello there. You’ve hit that page because you’re wondering how <a href="https://crates.io/crates/luminance">luminance</a> is supposed to be used.
+You’ve come to the right place. This document is an introduction to <a href="https://crates.io/crates/luminance">luminance</a>, its ways of doing
+<em>graphics programming</em> and how to write your first graphics application, the fun way!</p>
+<p>Let’s not waste time.</p>
+<p><img src="./imgs/hello-world.png" alt="" /></p>
+<h1><a class="header" href="#getting-started" id="getting-started">Getting started</a></h1>
+<p>You’ll need some prerequisites:</p>
+<table><thead><tr><th>Prerequisite</th><th>How to get / resolve</th></tr></thead><tbody>
+<tr><td><code>rustup</code></td><td><a href="https://rustup.rs">https://rustup.rs</a></td></tr>
+<tr><td>An up to date <code>rustc</code> compiler</td><td><code>rustup update stable &amp;&amp; rustup default stable</code></td></tr>
+</tbody></table>
+<p>Let’s create a new <em>Rust</em> project in your <code>~/dev</code> directory, for instance. We’ll name the project
+<code>luminance-hello-world</code>.</p>
+<pre><code>mkdir ~/dev # choose any other directory that suits you
+cd ~/dev
+cargo new --bin luminance-first-steps
+</code></pre>
+<p>Then we need to add <a href="https://crates.io/crates/luminance">luminance</a> as a dependency to our project. Edit your <code>Cargo.toml</code> file and
+change the <code>[dependencies]</code> section according to the following:</p>
+<pre><code class="language-toml">[dependencies]
+luminance = &quot;0.37&quot;
+luminance-glfw = &quot;0.11&quot;
+</code></pre>
+<p>Some explanations here:</p>
+<ul>
+<li><a href="https://crates.io/crates/luminance">luminance</a> is the core crate and contains everything that abstracts over GPU graphics
+capabilities. You will mostly use that crate to write graphics code.</li>
+<li><a href="https://crates.io/crates/luminance-glfw">luminance-glfw</a> is a <em>windowing</em> implementation crate for <a href="https://crates.io/crates/luminance">luminance</a>. There are several crates
+available for that, depending on the platform you expect to run on. <a href="https://crates.io/crates/luminance-glfw">luminance-glfw</a> supports a
+lot of platforms so you should be good to start (plus it’s pretty easy). Windowing code allows
+to ask your system create a window, handle inputs such as keypresses, mouse movements, touch,
+etc. etc.</li>
+</ul>
+<p>Optional but highly recommended: install <a href="https://crates.io/crates/cargo-watch">cargo-watch</a>. That tool allows you to have a <code>cargo</code>
+loop updating every time a code file in your project changes. You can set it up to re-compile,
+re-check, re-test, re-run or even re-doc… Very handy.</p>
+<pre><code>cargo install cargo-watch
+</code></pre>
+<p>You’re now ready to get started.</p>
+<h2><a class="header" href="#creating-a-window-and-preparing-graphics-code" id="creating-a-window-and-preparing-graphics-code">Creating a window and preparing graphics code</a></h2>
+<p>The first thing you want to do is to create a window. This is done via a type you can find in
+<a href="https://crates.io/crates/luminance-glfw">luminance-glfw</a>: <code>GlfwSurface</code>. A <em>graphics surface</em> is a common term yet a bit opaque describing
+a region of memory that accepts getting rendered into. In <a href="https://crates.io/crates/luminance">luminance</a>, it’s also responsible in
+handling all the events related to that surface.</p>
+<p>Creating a new <em>graphics surface</em> relies on several objects you need to decide values for:</p>
+<ul>
+<li>The dimensions of the surface. In our case, we will use a screen resolution of <em>960×540</em> just
+for the sake of the introduction. You create such dimensions with the <code>WindowDim::Windowed</code>
+variant.</li>
+<li>The title of the window. Whether it will get displayed depends on your compositor and window
+manager but pretty much all of them display the title in the top-level location of your window
+as a <em>window decoration property</em>. Titles are encoded as simple <code>&amp;str</code>.</li>
+<li>A set of options to tune the window and system-related features. For now, that last part is too
+advanced and we’ll stick to using the defaults. Use <code>WindowOpt::default()</code>.</li>
+</ul>
+<p>Getting a <code>GlfwSurface</code> might fail, so you need to handle when it fails.</p>
+<p>Once you get your surface, you can start playing with it. How depends on what kind of application
+you want to write. For a video game, a simulation, a demo or an animation program, the following
+<em>event-render</em> loop is enough. You ask for the event handler to check whether events have occurred
+and dequeue them all. Once you’re done, you render a frame, and you loop back.</p>
+<p>You quit the application if the window gets closed by the user or if they enter the <em>escape</em> key.</p>
+<pre><pre class="playpen"><code class="language-rust">use luminance_glfw::{Action, GlfwSurface, Key, Surface as _, WindowDim, WindowEvent, WindowOpt};
+use std::process::exit;
+
+fn main() {
+  // our graphics surface
+  let surface = GlfwSurface::new(
+    WindowDim::Windowed(960, 540),
+    &quot;Hello, world!&quot;,
+    WindowOpt::default()
+  );
+
+  match surface {
+    Ok(surface) =&gt; {
+      eprintln!(&quot;graphics surface created&quot;);
+      main_loop(surface);
+    }
+
+    Err(e) =&gt; {
+      eprintln!(&quot;cannot create graphics surface:\n{}&quot;, e);
+      exit(1);
+    }
+  }
+}
+
+fn main_loop(mut surface: GlfwSurface) {
+  'app: loop {
+    // handle events
+    for event in surface.poll_events() {
+      match event {
+        WindowEvent::Close | WindowEvent::Key(Key::Escape, _, Action::Release, _) =&gt; break 'app,
+        _ =&gt; ()
+      }
+    }
+
+    // rendering code goes here
+
+    // swap buffer chains
+    surface.swap_buffers();
+  }
+}
+</code></pre></pre>
+<p><a href="https://docs.rs/luminance-windowing/latest/luminance_windowing/trait.Surface.html#tymethod.poll_events"><code>Surface::poll_events</code></a> allows you to have a look whether you need to dequeue events. If no event
+is present in the event queue, that function exits immediately instead of blocking for an event.
+That allows you to keep maintaining a constant frame rate.</p>
+<p><a href="https://docs.rs/luminance-windowing/latest/luminance_windowing/trait.Surface.html#tymethod.swap_buffers"><code>Surface::swap_buffers</code></a> takes the graphics <em>back</em> buffer linked to your application and swaps it
+with the <em>front</em> buffer, which is the one exposed on your screen. That technique is commonly
+referred to as <a href="https://en.wikipedia.org/wiki/Multiple_buffering">double buffering</a>. With <a href="https://crates.io/crates/luminance">luminance</a>, all the renders must eventually end up in the
+<em>back</em> buffer so that they get swapped at the end of the main loop. It’s important to notice — and
+you will see in future tutorials — that you don’t necessarily have to make your renders <em>directly</em>
+into the back buffer. More on that later… ;)</p>
+<h2><a class="header" href="#changing-the-background-color" id="changing-the-background-color">Changing the background color</a></h2>
+<p>We’re getting to the interesting things. Before trying to render cool rotating cubes, we need to
+understand how graphics rendering works with <a href="https://crates.io/crates/luminance">luminance</a>.</p>
+<p><a href="https://crates.io/crates/luminance">luminance</a> has a special way of encoding renders. Instead of giving you all the GPU power right
+away, it constrains you to pretty much none. That seems insane but you will eventually recognize
+that such a way of doing is actually pretty useful.</p>
+<p>To render something, you need several resources. The first resource is a <em>frame buffer</em>. A frame
+buffer, encoded with <a href="https://docs.rs/luminance/latest/luminance/framebuffer/struct.Framebuffer.html"><code>Framebuffer</code></a>, is a special GPU resource that holds <em>frames</em>, i.e. the
+pixel storage for renders!</p>
+<blockquote>
+<p>So… is the <em>back</em> buffer you told us earlier some kind of <a href="https://docs.rs/luminance/latest/luminance/framebuffer/struct.Framebuffer.html"><code>Framebuffer</code></a>?</p>
+</blockquote>
+<p>It’s not <em>some</em> kind: it’s a <a href="https://docs.rs/luminance/latest/luminance/framebuffer/struct.Framebuffer.html"><code>Framebuffer</code></a>. And guess what: you can access it via the
+<a href="https://docs.rs/luminance-windowing/latest/luminance_windowing/trait.Surface.html#method.back_buffer"><code>Surface::back_buffer</code></a> method.</p>
+<p>So, let’s make our first cool render and make a color-varying background! First, you will need to
+import one symbol from <a href="https://crates.io/crates/luminance">luminance</a>: <a href="https://docs.rs/luminance/latest/luminance/context/trait.GraphicsContext.html"><code>GraphicsContext</code></a>, which is a trait that allows you to run
+<a href="https://crates.io/crates/luminance">luminance</a> code and talk to the GPU. We will also use <a href="https://doc.rust-lang.org/std/time/struct.Instant.html"><code>Instant</code></a>, from the standard library, to
+handle low-precision yet sufficient time points.</p>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>use luminance::context::GraphicsContext as _;
+use std::time::Instant;
+<span class="boring">}
+</span></code></pre></pre>
+<blockquote>
+<p>We don’t need, so far, to have access to the <a href="https://docs.rs/luminance/latest/luminance/context/trait.GraphicsContext.html"><code>GraphicsContext</code></a> symbol — we just need the
+implementors.</p>
+</blockquote>
+<p>Now, let’s get our <em>back</em> buffer.</p>
+<pre><pre class="playpen"><code class="language-rust">fn main_loop(mut surface: GlfwSurface) {
+  let start_t = Instant::now();
+  let back_buffer = surface.back_buffer().unwrap();
+
+  'app: loop {
+    // …
+</code></pre></pre>
+<p>As you can see, getting the <em>back</em> buffer is piece of cake. Now let’s handle that color.</p>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>    // rendering code goes here
+    // get the current time and create a color based on the time
+    let t = start_t.elapsed().as_millis() as f32 * 1e-3;
+    let color = [t.cos(), t.sin(), 0.5, 1.];
+
+    surface.pipeline_builder().pipeline(&amp;back_buffer, color, |_, _| ());
+
+    // swap buffer chains
+    surface.swap_buffers();
+<span class="boring">}
+</span></code></pre></pre>
+<p>That’s already a lot of code to discuss. <code>surface.pipeline_builder()</code> gets a lightweight object
+that you can use to create <em>graphics pipelines</em> — its type is <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.Builder.html"><code>Builder</code></a>. You can get that type
+once and for all and keep it around if you want to but in our case, since we’re only going to create
+a single pipeline, we’ll just chain everything.</p>
+<p>Then, the <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.Builder.html#method.pipeline"><code>Builder::pipeline</code></a> function, applied to the <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.Builder.html"><code>Builder</code></a> object, creates a graphics
+pipeline. A graphics pipeline is just a strongly typed description of what a GPU should do in order
+to render <em>things</em> into a <a href="https://docs.rs/luminance/latest/luminance/framebuffer/struct.Framebuffer.html"><code>Framebuffer</code></a>. You can picture pipelines as <a href="https://en.wikipedia.org/wiki/Abstract_syntax_tree">AST</a>s in which each node
+represents a given resource sharing and leaves are actual renders.</p>
+<blockquote>
+<p>More on <a href="https://docs.rs/luminance/latest/luminance/index.html#understanding-the-pipeline-architecture">pipelines here</a>.</p>
+</blockquote>
+<p>In our case, we don’t want to render anything, we just want to modify the <em>back</em> buffer background
+color. That is done with the arguments you pass to <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.Builder.html#method.pipeline"><code>Builder::pipeline</code></a>. The first one is the
+frame buffer to render to. In our case, it’s our <em>back</em> buffer.</p>
+<p>The second argument is the background color. Everytime you perform a render into a frame buffer, you
+<em>need</em> to provide that color as the frame buffer’s storage will be cleared with that value (color
+buffer, for short). It is possible to tell <a href="https://crates.io/crates/luminance">luminance</a> not to clear color buffers but this is off
+topic.</p>
+<p>The third and last argument is a <em>closure</em> you need to pass. That closure will be called as soon as
+the frame buffer is ready to receive a render. All this code is fully <em>synchronous</em> though, so
+lifetimes are enforced. In our case, since we’re not interested into making any actual render,
+we just pass a closure that does nothing. More on its two arguments later.</p>
+<p>You should obtain a window with a varying color, such as the following screenshot.</p>
+<p><img src="./imgs/hello-world.png" alt="" /></p>
+<p>The complete code is:</p>
+<pre><pre class="playpen"><code class="language-rust">use luminance::context::GraphicsContext as _;
+use luminance_glfw::{Action, GlfwSurface, Key, Surface as _, WindowDim, WindowEvent, WindowOpt};
+use std::process::exit;
+use std::time::Instant;
+
+fn main() {
+  let surface = GlfwSurface::new(WindowDim::Windowed(960, 540), &quot;Hello, world!&quot;, WindowOpt::default());
+
+  match surface {
+    Ok(surface) =&gt; {
+      eprintln!(&quot;graphics surface created&quot;);
+      main_loop(surface);
+    }
+
+    Err(e) =&gt; {
+      eprintln!(&quot;cannot create graphics surface:\n{}&quot;, e);
+      exit(1);
+    }
+  }
+}
+
+fn main_loop(mut surface: GlfwSurface) {
+  let start_t = Instant::now();
+  let back_buffer = surface.back_buffer().unwrap();
+
+  'app: loop {
+    // handle events
+    for event in surface.poll_events() {
+      match event {
+        WindowEvent::Close | WindowEvent::Key(Key::Escape, _, Action::Release, _) =&gt; break 'app,
+        _ =&gt; ()
+      }
+    }
+
+    // rendering code goes here
+    // get the current time and create a color based on the time
+    let t = start_t.elapsed().as_millis() as f32 * 1e-3;
+    let color = [t.cos(), t.sin(), 0.5, 1.];
+
+    surface.pipeline_builder().pipeline(&amp;back_buffer, color, |_, _| ());
+
+    // swap buffer chains
+    surface.swap_buffers();
+  }
+}
+</code></pre></pre>
+<h1><a class="header" href="#render-your-first-triangle" id="render-your-first-triangle">Render your first triangle</a></h1>
+<p>Now you know how to create a <em>graphics pipeline</em> and change the <em>frame buffer</em> background color.
+Let’s get to more exciting things, shall we.</p>
+<p>We are going to render a single triangle on screen. It will have its <em>vertices</em> with a different
+color (one red, one green, one blue) and will be filled by a color gradient between the three
+colors.</p>
+<p><img src="./imgs/your_first_triangle.png" alt="" /></p>
+<h1><a class="header" href="#what-is-a-triangle" id="what-is-a-triangle">What is a triangle?</a></h1>
+<p>Everyone knows what a triangle is… but what is a triangle on your GPU? In <a href="https://crates.io/crates/luminance">luminance</a>, a triangle
+can be <em>represented</em> in lots of ways. In our case:</p>
+<ul>
+<li>A triangle has three vertices.</li>
+<li>Each vertex has a position in 2D, represented by two floating point values on 32-bit.</li>
+<li>Each vertex has a color, represented as RGB.</li>
+</ul>
+<p>The first thing to do is to create… types. You will see throughout this wiki that <a href="https://crates.io/crates/luminance">luminance</a> is
+very type-oriented. Don’t freak out. <a href="https://crates.io/crates/luminance">luminance</a> requires you to define your type in a way it can
+acknowledge how vertices’ data are formed. The following, for instance, will not work:</p>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>type Position = (f32, f32);
+type RGB = (u8, u8, u8);
+type Vertex = (Position, RGB);
+<span class="boring">}
+</span></code></pre></pre>
+<p>But the real vertex definition is very, very similar. Hang on.</p>
+<h2><a class="header" href="#defining-your-vertex-type" id="defining-your-vertex-type">Defining your vertex type</a></h2>
+<p>In order to define our vertex type, we need to create a <code>struct</code> that will implement the <a href="https://docs.rs/luminance/latest/luminance/vertex/trait.Vertex.html"><code>Vertex</code></a>
+trait. That trait requires various information to be provided by the implementor and you don’t even
+have to worry about those because a crate exists to automatically implement such a trait:
+<a href="https://crates.io/crates/luminance-derive">luminance-derive</a>.</p>
+<p>First thing first: add <a href="https://crates.io/crates/luminance-derive">luminance-derive</a> to your project’s <code>[dependencies]</code> section:</p>
+<pre><code class="language-toml">luminance-derive = &quot;0.5&quot;
+</code></pre>
+<p>Simple. One last thing: when you will use the <code>Vertex</code> derive annotation, you will have to provide
+a <em>vertex semantics</em> type, implementing the <a href="https://docs.rs/luminance/latest/luminance/vertex/trait.Semantics.html"><code>Semantics</code></a> trait. Again, you don’t have to implement
+such a trait by hand: <a href="https://crates.io/crates/luminance-derive">luminance-derive</a> will do everything for us.</p>
+<p>Vertex semantics are a way to tell <a href="https://crates.io/crates/luminance">luminance</a> what the relationship between <em>all</em> objects you
+intend to create and the way they will be rendered is about. In our case, we just only need two
+semantics: <em>vertex positions</em> and <em>vertex colors</em>. Let’s create our semantics type:</p>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>use luminance_derive::Semantics;
+<span class="boring">}
+</span></code></pre></pre>
+<p>Our proc-macro derive, yay. Let’s use it:</p>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>#[derive(Copy, Clone, Debug, Semantics)]
+pub enum VertexSemantics {
+  #[sem(name = &quot;position&quot;, repr = &quot;[f32; 2]&quot;, wrapper = &quot;VertexPosition&quot;)]
+  Position,
+  #[sem(name = &quot;color&quot;, repr = &quot;[u8; 3]&quot;, wrapper = &quot;VertexRGB&quot;)]
+  Color
+}
+<span class="boring">}
+</span></code></pre></pre>
+<blockquote>
+<p>Woah, that’s a lot of new syntax!</p>
+</blockquote>
+<p>Indeed, let’s dig the syntax:</p>
+<ul>
+<li>The <code>Semantics</code> derive annotation marks an <code>enum</code> as being representative of <em>vertex semantics</em>.
+Currently, nothing else than <code>enum</code>s are supported.</li>
+<li>The type implementing <code>Semantics</code> must also implement <a href="https://doc.rust-lang.org/std/marker/trait.Copy.html"><code>Copy</code></a>, <a href="https://doc.rust-lang.org/std/clone/trait.Clone.html"><code>Clone</code></a> and <a href="https://doc.rust-lang.org/std/fmt/trait.Debug.html"><code>Debug</code></a>.</li>
+<li>Each variant of the <code>enum</code> represents a distinct <em>vertex semantics</em>.</li>
+<li>The syntax <code>#[sem(..)]</code> provides several mandatory information:
+<ul>
+<li>The <code>name = &quot;position&quot;</code> annotation gives <a href="https://crates.io/crates/luminance">luminance</a> a way to recognize the semantics in
+<em>shader stages</em>. You don’t have to worry about what it means so far but keep in mind that
+identifier must be unique.</li>
+<li><code>repr = &quot;[f32; 2]&quot;</code> tells which is the underlying expected type of the semantics. That
+constructs a strongly-typed assumption about the semantics. A <code>&quot;position&quot;</code> is a 2D <code>f32</code>.
+Period. You have a large list of type you can use here but you are limited to the implementors
+of <a href="https://docs.rs/luminance/latest/luminance/vertex/trait.VertexAttrib.html"><code>VertexAttrib</code></a>.</li>
+<li>The <code>wrapper = &quot;VertexPosition&quot;</code> annotation generates a new type called <code>VertexPosition</code> and
+in scope in the module you declared the <code>enum</code>. That type is the only one which is recognized
+as being usable with the <code>Semantics</code> <code>enum</code> you just declared — it implements the
+<a href="https://docs.rs/luminance/latest/luminance/vertex/trait.HasSemantics.html"><code>HasSemantics</code></a> trait for which <code>HasSemantics::Sem = VertexSemantics</code>.</li>
+</ul>
+</li>
+</ul>
+<p>All of this might be a bit confusing; let’s clarify even further. When you declare an <code>enum</code>
+annotated with <code>#[derive(Copy, Clone, Debug, Semantics)]</code>, <a href="https://crates.io/crates/luminance-derive">luminance-derive</a> does automatically
+implement <a href="https://docs.rs/luminance/latest/luminance/vertex/trait.Semantics.html"><code>Semantics</code></a> for you and generate as many types as variants in your <code>enum</code>. Those types
+represent <em>vertex attributes</em> types you will be able to use to construct types that will correctly
+implement the <a href="https://docs.rs/luminance/latest/luminance/vertex/trait.Vertex.html"><code>Vertex</code></a> trait.</p>
+<p>Talking about <a href="https://docs.rs/luminance/latest/luminance/vertex/trait.Vertex.html"><code>Vertex</code></a>, let’s go and define our vertex type. The <code>Vertex</code> derive annotation works
+only on <code>struct</code>s, so let’s create one. Import the <code>Vertex</code> proc-macro first:</p>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>use luminance_derive::{Semantics, Vertex};
+<span class="boring">}
+</span></code></pre></pre>
+<p>And then define your <code>Vertex</code> type (it’s possible to use the same typename because proc-macro won’t
+clash with types):</p>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>#[derive(Vertex)]
+#[vertex(sem = &quot;VertexSemantics&quot;)]
+pub struct Vertex {
+  position: VertexPosition,
+  #[vertex(normalized = &quot;true&quot;)]
+  color: VertexRGB
+}
+<span class="boring">}
+</span></code></pre></pre>
+<p>A new syntax! So:</p>
+<ul>
+<li>The <code>Vertex</code> derive annotation marks a <code>struct</code> as being a valid <em>vertex</em> type. Currently, only
+<code>struct</code> with fields are supported.</li>
+<li>The <code>#[vertex(sem = &quot;VertexSemantics&quot;)]</code> provides a mapping to a type that represents your
+<em>vertex semantics</em>.</li>
+<li>Each field must have a type that implements <code>HasSemantics&lt;Sem = VertexSemantics&gt;</code> in that case.
+Don’t forget about the <code>wrapper</code> types that got generated with the <code>Semantics</code> derive: those
+types are valid as fields’ types here.</li>
+<li>The special <code>#[vertex(normalized = &quot;true&quot;)]</code> annotation marks a field as being <em>normalized</em>.
+Normalized fields make sense when the field has an integral type, such as <code>[u8; 3]</code>, which is
+<em>unsigned integral</em>. When trying to fetch normalized vertex attribute, a <em>shader stage</em> will get
+normalized floating point numbers (lying in <code>[0; 1]</code>) instead of the typical e.g. <code>[0; 255]</code>.</li>
+</ul>
+<p>And we are good to go as our vertex type is now live!</p>
+<blockquote>
+<p>Some notes: the generated wrapper types have some useful methods and implementors. You can get
+a list easily by running <code>cargo doc --open</code>.</p>
+</blockquote>
+<h2><a class="header" href="#defining-a-triangle" id="defining-a-triangle">Defining a triangle</a></h2>
+<p>A triangle is just three points — three vertices. Let’s define them.</p>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>const VERTICES: [Vertex; 3] = [
+  Vertex { position: VertexPosition::new([-0.5, -0.5]), color: VertexRGB::new([255,   0,   0]) },
+  Vertex { position: VertexPosition::new([ 0.5, -0.5]), color: VertexRGB::new([  0, 255,   0]) },
+  Vertex { position: VertexPosition::new([  0.,  0.5]), color: VertexRGB::new([  0,   0, 255]) },
+];
+<span class="boring">}
+</span></code></pre></pre>
+<p>It’s that simple.</p>
+<blockquote>
+<p>Disclaimer: an on-going patch will soon allow to build vertices with <code>const fn</code> at the vertex type
+level too; not only the vertex attributes.</p>
+</blockquote>
+<h2><a class="header" href="#the-final-part-of-the-recipe-gpu-tessellations" id="the-final-part-of-the-recipe-gpu-tessellations">The final part of the recipe: GPU tessellations</a></h2>
+<blockquote>
+<p>Tessellations?</p>
+</blockquote>
+<p>In <a href="https://crates.io/crates/luminance">luminance</a>, everything that has a <em>vertex</em> or <em>must be rendered</em> is done via a <em>tessellation</em> as
+described by the <a href="https://docs.rs/luminance/latest/luminance/tess/struct.Tess.html"><code>Tess</code></a> type. GPU tessellations provide information about:</p>
+<ul>
+<li>The nature of the topology of the underlying <em>vertex mesh</em>. That is, zero, one or several
+buffers describing the raw topology of the mesh.</li>
+<li>The way vertices are linked to each other. That is done via several ways that are going to be
+explored in this wiki, but so far, we’ll stick to <em>primitive modes</em>, encoded via the <a href="https://docs.rs/luminance/latest/luminance/tess/enum.Mode.html"><code>Mode</code></a>
+type.</li>
+<li>And a lot of cool features you should be impatient to discover, but everything happens to those
+who wait. ;)</li>
+</ul>
+<p>Creating a <a href="https://docs.rs/luminance/latest/luminance/tess/struct.Tess.html"><code>Tess</code></a> will upload our vertices to the GPU so that we have an object (i.e. <a href="https://docs.rs/luminance/latest/luminance/tess/struct.Tess.html"><code>Tess</code></a>) to
+manipulate and render our triangle. However, one does not simply create a <a href="https://docs.rs/luminance/latest/luminance/tess/struct.Tess.html"><code>Tess</code></a>: we need
+<a href="https://docs.rs/luminance/latest/luminance/tess/struct.TessBuilder.html"><code>TessBuilder</code></a>, which follows the [builder pattern].</p>
+<p><img src="./imgs/one-does-not-simply-create-tess-without-builder.jpg" alt="" /></p>
+<p>Let’s see the code to create our <a href="https://docs.rs/luminance/latest/luminance/tess/struct.Tess.html"><code>Tess</code></a> via <a href="https://docs.rs/luminance/latest/luminance/tess/struct.TessBuilder.html"><code>TessBuilder</code></a>.</p>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>use luminance::tess::{Mode, TessBuilder};
+<span class="boring">}
+</span></code></pre></pre>
+<p>You really thought you wouldn’t need to import those?</p>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>// at the beginning of main_loop
+let triangle = TessBuilder::new(&amp;mut surface)
+  .add_vertices(VERTICES)
+  .set_mode(Mode::Triangle)
+  .build()
+  .unwrap();
+<span class="boring">}
+</span></code></pre></pre>
+<p>If you don’t specify the <a href="https://docs.rs/luminance/latest/luminance/tess/enum.Mode.html"><code>Mode</code></a>, the <a href="https://docs.rs/luminance/latest/luminance/tess/struct.TessBuilder.html"><code>TessBuilder</code></a> defaults to <a href="https://docs.rs/luminance/latest/luminance/tess/enum.Mode.html#variant.Point"><code>Mode::Point</code></a>, which will not
+connect your vertices between them and will leave three independent points on your screen. Also,
+in a production application, you shouldn’t use <code>.unwrap()</code> but instead propagate the error or
+treat it.</p>
+<p>We have everything we need to represent our triangle on GPU with <a href="https://crates.io/crates/luminance">luminance</a>. Let’s go on and see
+how we can render it into our frame buffer.</p>
+<h1><a class="header" href="#shady-triangle" id="shady-triangle">Shady triangle</a></h1>
+<p><a href="https://crates.io/crates/luminance">luminance</a> is not a framework nor a video game engine. By default, it comes with zero data. Hence,
+there is nothing <em>per se</em> that provides <em>materials</em> or that kind of concept. You will have to craft
+it yourself and that is what we are going to do in this section.</p>
+<p>Remember our pipeline creation from the <a href="Hello,-world!">previous</a> chapter? We needed to provide a
+closure taking two arguments. It’s time to explain you what those arguments are for. Let’s take
+the pipeline definition again:</p>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>surface.pipeline_builder().pipeline(&amp;back_buffer, color, |_, _| ());
+<span class="boring">}
+</span></code></pre></pre>
+<p>And rewrite it by using the arguments:</p>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>surface.pipeline_builder().pipeline(&amp;back_buffer, color, |pipeline, shd_gate| {
+  // …
+});
+<span class="boring">}
+</span></code></pre></pre>
+<p>The <code>pipeline</code> argument here represents a <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.Pipeline.html"><code>Pipeline</code></a> and <code>shd_gate</code> a <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.ShadingGate.html"><code>ShadingGate</code></a>.</p>
+<h3><a class="header" href="#the-graphics-pipeline" id="the-graphics-pipeline">The graphics pipeline</a></h3>
+<p>The <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.Pipeline.html"><code>Pipeline</code></a> object you’re given represents a <em>graphics pipeline</em>, which allows you to notify
+the GPU about scarce resources you’re about to use or perform specific tasks. That is pretty
+advanced so we will just ignore that argument and will leave it to <code>_</code>. But let’s explain a bit</p>
+<p>More on that in a future chapter.</p>
+<h3><a class="header" href="#the-shading-gate" id="the-shading-gate">The shading gate</a></h3>
+<p><a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.ShadingGate.html"><code>ShadingGate</code></a> represents a way to <em>shade</em> things. Shading means, like if you had a paper and color
+pens, filling in shapes with colors. <a href="https://crates.io/crates/luminance">luminance</a> works the same way. However, you have no pen and no
+default algorithm to fill your triangle. You need to instruct <a href="https://crates.io/crates/luminance">luminance</a> how to. And to do that,
+you need a small digression in the world of <a href="https://www.khronos.org/opengl/wiki/Core_Language_(GLSL)">GLSL</a> and shaders.</p>
+<p>A <em>shader stage</em> is a piece of code that runs on a GPU. Its inputs and how frequently it will be
+called heavily depend on its kind. The following table gives a better understanding.</p>
+<blockquote>
+<p>Here, frequency doesn’t refer to a frequency in time, but a frequency in GPU resources. You will
+get what it means below.</p>
+</blockquote>
+<table><thead><tr><th>Shader stage type</th><th>Mandatory?</th><th>What it’s for</th><th>Inputs</th><th>Running frequency</th></tr></thead><tbody>
+<tr><td><a href="https://docs.rs/luminance/latest/luminance/shader/stage/enum.Type.html#variant.VertexShader"><code>VertexShader</code></a></td><td>Yes.</td><td>Transforming vertices at the beginning of the pipeline.</td><td>Vertex attributes.</td><td>Once for every vertices that define our <a href="https://docs.rs/luminance/latest/luminance/tess/struct.Tess.html"><code>Tess</code></a>.</td></tr>
+<tr><td><a href="https://docs.rs/luminance/latest/luminance/shader/stage/enum.Type.html#variant.TessellationControlShader"><code>TessellationControlShader</code></a></td><td>No.</td><td>Determines how much a <em>primitive patch</em> must be tessellated.</td><td>Abstract patches.</td><td>At least once for every <em>abstract patches</em> flowing from the <a href="https://docs.rs/luminance/latest/luminance/shader/stage/enum.Type.html#variant.VertexShader"><code>VertexShader</code></a>.</td></tr>
+<tr><td><a href="https://docs.rs/luminance/latest/luminance/shader/stage/enum.Type.html#variant.TessellationEvaluationShader"><code>TessellationEvaluationShader</code></a></td><td>No.</td><td>Transform tessellated patches.</td><td>Abstract patches.</td><td>At least once for every <em>abstract patches</em> flowing from the <em>tessellator</em> that has followed the <a href="https://docs.rs/luminance/latest/luminance/shader/stage/enum.Type.html#variant.TessellationControlShader"><code>TessellationControlShader</code></a>.</td></tr>
+<tr><td><a href="https://docs.rs/luminance/latest/luminance/shader/stage/enum.Type.html#variant.GeometryShader"><code>GeometryShader</code></a></td><td>No.</td><td>Map, filter, add and transform <em>primitives</em>.</td><td>Primitive attributes.</td><td>Once for each primitive patch flowing out from either the <a href="https://docs.rs/luminance/latest/luminance/shader/stage/enum.Type.html#variant.VertexShader"><code>VertexShader</code></a> or <a href="https://docs.rs/luminance/latest/luminance/shader/stage/enum.Type.html#variant.TessellationEvaluationShader"><code>TessellationEvaluationShader</code></a>.</td></tr>
+<tr><td><a href="https://docs.rs/luminance/latest/luminance/shader/stage/enum.Type.html#variant.FragmentShader"><code>FragmentShader</code></a></td><td>Yes.</td><td>Transform <em>rasterized</em> fragments into <em>render target output(s)</em>.</td><td>Rasterized fragment.</td><td>Once for each fragments rasterized from the previous stages.</td></tr>
+</tbody></table>
+<p>Basically, you need to provide some valid <a href="https://www.khronos.org/opengl/wiki/Core_Language_(GLSL)">GLSL</a> code for, at least, the <a href="https://docs.rs/luminance/latest/luminance/shader/stage/enum.Type.html#variant.VertexShader"><code>VertexShader</code></a> and the
+<a href="https://docs.rs/luminance/latest/luminance/shader/stage/enum.Type.html#variant.FragmentShader"><code>FragmentShader</code></a>.</p>
+<blockquote>
+<p>As cool as they are, we will not dig (for this chapter) into the other types of shader stages.</p>
+</blockquote>
+<p>Assembling <em>shader stages</em> yields a <em>shader program</em>, which type is <a href="https://docs.rs/luminance/latest/luminance/shader/program/struct.Program.html"><code>Program</code></a>. Such an object
+can then be used with our <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.ShadingGate.html"><code>ShadingGate</code></a> to shade our triangle! What we need to do here is to
+write:</p>
+<ul>
+<li>A <a href="https://docs.rs/luminance/latest/luminance/shader/stage/enum.Type.html#variant.VertexShader"><code>VertexShader</code></a> in <a href="https://www.khronos.org/opengl/wiki/Core_Language_(GLSL)">GLSL</a> that will simply forwards the vertex attributes to the next stage
+so that those information get available later.</li>
+<li>A <a href="https://docs.rs/luminance/latest/luminance/shader/stage/enum.Type.html#variant.FragmentShader"><code>FragmentShader</code></a> that will read those information and output a single color for each pixel
+of the ~screen~ frame buffer.</li>
+</ul>
+<h3><a class="header" href="#the-vertex-shader" id="the-vertex-shader">The vertex shader</a></h3>
+<blockquote>
+<p>If you don’t know <a href="https://www.khronos.org/opengl/wiki/Core_Language_(GLSL)">GLSL</a>, you’re going to have some hard times but we will try to explain
+everything.</p>
+</blockquote>
+<p>A vertex shader runs for every vertices in your <a href="https://docs.rs/luminance/latest/luminance/tess/struct.Tess.html"><code>Tess</code></a>. In our case, we don’t really want to do
+anything useful with the vertices: we just want them to be drawn on our 2D screen. However, we need
+to tell the next stage (i.e. <a href="https://docs.rs/luminance/latest/luminance/shader/stage/enum.Type.html#variant.FragmentShader"><code>FragmentShader</code></a>) about what makes a <em>vertex</em>. That manual operation
+must be written in the <a href="https://docs.rs/luminance/latest/luminance/shader/stage/enum.Type.html#variant.VertexShader"><code>VertexShader</code></a>.</p>
+<p>In your project, add the <code>src/vs.glsl</code> file and fill it with:</p>
+<pre><code class="language-glsl">// those are our vertex attributes
+in vec2 position;
+in vec3 color;
+
+// this is the output of the vertex shader (we could have had several ones)
+out vec3 v_color;
+
+void main() {
+  // simply forward the color
+  v_color = color;
+
+  // mandatory; tell the GPU to use the position vertex attribute to put the vertex in space
+  gl_Position = vec4(position, 0., 1.);
+}
+</code></pre>
+<h3><a class="header" href="#the-fragment-shader" id="the-fragment-shader">The fragment shader</a></h3>
+<p>A fragment shader runs for every <em>rasterized</em> fragments from the render of your <a href="https://docs.rs/luminance/latest/luminance/tess/struct.Tess.html"><code>Tess</code></a>. Basically,
+your GPU transforms the geometry, projects it, performs several complex operations we end up with
+rasterized data. Rasterized data means to discretize all the vertex attributes. The discretization
+process is based on the resolution of the <em>render target</em> — i.e. the frame buffer outputs.
+Rasterized data will perform, for instance, interpolation of your vertex attributes so that each
+texel (i.e. a frame buffer / texture <em>pixel</em>) has its version of the vertex attribute.</p>
+<p>A rasterized triangle can be imagined as a collection of thousands of texels representing a
+triangle. Each and everyone of them will store a color, in our case, so that it’s easy to render
+that on a screen, store in an image, etc.</p>
+<p>In your project, add the <code>src/fs.glsl</code> file with the following content:</p>
+<pre><code class="language-glsl">// this was the vertex shader output; it’s now our (rasterized and interpolated) input!
+in vec3 v_color;
+
+// we will output a single color
+out vec3 frag_color;
+
+void main() {
+  // KISS
+  frag_color = v_color;
+}
+</code></pre>
+<p>In your <code>src/main.rs</code>, add the following lines:</p>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>const VS_STR: &amp;str = include_str!(&quot;vs.glsl&quot;);
+const FS_STR: &amp;str = include_str!(&quot;fs.glsl&quot;);
+<span class="boring">}
+</span></code></pre></pre>
+<p>And we’re good to go. Let’s create a <a href="https://docs.rs/luminance/latest/luminance/shader/program/struct.Program.html"><code>Program</code></a>. We’ll first need to import the type.</p>
+<h3><a class="header" href="#the-shader-program" id="the-shader-program">The shader program</a></h3>
+<p>A <em>shader program</em> is a collection of <em>shader stages</em>, connecting them to each other. It’s like
+building an actual program by gluing functions to each other. <a href="https://crates.io/crates/luminance">luminance</a> has a very opinionated
+idea of what a GPU shader program is and should be. That opinion will be explained in a future
+chapter. Let’s focus on the simple stuff first.</p>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>use luminance::shader::program::Program;
+<span class="boring">}
+</span></code></pre></pre>
+<p>Then, right before your loop:</p>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>let program: Program&lt;VertexSemantics, (), ()&gt; = Program::from_strings(None, VS_STR, None, FS_STR)
+  .unwrap()
+  .ignore_warnings();
+<span class="boring">}
+</span></code></pre></pre>
+<p>As you can see, you need to provide the <em>vertex semantics type</em> you defined earlier. That enables
+<a href="https://crates.io/crates/luminance">luminance</a> to check whether your <em>shader program</em> is compatible with the <a href="https://docs.rs/luminance/latest/luminance/tess/struct.Tess.html"><code>Tess</code></a> you intend to use
+it with… at compile-time. Ignore the two <code>()</code>, we’ll discuss that later. However, notice the use
+of the [BuiltProgram::ignore_warnings] method: it gives you the actual <a href="https://docs.rs/luminance/latest/luminance/shader/program/struct.Program.html"><code>Program</code></a> by ignoring any
+<em>warnings</em> that might have happened while creating the shader program. You can inspect them if you
+want to but for the purpose of this example, you will not need to.</p>
+<blockquote>
+<p>On a general note, <a href="https://crates.io/crates/luminance">luminance</a> is heavily type-driven. Familiarize yourself with how you can
+drive behavior with types (the <a href="https://doc.rust-lang.org/1.30.0/book/first-edition/generics.html">turbofish syntax</a>, for instance, will be useful).</p>
+</blockquote>
+<h3><a class="header" href="#the-shading-node" id="the-shading-node">The shading node</a></h3>
+<p>The next step is to create a new <em>shading node</em> in your graphics pipeline. This is done via the
+<a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.ShadingGate.html"><code>ShadingGate</code></a>.</p>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>surface.pipeline_builder().pipeline(&amp;back_buffer, color, |_, mut shd_gate| {
+  shd_gate.shade(&amp;program, |_, mut rdr_gate| {
+    // …
+  });
+});
+<span class="boring">}
+</span></code></pre></pre>
+<p>You can see we are getting access to a new type of <em>gate</em> here: a <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.RenderGate.html"><code>RenderGate</code></a>.</p>
+<h1><a class="header" href="#rendering-our-triangle" id="rendering-our-triangle">Rendering our triangle</a></h1>
+<p>A <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.RenderGate.html"><code>RenderGate</code></a> allows to create <em>render nodes</em>. Such nodes will share <a href="https://docs.rs/luminance/latest/luminance/render_state/struct.RenderState.html"><code>RenderState</code></a>s for all
+lower nodes in the graphics pipeline. We will see what we can do with <a href="https://docs.rs/luminance/latest/luminance/render_state/struct.RenderState.html"><code>RenderState</code></a> in a future
+chapter. Currently, we will just use the default one.</p>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>use luminance::render_state::RenderState;
+<span class="boring">}
+</span></code></pre></pre>
+<p>And alter your pipeline:</p>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>surface.pipeline_builder().pipeline(&amp;back_buffer, color, |_, mut shd_gate| {
+  shd_gate.shade(&amp;program, |_, mut rdr_gate| {
+    rdr_gate.render(RenderState::default(), |mut tess_gate| {
+      // …
+    });
+  });
+});
+<span class="boring">}
+</span></code></pre></pre>
+<p>We’re almost there. We’re getting a <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.TessGate.html"><code>TessGate</code></a>, allowing us to render actual tessellations. In
+order to do so, we will need to create a <a href="https://docs.rs/luminance/latest/luminance/tess/struct.TessSlice.html"><code>TessSlice</code></a> out of our <a href="https://docs.rs/luminance/latest/luminance/tess/struct.Tess.html"><code>Tess</code></a>. That enables to slice
+GPU tessellation on the fly fro free. In our case, we want the whole thing (the whole triangle),
+so we will use the [<code>..</code>] operator.</p>
+<blockquote>
+<p>You will need the <a href="https://docs.rs/luminance/latest/luminance/tess/struct.TessSliceIndex.html"><code>TessSliceIndex</code></a> trait to do such a thing.</p>
+</blockquote>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>use luminance::tess::{Mode, TessBuilder, TessSliceIndex as _};
+<span class="boring">}
+</span></code></pre></pre>
+<p>Let’s go and finish it.</p>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>surface.pipeline_builder().pipeline(&amp;back_buffer, color, |_, mut shd_gate| {
+  shd_gate.shade(&amp;program, |_, mut rdr_gate| {
+    rdr_gate.render(RenderState::default(), |mut tess_gate| {
+      tess_gate.render(triangle.slice(..));
+    });
+  });
+});
+<span class="boring">}
+</span></code></pre></pre>
+<p>Compile and run the code. You should see something similar to this:</p>
+<p><img src="imgs/your_first_triangle.png" alt="" /></p>
+<p>The complete code:</p>
+<pre><pre class="playpen"><code class="language-rust">use luminance::context::GraphicsContext as _;
+use luminance::render_state::RenderState;
+use luminance::shader::program::Program;
+use luminance::tess::{Mode, TessBuilder, TessSliceIndex as _};
+use luminance_derive::{Semantics, Vertex};
+use luminance_glfw::{Action, GlfwSurface, Key, Surface as _, WindowDim, WindowEvent, WindowOpt};
+use std::process::exit;
+use std::time::Instant;
+
+#[derive(Copy, Clone, Debug, Semantics)]
+pub enum VertexSemantics {
+  #[sem(name = &quot;position&quot;, repr = &quot;[f32; 2]&quot;, wrapper = &quot;VertexPosition&quot;)]
+  Position,
+  #[sem(name = &quot;color&quot;, repr = &quot;[u8; 3]&quot;, wrapper = &quot;VertexRGB&quot;)]
+  Color
+}
+
+#[derive(Vertex)]
+#[vertex(sem = &quot;VertexSemantics&quot;)]
+pub struct Vertex {
+  position: VertexPosition,
+  #[vertex(normalized = &quot;true&quot;)]
+  color: VertexRGB
+}
+
+const VERTICES: [Vertex; 3] = [
+  Vertex { position: VertexPosition::new([-0.5, -0.5]), color: VertexRGB::new([255,   0,   0]) },
+  Vertex { position: VertexPosition::new([ 0.5, -0.5]), color: VertexRGB::new([  0, 255,   0]) },
+  Vertex { position: VertexPosition::new([  0.,  0.5]), color: VertexRGB::new([  0,   0, 255]) },
+];
+
+const VS_STR: &amp;str = include_str!(&quot;vs.glsl&quot;);
+const FS_STR: &amp;str = include_str!(&quot;fs.glsl&quot;);
+
+fn main() {
+  let surface = GlfwSurface::new(WindowDim::Windowed(960, 540), &quot;Hello, world!&quot;, WindowOpt::default());
+
+  match surface {
+    Ok(surface) =&gt; {
+      eprintln!(&quot;graphics surface created&quot;);
+      main_loop(surface);
+    }
+
+    Err(e) =&gt; {
+      eprintln!(&quot;cannot create graphics surface:\n{}&quot;, e);
+      exit(1);
+    }
+  }
+}
+
+fn main_loop(mut surface: GlfwSurface) {
+  let start_t = Instant::now();
+
+  let back_buffer = surface.back_buffer().unwrap();
+
+  let triangle = TessBuilder::new(&amp;mut surface)
+    .add_vertices(VERTICES)
+    .set_mode(Mode::Triangle)
+    .build()
+    .unwrap();
+
+  let program: Program&lt;VertexSemantics, (), ()&gt; = Program::from_strings(None, VS_STR, None, FS_STR)
+    .unwrap()
+    .ignore_warnings();
+
+  'app: loop {
+    // handle events
+    for event in surface.poll_events() {
+      match event {
+        WindowEvent::Close | WindowEvent::Key(Key::Escape, _, Action::Release, _) =&gt; break 'app,
+        _ =&gt; ()
+      }
+    }
+
+    // rendering code goes here
+    // get the current time and create a color based on the time
+    let t = start_t.elapsed().as_millis() as f32 * 1e-3;
+    let color = [t.cos(), t.sin(), 0.5, 1.];
+
+    surface.pipeline_builder().pipeline(&amp;back_buffer, color, |_, mut shd_gate| {
+      shd_gate.shade(&amp;program, |_, mut rdr_gate| {
+        rdr_gate.render(RenderState::default(), |mut tess_gate| {
+          tess_gate.render(triangle.slice(..));
+        });
+      });
+    });
+
+    // swap buffer chains
+    surface.swap_buffers();
+  }
+}
+</code></pre></pre>
+<h1><a class="header" href="#wavefront-obj-loader" id="wavefront-obj-loader">Wavefront .obj loader</a></h1>
+<p>In the previous chapter, we saw how to render a single triangle by using several concepts:</p>
+<ul>
+<li><a href="https://docs.rs/luminance/latest/luminance/vertex/trait.Vertex.html"><code>Vertex</code></a> and <a href="https://docs.rs/luminance/latest/luminance/vertex/trait.Semantics.html"><code>Semantics</code></a> types to define what vertices can be.</li>
+<li><a href="https://docs.rs/luminance/latest/luminance/tess/enum.Mode.html"><code>Mode</code></a>, <a href="https://docs.rs/luminance/latest/luminance/tess/struct.Tess.html"><code>Tess</code></a> and its <a href="https://docs.rs/luminance/latest/luminance/tess/struct.TessBuilder.html"><code>TessBuilder</code></a> companion type to build GPU tessellations.</li>
+<li><a href="https://docs.rs/luminance/latest/luminance/shader/stage/enum.Type.html#variant.VertexShader"><code>VertexShader</code></a>, <a href="https://docs.rs/luminance/latest/luminance/shader/stage/enum.Type.html#variant.FragmentShader"><code>FragmentShader</code></a> and <a href="https://docs.rs/luminance/latest/luminance/shader/program/struct.Program.html"><code>Program</code></a> to create shaders.</li>
+<li><a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.Pipeline.html"><code>Pipeline</code></a>, <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.ShadingGate.html"><code>ShadingGate</code></a>, <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.RenderGate.html"><code>RenderGate</code></a> and <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.TessGate.html"><code>TessGate</code></a> to create graphics pipelines.</li>
+</ul>
+<p>In this chapter, we will see how we can write a <a href="https://en.wikipedia.org/wiki/Wavefront_.obj_file">Wavefront .obj</a> viewer.</p>
+<p><img src="./imgs/suzanne_lit.png" alt="" /></p>
+<h1><a class="header" href="#the-wavefront-obj-format" id="the-wavefront-obj-format">The Wavefront .obj format</a></h1>
+<blockquote>
+<p><em>A what?!</em></p>
+</blockquote>
+<p>The <a href="https://en.wikipedia.org/wiki/Wavefront_.obj_file">Wavefront .obj</a> file format is a format that describes 3D data in a very simple manner. It is
+a text format that has been around the graphics and 3D industry for a while now. Open and widely
+adopted by the graphics community, it’s often criticized for its lack of modern features.
+Nevertheless, it is a very popular format, simple to parse and contains enough information for a lot
+of applications. Applications such as Z-Brush, Blender or 3Ds Max have full support for such a
+format so it’s a perfect match for our community concerns.</p>
+<p>Because we do not care about the actual format definition nor implementing a parser, we will use the
+<a href="https://crates.io/crates/wavefront_obj">wavefront_obj</a> crate for that purpose.</p>
+<p>That format is basically divided into several parts (non-exhaustive):</p>
+<ul>
+<li>Materials definitions. We are currently not interested by those and we will just ignore them.</li>
+<li>Vertex definitions. Vertices are spread out by attributes and each vertex attribute is declared
+on one single line. Currently, we are interested in:
+<ul>
+<li>3D positions, with an optional fourth argument.</li>
+<li>UV mapping coordinates. Those are used for texturing. More on that later.</li>
+<li>Normals. Normals are very important to perform lighting computations, vertex displacement, etc.</li>
+</ul>
+</li>
+<li>Face definitions. A face is just a list of numbers indexing the previously declared vertices to
+form either <em>triangles</em> or <em>quads</em>.</li>
+<li>Object definitions. Faces and vertices can be gathered in named objects, but we do not care about
+that so far.</li>
+</ul>
+<p>So what we will want to do here is to load a <code>.obj</code> object and actually display it with
+<strong>luminance</strong>.</p>
+<h1><a class="header" href="#defining-our-vertex-type" id="defining-our-vertex-type">Defining our vertex type</a></h1>
+<p>The first thing to do is to define the kind of geometry our renderer will support. In the first
+place, we are not interested into supporting texturing nor even lighting, just raw geometry. We
+will then only need the position.</p>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>use luminance_derive::{Semantics, Vertex};
+
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, Semantics)]
+pub enum Semantics {
+  #[sem(name = &quot;position&quot;, repr = &quot;[f32; 3]&quot;, wrapper = &quot;VPos&quot;)]
+  Position
+}
+
+#[derive(Clone, Copy, Debug, Vertex)]
+#[vertex(sem = &quot;Semantics&quot;)]
+pub struct Vertex {
+  position: VPos
+}
+<span class="boring">}
+</span></code></pre></pre>
+<p>You should be familiar with that code by now. We will just add this for future use:</p>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>type VertexIndex = u32;
+<span class="boring">}
+</span></code></pre></pre>
+<blockquote>
+<p><a href="https://crates.io/crates/luminance">luminance</a> supports several kinds of indices. <code>u32</code> is more than enough for our current use case
+but you never know.</p>
+</blockquote>
+<h1><a class="header" href="#loading-an-obj-object" id="loading-an-obj-object">Loading an .obj object</a></h1>
+<p>This is not really the purpose of this wiki but you actually need that code in order to do the rest.
+So here it is. Refer to the <a href="https://crates.io/crates/wavefront_obj">wavefront_obj</a> for further details. The idea here is that we define our
+own <code>Obj</code> type with our own representation of what an object is. We then use <a href="https://crates.io/crates/wavefront_obj">wavefront_obj</a> to
+load one object and convert it to our representation. Simple.</p>
+<p>All the code above introduces new concepts from <a href="https://crates.io/crates/wavefront_obj">wavefront_obj</a> that will not be explained because
+this is not the place in this current wiki. Nevertheless, no new concept was introduced regarding
+<a href="https://crates.io/crates/luminance">luminance</a>.</p>
+<blockquote>
+<p>Note: we also use the <a href="https://crates.io/crates/try-guard">try-guard</a> crate to convert boolean expression to <em>try</em> values.</p>
+</blockquote>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>use std::fs::File;
+use std::io::Read as _;
+use std::path::Path;
+use try_guard::verify;
+use wavefront_obj::obj;
+
+#[derive(Debug)]
+struct Obj {
+  vertices: Vec&lt;Vertex&gt;,
+  indices: Vec&lt;VertexIndex&gt;,
+}
+
+impl Obj {
+  fn to_tess&lt;C&gt;(self, ctx: &amp;mut C) -&gt; Result&lt;Tess, TessError&gt; where C: GraphicsContext {
+    TessBuilder::new(ctx)
+      .set_mode(Mode::Triangle)
+      .add_vertices(self.vertices)
+      .set_indices(self.indices)
+      .build()
+  }
+
+  fn load&lt;P&gt;(path: P) -&gt; Result&lt;Self, String&gt; where P: AsRef&lt;Path&gt; {
+    let file_content = {
+      let mut file = File::open(path).map_err(|e| format!(&quot;cannot open file: {}&quot;, e))?;
+      let mut content = String::new();
+      file.read_to_string(&amp;mut content).unwrap();
+      content
+    };
+    let obj_set = obj::parse(file_content).map_err(|e| format!(&quot;cannot parse: {:?}&quot;, e))?;
+    let objects = obj_set.objects;
+
+    verify!(objects.len() == 1).ok_or(&quot;expecting a single object&quot;.to_owned())?;
+
+    let object = objects.into_iter().next().unwrap();
+
+    verify!(object.geometry.len() == 1).ok_or(&quot;expecting a single geometry&quot;.to_owned())?;
+
+    let geometry = object.geometry.into_iter().next().unwrap();
+
+    println!(&quot;loading {}&quot;, object.name);
+    println!(&quot;{} vertices&quot;, object.vertices.len());
+    println!(&quot;{} shapes&quot;, geometry.shapes.len());
+
+    // build up vertices; for this to work, we remove duplicated vertices by putting them in a
+    // map associating the vertex with its ID
+    let mut vertex_cache: HashMap&lt;obj::VTNIndex, VertexIndex&gt; = HashMap::new();
+    let mut vertices: Vec&lt;Vertex&gt; = Vec::new();
+    let mut indices: Vec&lt;VertexIndex&gt; = Vec::new();
+
+    for shape in geometry.shapes {
+      if let obj::Primitive::Triangle(a, b, c) = shape.primitive {
+        for key in &amp;[a, b, c] {
+          if let Some(vertex_index) = vertex_cache.get(key) {
+            indices.push(*vertex_index);
+          } else {
+            let p = object.vertices[key.0];
+            let position = VPos::new([p.x as f32, p.y as f32, p.z as f32]);
+            let vertex = Vertex { position };
+            let vertex_index = vertices.len() as VertexIndex;
+
+            vertex_cache.insert(*key, vertex_index);
+            vertices.push(vertex);
+            indices.push(vertex_index);
+          }
+        }
+      } else {
+        return Err(&quot;unsupported non-triangle shape&quot;.to_owned());
+      }
+    }
+
+    Ok(Obj { vertices, indices })
+  }
+}
+<span class="boring">}
+</span></code></pre></pre>
+<p>Basically, calling <code>Obj::load(path)</code> here will get us a <code>Result&lt;Obj, String&gt;</code>. We can then just
+convert it to a <a href="https://docs.rs/luminance/latest/luminance/tess/struct.Tess.html"><code>Tess</code></a> for <a href="https://crates.io/crates/luminance">luminance</a> to process.</p>
+<h1><a class="header" href="#the-shaders" id="the-shaders">The shaders</a></h1>
+<p>Again, we need to define our shaders. But in our case, we are going to need to write <em>slightly</em>
+more complicated shaders. See, a 3D viewer requires objects to be <em>projected</em> onto one’s screen. In
+the previous chapters, we just rendered a triangle in 2D. Here we are talking 3D. Going from a three
+dimensional world to a screen (i.e. 2D) requires some operations to do.</p>
+<h2><a class="header" href="#projection-matrix" id="projection-matrix">Projection matrix</a></h2>
+<p>Going from a 3D space to a 2D space always implies losing information on the fly in the process.
+This is really easy to picture by taking an easier example. Imagine someone moving around Earth.
+They have a position, including an altitude. Now imagine you want to <em>project</em> their positions onto
+the up axis, giving the altitude at which those persons are. One very easy way to do that is to
+simply <em>drop</em> all the other components of their positions and just retain their “up” component. For
+instance, if we have a position as:</p>
+<pre><code>position = (x, y, z)
+</code></pre>
+<p>And we say that <code>y</code> is the component of the up-axis, we can define our projection as such:</p>
+<pre><code>project_altitude((_, y, _)) = y
+</code></pre>
+<p>Going from a 3D space to a screen can be done in <em>several</em> ways. The way done above was <em>3D -&gt; 1D</em>
+but here, <em>3D -&gt; 2D</em> can be achieved by several ideas. For instance, an <em>orthogonal projection</em> is
+a kind of projection that preserves parallels. A <em>perspective projection</em> is a projection that
+implies distorting the vertices so that the <em>field of view</em> is respected. You are typically used to
+that kind of projection when playing a video game or watching a movie, for instance. Or just taking
+a picture!</p>
+<h2><a class="header" href="#the-perspective-matrix" id="the-perspective-matrix">The perspective matrix</a></h2>
+<p>Any way, no more theory talk. In order to use a perspective matrix and project our loaded object,
+we will be using the <a href="https://crates.io/crates/cgmath">cgmath</a> crate. Many exist that can do the job but I really like the simplicity
+and raw speed of <a href="https://crates.io/crates/cgmath">cgmath</a>.</p>
+<pre><code class="language-toml">cgmath = &quot;0.17&quot;
+</code></pre>
+<p>We will be using several symbols from it:</p>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>use cgmath::{EuclideanSpace, Matrix4, Point3, Quaternion, Rad, Rotation3, Vector3, perspective};
+<span class="boring">}
+</span></code></pre></pre>
+<p>Don’t get scared about the heavy-math symbol names. What you must know, however, is this:</p>
+<ul>
+<li>In graphics applications, we use <a href="https://en.wikipedia.org/wiki/Linear_algebra">linear algebra</a> <em>a lot</em>. You don’t have to know everything by
+heart, obviously, but having a linear algebra background will highly help for sure.</li>
+<li>From linear algebra, we’re mostly interested into several concepts:
+<ul>
+<li>Vector spaces. The most important one. You should know how you are supposed to add vectors and
+how to scale them by a given scalar number and how to compute the sine of the angle between two
+vectors. More prerequisites will come but for today that’s enough about vector spaces.</li>
+<li>Matrices. Unlike the movie, they’re not entertainment and can encode lots of other math
+concepts, among linear maps and manipulating vector spaces in a compact and powerful way. We
+use them for combining translations, scaling, rotations, <a href="https://en.wikipedia.org/wiki/Shear_matrix">shearing</a>, etc.</li>
+<li>Quaternions. Scary name for a cute structure. Quaternions are 4-components numbers that can
+represent a lot of things. In our case, we like to use them to represent arbitrary rotations of
+φ angle (often expressed in radians) around a given unit axis (a unit axis is a 3D vector that
+has been <a href="http://mathworld.wolfram.com/NormalizedVector.html">normalized</a>).</li>
+</ul>
+</li>
+</ul>
+<p>I know, I know, that’s a lot of new concepts completely unrelated to <a href="https://crates.io/crates/luminance">luminance</a>. But you need them
+and, trust me, it’s not that hard.</p>
+<p>Back to our code now.</p>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>const FOVY: Rad&lt;f32&gt; = Rad(std::f32::consts::PI / 2.);
+const Z_NEAR: f32 = 0.1;
+const Z_FAR: f32 = 10.;
+
+// …
+
+// in the main_loop function, before the actual loop
+
+let projection = perspective(FOVY, surface.width() as f32 / surface.height() as f32, Z_NEAR, Z_FAR);
+<span class="boring">}
+</span></code></pre></pre>
+<p>This defines a projection matrix with a <em>field of view</em> set to <em>π ÷ 2</em> (wich represents a field of
+view of 90°), with an <em>aspect ratio</em> defines by the division between the width and height of the
+framebuffer we’re rendering into and with two special parameters, <code>Z_NEAR</code> and <code>Z_FAR</code>. Those are
+<em>clipping</em> parameters defining a <em>frustrum</em> object. Everything outside the frustrum won’t be
+visible when asking to render.</p>
+<p><img src="https://i0.wp.com/www.lighthouse3d.com/wp-content/uploads/2011/04/vf.gif?w=405" alt="" /></p>
+<blockquote>
+<p>Image taken from <a href="http://www.lighthouse3d.com/tutorials/view-frustum-culling">here</a>.</p>
+</blockquote>
+<h2><a class="header" href="#the-view-matrix" id="the-view-matrix">The view matrix</a></h2>
+<p>A single projection matrix <em>projects</em> 3D coordinates on 2D coordinates with a given perspective but
+the 3D coordinate system is still left unchanged. What it means is that projecting only will place
+you in a situation where you’re still at the origin (i.e. <code>(0, 0, 0)</code>) looking in the <em>forward</em>
+direction. What the forward vector is depends on which canonical system you decide to use, but in
+our case, it’s a <a href="https://en.wikipedia.org/wiki/Right-hand_rule">right-handed system</a>. The <em>X</em> unit axis goes from left to right of your screen;
+the <em>Y</em> unit axis goes from down to up your screen and the <em>Z</em> axis (also called <em>depth</em>) goes from
+<em>inside your screen</em> towards your face.</p>
+<p>Because we will just place the loaded object at the origin, we will want to slightly offset our
+position and view direction so that we can actually see the object. Again, <a href="https://crates.io/crates/cgmath">cgmath</a> provides us with
+the right <em>transformation matrix</em> for this.</p>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>let view = Matrix4::&lt;f32&gt;::look_at(Point3::new(2., 2., 2.), Point3::origin(), Vector3::unit_y());
+<span class="boring">}
+</span></code></pre></pre>
+<p>We will then be at the 3D point <code>(2, 2, 2)</code> and will look at the origin, the <em>Y</em> unit axis being
+considered the <em>up</em> axis.</p>
+<h2><a class="header" href="#declaring-the-matrices-in-the-shader" id="declaring-the-matrices-in-the-shader">Declaring the matrices in the shader</a></h2>
+<p>Next step is to actually use those matrices. In order to do so, we need to do two things:</p>
+<ul>
+<li>Use the matrices in the shader code.</li>
+<li>Tell <a href="https://crates.io/crates/luminance">luminance</a> about the existence of those matrices in the shaders so that we can update them.</li>
+</ul>
+<h3><a class="header" href="#glsl-matrices" id="glsl-matrices">GLSL matrices</a></h3>
+<p>Let’s start from the <em>vertex shader</em> we used in the previous chapter.</p>
+<pre><code class="language-glsl">// those are our vertex attributes
+in vec2 position;
+in vec3 color;
+
+// this is the output of the vertex shader (we could have had several ones)
+out vec3 v_color;
+
+void main() {
+  // simply forward the color
+  v_color = color;
+
+  // mandatory; tell the GPU to use the position vertex attribute to put the vertex in space
+  gl_Position = vec4(position, 0., 1.);
+}
+</code></pre>
+<p>In our case, we don’t have vertex colors anymore and we will likely just set a constant color to
+start with. Plus, now the point is in 3D, not 2D.</p>
+<pre><code class="language-glsl">in vec3 position; // 3D point!
+
+void main() {
+  gl_Position = vec4(position, 1.);
+}
+</code></pre>
+<p>The problem is: it’s easy for the GPU to render 2D coordinates because there’s nothing to project:
+your screen is already using a 2D space coordinate system. However, how should we handle our 3D
+vertices?</p>
+<p>You already have the answer: the <em>projection</em> matrix. That matrix will just turn your 3D vertices
+into 2D vertices. In order to use it, you need to declare a <em>shader uniform variable</em>. Uniforms are
+special variables which values are set by the application before or after a render command. When
+a render command is issued, it is not possible to change the value anymore until the render command
+has finished. You can picture those uniform values as <em>constants over a draw call</em>. Some graphics
+APIs call those <em>constant buffers</em> for that reason.</p>
+<p>Let’s add one we’ll call <code>projection</code>. You declare them at global scope, just next to <code>in</code> and
+<code>out</code> declarations. They can be declared in any shader stage that needs to manipulate them.</p>
+<pre><code class="language-glsl">uniform mat4 projection;
+</code></pre>
+<p>It’s as simple as that. In our case, <code>projection</code> is a 4×4 matrix that will be supplied by the
+application.</p>
+<p>In order to be projected, a point must be multiplied by a matrix. Let’s just project our 3D point
+then:</p>
+<pre><code class="language-glsl">gl_Position = projection * vec4(position, 1.);
+</code></pre>
+<p>All of this might be a bit weird or awkward at first because it’s highly linked to how vector spaces
+and linear algebra work but you’ll have to trust me on this (or read some linear algebra theory!).</p>
+<p>Now let’s add the <em>view</em> matrix, allowing us to slightly offset the camera in the scene:</p>
+<pre><code class="language-glsl">uniform mat4 view;
+</code></pre>
+<p>Simple, right?</p>
+<pre><code class="language-glsl">gl_Position = projection * view * vec4(position, 1.);
+</code></pre>
+<p>So, some explications here. We multiply <code>view</code> and <code>position</code> first because <code>view</code> is a matrix that
+<em>transforms</em> a 3D point into another 3D point. You can picture that as a <em>basis transformation</em>.
+Then we want to project that transformed point, so we multiply by the <code>projection</code> at the very left.</p>
+<p>That’s all for the GLSL code. Nothing else to do: our 3D point is now projected onto our screen by
+having gone through two basis change:</p>
+<ul>
+<li>A <em>3D -&gt; 3D</em> linear transformation to <em>move the camera around</em>.</li>
+<li>A <em>3D -&gt; 2D</em> projection to introduce perspective.</li>
+</ul>
+<h3><a class="header" href="#the-uniform-interface" id="the-uniform-interface">The uniform interface</a></h3>
+<p>In order for your application to actually update and send those matrices to the GPU, you need to
+declare them and change the way the shader <a href="https://docs.rs/luminance/latest/luminance/shader/program/struct.Program.html"><code>Program</code></a> works. A special concept must be used here:
+<a href="https://docs.rs/luminance/latest/luminance/shader/program/trait.UniformInterface.html">uniform interfaces</a>.</p>
+<p>A uniform interface is a typed contract between the GLSL code compiled and linked in a shader
+<a href="https://docs.rs/luminance/latest/luminance/shader/program/struct.Program.html"><code>Program</code></a> and what you are supposed to with it. This powerful abstraction allows you to specify,
+via a type, a set of <em>variables</em> that are available in the GLSL code and that you can get access to
+as soon as your <a href="https://docs.rs/luminance/latest/luminance/shader/program/struct.Program.html"><code>Program</code></a> gets shading things. The way you do this is a multi-step yet simple
+process:</p>
+<ol>
+<li>You define a <code>struct</code> that holds the GPU variables. Those are called <a href="https://docs.rs/luminance/latest/luminance/shader/program/struct.Uniform.html"><code>Uniform</code></a>.</li>
+<li>You implement the <a href="https://docs.rs/luminance/latest/luminance/shader/program/trait.UniformInterface.html"><code>UniformInterface</code></a> trait for that type. If you don’t want to get too much
+into the details of that trait, you can use <a href="https://crates.io/crates/luminance-derive">luminance-derive</a> to implement the trait very easily.
+That’s what we are going to do.</li>
+<li>You set your <a href="https://docs.rs/luminance/latest/luminance/shader/program/struct.Program.html"><code>Program</code></a> type variable setting its <em>uniform interface</em> to the type you just
+created.</li>
+<li>When you use a <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.ShadingGate.html"><code>ShadingGate</code></a> to shade objects, you have access to your <em>uniform interface</em> and
+can then update GPU variables there.</li>
+</ol>
+<p>Why cannot you create and handle the uniform interface by yourself? The thing is: that concept
+<em>must</em> be <a href="https://en.wikipedia.org/wiki/Functor#Covariance_and_contravariance">contravariant</a>, because allowing you to handle such objects around while they depend on
+the current GPU context and state would be highly unsafe.</p>
+<p>Let’s create such a type.</p>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>#[derive(Debug, UniformInterface)]
+struct ShaderInterface {
+  #[uniform(unbound)]
+  projection: Uniform&lt;M44&gt;,
+  #[uniform(unbound)]
+  view: Uniform&lt;M44&gt;,
+}
+<span class="boring">}
+</span></code></pre></pre>
+<p>Sooo… as you can see, we define a regular <code>struct</code> but <em>derive</em> <code>UniformInterface</code>. Deriving the
+trait unlocks several annotations you can use via the <code>#[uniform(..)]</code> syntax. Here, we’ll talk
+about two:</p>
+<ul>
+<li><code>#[uniform(unbound)]</code>: that annotation tells luminance that <strong>if</strong> the GPU variable this uniform
+variable refers to is <em>inactive</em> or <em>inexistent</em>, no error will be generated. Instead, a special
+<em>unbound</em> uniform variable will be emitted. So an <em>unbound</em> <code>Uniform&lt;M44&gt;</code> means that if the GPU
+variable named after that uniform is <em>inactive</em> or <em>inexistent</em>, the resulting <code>Uniform&lt;M44&gt;</code> will
+silently do nothing when you will try to update it. This is a feature you want when you’re
+developing or debugging but you should disable that on an end-user application or if you don’t
+care about errors for a given variable.</li>
+<li><code>#[uniform(name = &quot;foo&quot;)]</code>: rename the field. By default, the GLSL uniform variable will match the
+name of the <code>struct</code> field you define. You can change the mapping with that simple annotation.</li>
+<li>You can of course mix annotations; e.g. <code>#[uniform(name = &quot;t&quot;, unbound)]</code> is an <em>unbound</em> uniform
+variable mapped to a <code>uniform float t</code> in the GLSL code.</li>
+</ul>
+<p>All we have to do now is to change the type of our <a href="https://docs.rs/luminance/latest/luminance/shader/program/struct.Program.html"><code>Program</code></a> to use the uniform interface and
+we’re done.</p>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>let program: Program&lt;Semantics, (), ShaderInterface&gt; = Program::from_strings(None, VS_STR, None, FS_STR)
+  .unwrap()
+  .ignore_warnings();
+<span class="boring">}
+</span></code></pre></pre>
+<h1><a class="header" href="#altering-the-graphics-pipeline" id="altering-the-graphics-pipeline">Altering the graphics pipeline</a></h1>
+<p>Now that we have a shader program that can accept updating our two matrices, we need to actually
+pass the matrices down to the GPU so that it can use them when transforming points in the <em>vertex
+shader</em>. That is done via the <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.ShadingGate.html"><code>ShadingGate</code></a>. When you call the <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.ShadingGate.html#method.shade"><code>ShadingGate::shade</code></a> method,
+you must pass a closure that will receive two arguments:</p>
+<ul>
+<li>A <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.RenderGate.html"><code>RenderGate</code></a>, as seen in previous chapters.</li>
+<li>A <a href="https://docs.rs/luminance/latest/luminance/shader/program/struct.ProgramInterface.html"><code>ProgramInterface</code></a>, that gives you access to your type (i.e. <code>ShaderInterface</code> here).</li>
+</ul>
+<p>The <a href="https://docs.rs/luminance/latest/luminance/shader/program/struct.ProgramInterface.html"><code>ProgramInterface</code></a> argument allows you to directly manipulate the fields in your
+<code>ShaderInterface</code> — here, <code>projection</code> and <code>view</code>. It also allows other operations on the
+<a href="https://docs.rs/luminance/latest/luminance/shader/program/struct.Program.html"><code>Program</code></a>’s <em>uniforms</em> but it’s currently off topic — feel free to read its documentation if
+you’re interested, though.</p>
+<p><a href="https://docs.rs/luminance/latest/luminance/shader/program/struct.ProgramInterface.html"><code>ProgramInterface</code></a> implements <code>Deref&lt;Target = ShaderInterface&gt;</code>, so you can directly select your
+fields. You update a uniform by using the <a href="https://docs.rs/luminance/latest/luminance/shader/program/struct.Uniform.html#method.update"><code>Uniform::update</code></a> method.</p>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>surface.pipeline_builder().pipeline(&amp;back_buffer, color, |_, mut shd_gate| {
+  shd_gate.shade(&amp;program, |iface, mut rdr_gate| {
+    iface.projection.update(projection.into()); // here
+    iface.view.update(view.into()); // and here
+
+    rdr_gate.render(RenderState::default(), |mut tess_gate| {
+      tess_gate.render(mesh.slice(..));
+    });
+  });
+});
+<span class="boring">}
+</span></code></pre></pre>
+<p>It’s as simple as that.</p>
+<blockquote>
+<p><em>Why the <code>.into()</code> call</em>?</p>
+</blockquote>
+<p>Because of <a href="https://crates.io/crates/cgmath">cgmath</a>’s type that must be converted to <a href="https://docs.rs/luminance/latest/luminance/linear/type.M44.html"><code>M44</code></a>.</p>
+<p>If you compile and run with the following
+<a href="https://phaazon.net/media/uploads/suzanne.obj">suzanne.obj</a> file, you should see this:</p>
+<p><img src="imgs/suzanne_flat.png" alt="" /></p>
+<p>As you can see, we can guess the monkey silhouette but we don’t actually see any details. In order
+to fix that, we will need several things:</p>
+<ul>
+<li>Vertex normals. Those are used to make light rays <em>bounce</em> over the surface of the object and then
+compute angles to determine illumination.</li>
+<li>At least one light, to actually “see” the object.</li>
+</ul>
+<h1><a class="header" href="#adding-light" id="adding-light">Adding light</a></h1>
+<p>You might be used to it now: if we need vertex normals, we need to change our vertex type
+definition.</p>
+<h2><a class="header" href="#rethinking-our-vertex-type" id="rethinking-our-vertex-type">Rethinking our vertex type</a></h2>
+<p>We need normals, so let’s just state it in our vertex type and semantics!</p>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, Semantics)]
+pub enum Semantics {
+  #[sem(name = &quot;position&quot;, repr = &quot;[f32; 3]&quot;, wrapper = &quot;VPos&quot;)]
+  Position,
+  #[sem(name = &quot;normal&quot;, repr = &quot;[f32; 3]&quot;, wrapper = &quot;VNor&quot;)]
+  Normal,
+}
+
+#[derive(Clone, Copy, Debug, Vertex)]
+#[vertex(sem = &quot;Semantics&quot;)]
+struct Vertex {
+  position: VPos,
+  normal: VNor
+}
+<span class="boring">}
+</span></code></pre></pre>
+<p>If you try to compile now, you will get an error such as the following:</p>
+<pre><code>error[E0063]: missing field `normal` in initializer of `Vertex`
+   --&gt; src/main.rs:102:26
+    |
+102 |             let vertex = Vertex { position };
+    |                          ^^^^^^ missing `normal`
+</code></pre>
+<p>Ah, the beauty of strong-typing. :) Let’s fix our loader!</p>
+<h2><a class="header" href="#adapting-the-loading-code" id="adapting-the-loading-code">Adapting the loading code</a></h2>
+<p>Let’s take normals into account when loading objects:</p>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>for shape in geometry.shapes {
+  if let obj::Primitive::Triangle(a, b, c) = shape.primitive {
+    for key in &amp;[a, b, c] {
+      if let Some(vertex_index) = vertex_cache.get(key) {
+        indices.push(*vertex_index);
+      } else {
+        let p = object.vertices[key.0];
+        let n = object.normals[key.2.ok_or(&quot;missing normal for a vertex&quot;.to_owned())?];
+        let position = VPos::new([p.x as f32, p.y as f32, p.z as f32]);
+        let normal = VNor::new([n.x as f32, n.y as f32, n.z as f32]);
+        let vertex = Vertex { position, normal };
+        let vertex_index = vertices.len() as VertexIndex;
+
+        vertex_cache.insert(*key, vertex_index);
+        vertices.push(vertex);
+        indices.push(vertex_index);
+      }
+    }
+  } else {
+    return Err(&quot;unsupported non-triangle shape&quot;.to_owned());
+  }
+}
+<span class="boring">}
+</span></code></pre></pre>
+<p>The main change is this line:</p>
+<pre><pre class="playpen"><code class="language-rust">
+<span class="boring">#![allow(unused_variables)]
+</span><span class="boring">fn main() {
+</span>let n = object.normals[key.2.ok_or(&quot;missing normal for a vertex&quot;.to_owned())?];
+<span class="boring">}
+</span></code></pre></pre>
+<p>Basically, the obj format doesn’t force to use normals, so the normal index is optional. In our
+case, we can enforce it this way or we could have a fallback normal that would point in the same
+direction for all vertices. Up to you to decide.</p>
+<h2><a class="header" href="#debugging-normals" id="debugging-normals">Debugging normals</a></h2>
+<p>Let’s make a small and fun debug session to ensure our normals are okay. Modify the vertex and
+fragment shader stages to forward the normals and display them.</p>
+<pre><code class="language-glsl">// vertex shader
+in vec3 position;
+in vec3 normal;
+
+out vec3 v_normal;
+
+uniform mat4 projection;
+uniform mat4 view;
+
+void main() {
+  v_normal = normal;
+  gl_Position = projection * view * vec4(position, 1.);
+}
+</code></pre>
+<pre><code class="language-glsl">// fragment shader
+in vec3 v_normal;
+
+// we will output a single color
+out vec3 frag_color;
+
+void main() {
+  // KISS
+  frag_color = v_normal;
+}
+</code></pre>
+<p>Recompile and run. You should have something similar to this:</p>
+<p><img src="imgs/suzanne_normals.png" alt="" /></p>
+<p>How fancy! We can see several interesting things here:</p>
+<ul>
+<li>The top of the skull of Suzanne is mostly green. It makes sense because in those positions, the
+vertex normals are roughly <code>(0, 1, 0)</code>, which when translated to RGB colors is mostly green.</li>
+<li>The front face is mostly blue, which makes sense too as the normals there are around <code>(0, 0, 1)</code>,
+which is blue in RGB encoding.</li>
+<li>The left side (from Suzanne point of view) is mostly red, which makes sense too as it’s
+<code>(1, 0, 0)</code> when encoded as RGB.</li>
+<li>You can see that normals here are <em>smoothly</em> interpolated — i.e. you don’t actually see the triangles
+that compose it. This is due to the fact the normals here were generated so that their directions
+generate smooth interpolation across triangles. We could have used flat normals (i.e. face
+normals) instead, or we could also explicitly tell the GPU not to perform interpolation in the
+shaders. You can try it by using <code>flat out vec3 v_normal;</code> in the vertex shader and
+<code>flat in vec3 v_normal;</code> in the fragment shader.</li>
+</ul>
+<p>Face normals here:</p>
+<p><img src="imgs/suzanne_face_normals.png" alt="" /></p>
+<h2><a class="header" href="#actually-lighting-the-mesh" id="actually-lighting-the-mesh">Actually lighting the mesh!</a></h2>
+<p>Lighting is now a simple shader concept. Let’s implement a simple lighting effect based on
+<a href="https://en.wikipedia.org/wiki/Shading#Directional_lighting">directional lighting</a>. Basically, we can
+shade an object by computing the sine of the angles between the light rays and the object normal.
+This is called diffused lighting and is an approximation that already gives good results.</p>
+<p>The following code is based on the <a href="https://en.wikipedia.org/wiki/Phong_shading">Phong</a> illumination model. It’s basic and we know how to do
+way better in terms of realism, but for our case, it’s more than enough.</p>
+<pre><code class="language-glsl">in vec3 v_normal;
+
+// we will output a single color
+out vec3 frag_color;
+
+void main() {
+  // object color
+  vec3 obj_color = vec3(.6, .6, .6);
+
+  // light direction
+  vec3 light_dir = vec3(0., -1., -.5);
+
+  // diffusion factor (hence the k)
+  float kd = dot(v_normal, -light_dir);
+
+  frag_color = obj_color * kd;
+}
+</code></pre>
+<p>And here’s the result:</p>
+<p><img src="imgs/suzanne_lit.png" alt="" /></p>
+<p>Complete code:</p>
+<pre><pre class="playpen"><code class="language-rust">use cgmath::{EuclideanSpace, Matrix4, Point3, Rad, Vector3, perspective};
+use luminance::context::GraphicsContext;
+use luminance::linear::M44;
+use luminance::render_state::RenderState;
+use luminance::shader::program::{Program, Uniform};
+use luminance::tess::{Mode, Tess, TessBuilder, TessError, TessSliceIndex};
+use luminance_derive::{Semantics, UniformInterface, Vertex};
+use luminance_glfw::{Action, GlfwSurface, Key, Surface as _, WindowDim, WindowEvent, WindowOpt};
+use std::collections::HashMap;
+use std::env;
+use std::fs::File;
+use std::io::Read as _;
+use std::path::Path;
+use std::process::exit;
+use std::time::Instant;
+use try_guard::verify;
+use wavefront_obj::obj;
+
+const VS_STR: &amp;str = include_str!(&quot;vs.glsl&quot;);
+const FS_STR: &amp;str = include_str!(&quot;fs.glsl&quot;);
+
+const FOVY: Rad&lt;f32&gt; = Rad(std::f32::consts::PI / 2.);
+const Z_NEAR: f32 = 0.1;
+const Z_FAR: f32 = 10.;
+
+#[derive(Debug, UniformInterface)]
+struct ShaderInterface {
+  #[uniform(unbound)]
+  projection: Uniform&lt;M44&gt;,
+  #[uniform(unbound)]
+  view: Uniform&lt;M44&gt;,
+}
+
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, Semantics)]
+pub enum Semantics {
+  #[sem(name = &quot;position&quot;, repr = &quot;[f32; 3]&quot;, wrapper = &quot;VPos&quot;)]
+  Position,
+  #[sem(name = &quot;normal&quot;, repr = &quot;[f32; 3]&quot;, wrapper = &quot;VNor&quot;)]
+  Normal,
+}
+
+#[derive(Clone, Copy, Debug, Vertex)]
+#[vertex(sem = &quot;Semantics&quot;)]
+struct Vertex {
+  position: VPos,
+  normal: VNor
+}
+
+type VertexIndex = u32;
+
+struct Obj {
+  vertices: Vec&lt;Vertex&gt;,
+  indices: Vec&lt;VertexIndex&gt;,
+}
+
+impl Obj {
+  fn to_tess&lt;C&gt;(self, ctx: &amp;mut C) -&gt; Result&lt;Tess, TessError&gt; where C: GraphicsContext {
+    TessBuilder::new(ctx)
+      .set_mode(Mode::Triangle)
+      .add_vertices(self.vertices)
+      .set_indices(self.indices)
+      .build()
+  }
+
+  fn load&lt;P&gt;(path: P) -&gt; Result&lt;Self, String&gt; where P: AsRef&lt;Path&gt; {
+    let file_content = {
+      let mut file = File::open(path).map_err(|e| format!(&quot;cannot open file: {}&quot;, e))?;
+      let mut content = String::new();
+      file.read_to_string(&amp;mut content).unwrap();
+      content
+    };
+    let obj_set = obj::parse(file_content).map_err(|e| format!(&quot;cannot parse: {:?}&quot;, e))?;
+    let objects = obj_set.objects;
+
+    verify!(objects.len() == 1).ok_or(&quot;expecting a single object&quot;.to_owned())?;
+
+    let object = objects.into_iter().next().unwrap();
+
+    verify!(object.geometry.len() == 1).ok_or(&quot;expecting a single geometry&quot;.to_owned())?;
+
+    let geometry = object.geometry.into_iter().next().unwrap();
+
+    println!(&quot;loading {}&quot;, object.name);
+    println!(&quot;{} vertices&quot;, object.vertices.len());
+    println!(&quot;{} shapes&quot;, geometry.shapes.len());
+
+    // build up vertices; for this to work, we remove duplicated vertices by putting them in a
+    // map associating the vertex with its ID
+    let mut vertex_cache: HashMap&lt;obj::VTNIndex, VertexIndex&gt; = HashMap::new();
+    let mut vertices: Vec&lt;Vertex&gt; = Vec::new();
+    let mut indices: Vec&lt;VertexIndex&gt; = Vec::new();
+
+    for shape in geometry.shapes {
+      if let obj::Primitive::Triangle(a, b, c) = shape.primitive {
+        for key in &amp;[a, b, c] {
+          if let Some(vertex_index) = vertex_cache.get(key) {
+            indices.push(*vertex_index);
+          } else {
+            let p = object.vertices[key.0];
+            let n = object.normals[key.2.ok_or(&quot;missing normal for a vertex&quot;.to_owned())?];
+            let position = VPos::new([p.x as f32, p.y as f32, p.z as f32]);
+            let normal = VNor::new([n.x as f32, n.y as f32, n.z as f32]);
+            let vertex = Vertex { position, normal };
+            let vertex_index = vertices.len() as VertexIndex;
+
+            vertex_cache.insert(*key, vertex_index);
+            vertices.push(vertex);
+            indices.push(vertex_index);
+          }
+        }
+      } else {
+        return Err(&quot;unsupported non-triangle shape&quot;.to_owned());
+      }
+    }
+
+    Ok(Obj { vertices, indices })
+  }
+}
+
+fn main() {
+  let surface = GlfwSurface::new(WindowDim::Windowed(960, 540), &quot;Hello, world!&quot;, WindowOpt::default());
+
+  match surface {
+    Ok(surface) =&gt; {
+      eprintln!(&quot;graphics surface created&quot;);
+      main_loop(surface);
+    }
+
+    Err(e) =&gt; {
+      eprintln!(&quot;cannot create graphics surface:\n{}&quot;, e);
+      exit(1);
+    }
+  }
+}
+
+fn main_loop(mut surface: GlfwSurface) {
+  let path = env::args().skip(1).next().expect(&quot;first argument must be the path of the .obj file to view&quot;);
+  println!(&quot;loading {}&quot;, path);
+
+  let mesh = Obj::load(path).unwrap().to_tess(&amp;mut surface).unwrap();
+
+  let start_t = Instant::now();
+  let back_buffer = surface.back_buffer().unwrap();
+
+  let program: Program&lt;Semantics, (), ShaderInterface&gt; = Program::from_strings(None, VS_STR, None, FS_STR)
+    .unwrap()
+    .ignore_warnings();
+
+  let projection = perspective(FOVY, surface.width() as f32 / surface.height() as f32, Z_NEAR, Z_FAR);
+  let view = Matrix4::&lt;f32&gt;::look_at(Point3::new(2., 2., 2.), Point3::origin(), Vector3::unit_y());
+
+  'app: loop {
+    // handle events
+    for event in surface.poll_events() {
+      match event {
+        WindowEvent::Close | WindowEvent::Key(Key::Escape, _, Action::Release, _) =&gt; break 'app,
+        _ =&gt; ()
+      }
+    }
+
+    // rendering code goes here
+    // get the current time and create a color based on the time
+    let t = start_t.elapsed().as_millis() as f32 * 1e-3;
+    let color = [t.cos(), t.sin(), 0.5, 1.];
+
+    surface.pipeline_builder().pipeline(&amp;back_buffer, color, |_, mut shd_gate| {
+      shd_gate.shade(&amp;program, |iface, mut rdr_gate| {
+        iface.projection.update(projection.into());
+        iface.view.update(view.into());
+
+        rdr_gate.render(RenderState::default(), |mut tess_gate| {
+          tess_gate.render(mesh.slice(..));
+        });
+      });
+    });
+
+    // swap buffer chains
+    surface.swap_buffers();
+  }
+}
+</code></pre></pre>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+        
+        
+        <script type="text/javascript">
+            window.playpen_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+        
+        <script type="text/javascript">
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+        
+        
+
+    </body>
+</html>
