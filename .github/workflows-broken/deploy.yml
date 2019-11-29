@@ -36,4 +36,4 @@ jobs:
           git config --local user.name "$GITHUB_ACTOR"
           git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
           git commit -am "Deploy to GitHub Pages."
-          git push origin gh-pages # add the new deployment
+          git push https://$GH_PAT@github.com/$GITHUB_REPOSITORY gh-pages # add the new deployment
