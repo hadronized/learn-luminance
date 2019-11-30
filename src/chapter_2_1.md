@@ -34,7 +34,7 @@ luminance-derive = "0.5"
 
 Simple. One last thing: when you will use the `Vertex` derive annotation, you will have to provide
 a _vertex semantics_ type, implementing the [`Semantics`] trait. Again, you don’t have to implement
-such a trait by hand: [luminance-derive] will do everything for us.
+such a trait by hand: [luminance-derive] will handle all that for you.
 
 Vertex semantics are a way to tell [luminance] what the relationship between _all_ objects you
 intend to create and the way they will be rendered is about. In our case, we just only need two
