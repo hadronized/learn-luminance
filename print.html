@@ -153,7 +153,56 @@
                         <h1><a class="header" href="#learn-luminance" id="learn-luminance">Learn luminance</a></h1>
 <p>You’re here because you want to learn luminance. Here is the chapter summary.</p>
 <h2><a class="header" href="#everything-you-should-know-before-jumping-in" id="everything-you-should-know-before-jumping-in">Everything you should know before jumping in</a></h2>
-<p>Let’s just list everything you want to know before learning:</p>
+<p><strong>luminance</strong> is an effort to make graphics rendering simple and elegant. It was originally imagined,
+designed and implemented by <a href="https://github.com/phaazon">@phaazon</a> in Haskell (<a href="https://hackage.haskell.org/package/luminance">here</a>)
+and eventually ported to Rust in 2016. The core concepts remained the same and the crate has been
+slowly evolving ever since. At first used only by @phaazon for his Rust demoscene productions (
+example <a href="https://github.com/phaazon/celeri-remoulade">here</a> and
+<a href="https://github.com/phaazon/outline-2017-invitro">here</a>, using
+<a href="https://crates.io/crates/spectra">spectra</a>) and a bunch of curious peeps, it has more visibility
+among the graphics ecosystem of Rust.</p>
+<p>Currently, such an ecosystem is spread into several crates, ideas and people. It is highly
+recommended to read the great article about the ecosystem by @Icefoxen, <a href="https://wiki.alopex.li/AGuideToRustGraphicsLibraries2019">here</a>.</p>
+<p>However, <strong>luminance</strong> is a bit different from what it was initially imagined for. People are
+looking for an easy-to-use crate, with good abstractions and safe-guards against all the <em>bad</em> and
+<em>dangerous</em> graphics API caveats. <strong>luminance</strong> has always been about providing a safe, type-safe
+and elegant API (being Haskell-based makes it heavily use type systems, for instance) but it has
+now a more accurate place in the ecosystem. Where <a href="https://crates.io/crates/gfx-hal">gfx-hal</a> provides you with an experience focused
+on down-to-metal performance and an API very similar to <a href="https://www.khronos.org/vulkan">Vulkan</a>’s, <strong>luminance</strong> provides an API
+that is, for sure, a bit less low-level — and hence, yes, it’s likely you will not have the same
+performances as with <a href="https://crates.io/crates/gfx-hal">gfx-hal</a> (even though no benchmarks have been done so far), and the API is not
+<a href="https://www.khronos.org/vulkan">Vulkan</a>-based — but easier to start with, especially if you don’t already have a background
+experience with <a href="https://www.khronos.org/opengl">OpenGL</a> or <a href="https://www.khronos.org/vulkan">Vulkan</a>.</p>
+<p>The strengths of <strong>luminance</strong> are:</p>
+<ul>
+<li>Easy to learn: the concepts, based on <a href="https://www.khronos.org/opengl">OpenGL</a>, are applied to <em>graphics</em>, not <em>general-purpose
+programming on GPU</em>. Using <strong>luminance</strong> will help you wrap your fingers around what graphics
+programming is about and it will help you to, perhaps, jump to lower abstractions like
+<a href="https://crates.io/crates/gfx-hal">gfx-hal</a>, if you ever need to.</li>
+<li>Performant: by using Rust and being designed around the concept of good performances,
+<strong>luminance</strong> should allow you to build nice and fast simulations, animations and video games.
+Remember that games you played years ago didn’t have <a href="https://www.khronos.org/vulkan">Vulkan</a> and were impressive nonetheless.
+It’s unlikely you will get 100% out of your GPU by using <strong>luminance</strong> since it’s built over
+technologies that are not using 100% of your GPU. Unless you need and know exactly why you need
+100% of your GPU, you should be <em>just fine™</em>.</li>
+<li>Elegant: the design is heavily based on functional programming concepts such as typeclasses,
+associated types, singleton types, existentials, contravariant resources, procedural macros,
+strong typing, etc. Plus, every bit of possible <em>stateful</em> computations is hidden behind a
+system of smart state, removing the need to worry about side-effects. <strong>luminance</strong> still has
+mutation (unlike its Haskell version) but the Rust type-system and borrow checker allow for
+safe mutations.</li>
+<li>Modern: the whole <strong>luminance</strong> ecosystem tries its best to stay up-to-date with Rust evolutions
+and features. On the same level, the underneath technologies are kept up-to-date and might even
+change if a more modern and more adapted one emerges (<a href="https://www.khronos.org/vulkan">Vulkan</a> might eventually get adopted but
+this is just an idea for now).</li>
+<li><em>Opinionated enough</em>: a big bet with <strong>luminance</strong> was to make it opinionated, but not too much.
+It needs to be opinionated to allow some design constructs to be possible and optimize
+performance and allow for extra safety. However, it must not be too much to prevent it to become
+a <em>framework</em>. <strong>luminance</strong> is a <em>library</em>, not a <em>framework</em>, meaning that it will adapt to
+how <strong>you</strong> think you should design your software, not the other way around. That is limited to
+the design of <strong>luminance</strong> but you shouldn’t feel too hands-tied.</li>
+</ul>
+<p>Some practical information you want to know before learning:</p>
 <ul>
 <li>The <a href="https://github.com/phaazon/luminance-rs">official GitHub repository</a></li>
 <li>The <a href="https://github.com/phaazon/luminance-rs/blob/master/luminance/examples/README.md">luminance examples</a>.
@@ -168,11 +217,12 @@ it with luminance, or just to have a rough idea of what’s supported.</li>
 luminance-derive = &quot;0.5&quot;
 luminance-windowing = &quot;0.8&quot;
 luminance-glfw = &quot;0.11&quot;
-luminance-glutin = &quot;0.6&quot;
 </code></pre>
 <p>If you are using a version from crates.io that si more recent that this current book, feel free to
-ask via an <a href="https://github.com/phaazon/luminance-rs/issues">issue</a> to update the book! The goal is to keep it
-as updated as possible, but it might happen it lags a bit behind. Sorry for that.</p>
+ask via an <a href="https://github.com/phaazon/luminance-rs/issues">issue</a> to update the book! The goal is
+to keep it as updated as possible, but it might happen it lags a bit behind. Sorry for that.</p>
+<p>Even though some other crates exist (windowing, for most), we are not going to focus on them and
+will stick to the ones above.</p>
 <h1><a class="header" href="#introduction-to-luminance-for-newcomers" id="introduction-to-luminance-for-newcomers">Introduction to luminance for newcomers</a></h1>
 <p>Hello there. You’ve hit that page because you’re wondering how <a href="https://crates.io/crates/luminance">luminance</a> is supposed to be used.
 You’ve come to the right place. This document is an introduction to <a href="https://crates.io/crates/luminance">luminance</a>, its ways of doing
@@ -445,7 +495,7 @@ have to worry about those because a crate exists to automatically implement such
 </code></pre>
 <p>Simple. One last thing: when you will use the <code>Vertex</code> derive annotation, you will have to provide
 a <em>vertex semantics</em> type, implementing the <a href="https://docs.rs/luminance/latest/luminance/vertex/trait.Semantics.html"><code>Semantics</code></a> trait. Again, you don’t have to implement
-such a trait by hand: <a href="https://crates.io/crates/luminance-derive">luminance-derive</a> will do everything for us.</p>
+such a trait by hand: <a href="https://crates.io/crates/luminance-derive">luminance-derive</a> will handle all that for you.</p>
 <p>Vertex semantics are a way to tell <a href="https://crates.io/crates/luminance">luminance</a> what the relationship between <em>all</em> objects you
 intend to create and the way they will be rendered is about. In our case, we just only need two
 semantics: <em>vertex positions</em> and <em>vertex colors</em>. Let’s create our semantics type:</p>

@@ -178,7 +178,7 @@ have to worry about those because a crate exists to automatically implement such
 </code></pre>
 <p>Simple. One last thing: when you will use the <code>Vertex</code> derive annotation, you will have to provide
 a <em>vertex semantics</em> type, implementing the <a href="https://docs.rs/luminance/latest/luminance/vertex/trait.Semantics.html"><code>Semantics</code></a> trait. Again, you don’t have to implement
-such a trait by hand: <a href="https://crates.io/crates/luminance-derive">luminance-derive</a> will do everything for us.</p>
+such a trait by hand: <a href="https://crates.io/crates/luminance-derive">luminance-derive</a> will handle all that for you.</p>
 <p>Vertex semantics are a way to tell <a href="https://crates.io/crates/luminance">luminance</a> what the relationship between <em>all</em> objects you
 intend to create and the way they will be rendered is about. In our case, we just only need two
 semantics: <em>vertex positions</em> and <em>vertex colors</em>. Let’s create our semantics type:</p>
