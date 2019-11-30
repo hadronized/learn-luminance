@@ -24,11 +24,11 @@ The `pipeline` argument here represents a [`Pipeline`] and `shd_gate` a [`Shadin
 
 ### The graphics pipeline
 
-The [`Pipeline`] object you’re given represents a _graphics pipeline_, which allows you to notify
-the GPU about scarce resources you’re about to use or perform specific tasks. That is pretty
-advanced so we will just ignore that argument and will leave it to `_`. But let’s explain a bit
+The [`Pipeline`] object you’re given represents a _graphics pipeline_. It allows you to notify
+the GPU about scarce resources you’re about to use or perform specific tasks related to such
+resources. That is pretty advanced so we will just ignore that object and will leave it to `_`.
 
-More on that in a future chapter.
+More on [`Pipeline`] in a future chapter.
 
 ### The shading gate
 
