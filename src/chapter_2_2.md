@@ -24,11 +24,11 @@ The `pipeline` argument here represents a [`Pipeline`] and `shd_gate` a [`Shadin
 
 ### The graphics pipeline
 
-The [`Pipeline`] object you’re given represents a _graphics pipeline_, which allows you to notify
-the GPU about scarce resources you’re about to use or perform specific tasks. That is pretty
-advanced so we will just ignore that argument and will leave it to `_`. But let’s explain a bit
+The [`Pipeline`] object you’re given represents a _graphics pipeline_. It allows you to notify
+the GPU about scarce resources you’re about to use or perform specific tasks related to such
+resources. That is pretty advanced so we will just ignore that object and will leave it to `_`.
 
-More on that in a future chapter.
+More on [`Pipeline`] in a future chapter.
 
 ### The shading gate
 
@@ -60,9 +60,9 @@ Assembling _shader stages_ yields a _shader program_, which type is [`Program`].
 can then be used with our [`ShadingGate`] to shade our triangle! What we need to do here is to
 write:
 
-  - A [`VertexShader`] in [GLSL] that will simply forwards the vertex attributes to the next stage
-    so that those information get available later.
-  - A [`FragmentShader`] that will read those information and output a single color for each pixel
+  - A [`VertexShader`] in [GLSL] that will simply forward the vertex attributes to the next stage
+    so that this information is available later.
+  - A [`FragmentShader`] that will read this information and output a single color for each pixel
     of the ~screen~ frame buffer.
 
 ### The vertex shader
