@@ -172,10 +172,10 @@ the pipeline definition again:</p>
 </span></code></pre></pre>
 <p>The <code>pipeline</code> argument here represents a <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.Pipeline.html"><code>Pipeline</code></a> and <code>shd_gate</code> a <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.ShadingGate.html"><code>ShadingGate</code></a>.</p>
 <h3><a class="header" href="#the-graphics-pipeline" id="the-graphics-pipeline">The graphics pipeline</a></h3>
-<p>The <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.Pipeline.html"><code>Pipeline</code></a> object you’re given represents a <em>graphics pipeline</em>, which allows you to notify
-the GPU about scarce resources you’re about to use or perform specific tasks. That is pretty
-advanced so we will just ignore that argument and will leave it to <code>_</code>. But let’s explain a bit</p>
-<p>More on that in a future chapter.</p>
+<p>The <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.Pipeline.html"><code>Pipeline</code></a> object you’re given represents a <em>graphics pipeline</em>. It allows you to notify
+the GPU about scarce resources you’re about to use or perform specific tasks related to such
+resources. That is pretty advanced so we will just ignore that object and will leave it to <code>_</code>.</p>
+<p>More on <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.Pipeline.html"><code>Pipeline</code></a> in a future chapter.</p>
 <h3><a class="header" href="#the-shading-gate" id="the-shading-gate">The shading gate</a></h3>
 <p><a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.ShadingGate.html"><code>ShadingGate</code></a> represents a way to <em>shade</em> things. Shading means, like if you had a paper and color
 pens, filling in shapes with colors. <a href="https://crates.io/crates/luminance">luminance</a> works the same way. However, you have no pen and no
@@ -203,9 +203,9 @@ get what it means below.</p>
 can then be used with our <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.ShadingGate.html"><code>ShadingGate</code></a> to shade our triangle! What we need to do here is to
 write:</p>
 <ul>
-<li>A <a href="https://docs.rs/luminance/latest/luminance/shader/stage/enum.Type.html#variant.VertexShader"><code>VertexShader</code></a> in <a href="https://www.khronos.org/opengl/wiki/Core_Language_(GLSL)">GLSL</a> that will simply forwards the vertex attributes to the next stage
-so that those information get available later.</li>
-<li>A <a href="https://docs.rs/luminance/latest/luminance/shader/stage/enum.Type.html#variant.FragmentShader"><code>FragmentShader</code></a> that will read those information and output a single color for each pixel
+<li>A <a href="https://docs.rs/luminance/latest/luminance/shader/stage/enum.Type.html#variant.VertexShader"><code>VertexShader</code></a> in <a href="https://www.khronos.org/opengl/wiki/Core_Language_(GLSL)">GLSL</a> that will simply forward the vertex attributes to the next stage
+so that this information is available later.</li>
+<li>A <a href="https://docs.rs/luminance/latest/luminance/shader/stage/enum.Type.html#variant.FragmentShader"><code>FragmentShader</code></a> that will read this information and output a single color for each pixel
 of the ~screen~ frame buffer.</li>
 </ul>
 <h3><a class="header" href="#the-vertex-shader" id="the-vertex-shader">The vertex shader</a></h3>
