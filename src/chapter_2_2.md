@@ -60,9 +60,9 @@ Assembling _shader stages_ yields a _shader program_, which type is [`Program`].
 can then be used with our [`ShadingGate`] to shade our triangle! What we need to do here is to
 write:
 
-  - A [`VertexShader`] in [GLSL] that will simply forwards the vertex attributes to the next stage
-    so that those information get available later.
-  - A [`FragmentShader`] that will read those information and output a single color for each pixel
+  - A [`VertexShader`] in [GLSL] that will simply forward the vertex attributes to the next stage
+    so that this information is available later.
+  - A [`FragmentShader`] that will read this information and output a single color for each pixel
     of the ~screen~ frame buffer.
 
 ### The vertex shader
