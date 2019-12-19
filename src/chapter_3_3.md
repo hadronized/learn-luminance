@@ -5,9 +5,9 @@ So here it is. Refer to the [wavefront_obj] crate for further details. The idea 
 own `Obj` type with our own representation of what an object is. We then use [wavefront_obj] to
 load one object and convert it to our representation. Simple.
 
-All the code above introduces new concepts from [wavefront_obj] that will not be explained because
-this is not the place in this current wiki. Nevertheless, no new concept was introduced regarding
-[luminance].
+All the code you read so far introduced new concepts from [wavefront_obj] that will not be explained
+because this is not the right place in this current book. Nevertheless, no new concept was introduced
+regarding [luminance].
 
 > Note: we also use the [try-guard] crate to convert boolean expression to _try_ values.
 

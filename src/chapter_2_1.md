@@ -7,7 +7,7 @@ can be _represented_ in lots of ways. In our case:
   - Each vertex has a position in 2D, represented by two floating point values on 32-bit.
   - Each vertex has a color, represented as RGB.
 
-The first thing to do is to create… types. You will see throughout this wiki that [luminance] is
+The first thing to do is to create… types. You will see throughout this book that [luminance] is
 very type-oriented. Don’t freak out. [luminance] requires you to define your type in a way it can
 acknowledge how vertices’ data are formed. The following, for instance, will not work:
 
@@ -149,7 +149,7 @@ described by the [`Tess`] type. GPU tessellations provide information about:
   - The nature of the topology of the underlying _vertex mesh_. That is, zero, one or several
     buffers describing the raw topology of the mesh.
   - The way vertices are linked to each other. That is done via several ways that are going to be
-    explored in this wiki, but so far, we’ll stick to _primitive modes_, encoded via the [`Mode`]
+    explored in this book, but so far, we’ll stick to _primitive modes_, encoded via the [`Mode`]
     type.
   - And a lot of cool features you should be impatient to discover, but everything happens to those
     who wait. ;)
