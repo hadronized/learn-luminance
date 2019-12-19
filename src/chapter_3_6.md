@@ -351,6 +351,39 @@ fn main_loop(mut surface: GlfwSurface) {
 }
 ```
 
+You’ll also need the vertex and fragment shaders:
+
+```glsl
+// vertex shader
+in vec3 position;
+in vec3 normal;
+
+out vec3 v_normal;
+
+uniform mat4 projection;
+uniform mat4 view;
+
+void main() {
+  v_normal = normal;
+  gl_Position = projection * view * vec4(position, 1.);
+}
+```
+
+```glsl
+// fragment shader
+in vec3 v_normal;
+
+out vec3 frag_color;
+
+void main() {
+  vec3 obj_color = vec3(.6, .6, .6);
+  vec3 light_dir = vec3(0., -1., -.5);
+  float kd = dot(v_normal, -light_dir);
+
+  frag_color = obj_color * kd;
+}
+```
+
 [luminance]: https://crates.io/crates/luminance
 [luminance-derive]: https://crates.io/crates/luminance-derive
 [`Vertex`]: https://docs.rs/luminance/latest/luminance/vertex/trait.Vertex.html
