@@ -9,18 +9,18 @@ We need normals, so let’s just state it in our vertex type and semantics!
 
 ```rust
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, Semantics)]
-pub enum Semantics {
-  #[sem(name = "position", repr = "[f32; 3]", wrapper = "VPos")]
+pub enum VertexSemantics {
+  #[sem(name = "position", repr = "[f32; 3]", wrapper = "VertexPosition")]
   Position,
-  #[sem(name = "normal", repr = "[f32; 3]", wrapper = "VNor")]
+  #[sem(name = "normal", repr = "[f32; 3]", wrapper = "VertexNormal")]
   Normal,
 }
 
 #[derive(Clone, Copy, Debug, Vertex)]
-#[vertex(sem = "Semantics")]
+#[vertex(sem = "VertexSemantics")]
 struct Vertex {
-  position: VPos,
-  normal: VNor
+  position: VertexPosition,
+  normal: VertexNormal
 }
 ```
 
@@ -49,8 +49,8 @@ for shape in geometry.shapes {
       } else {
         let p = object.vertices[key.0];
         let n = object.normals[key.2.ok_or("missing normal for a vertex".to_owned())?];
-        let position = VPos::new([p.x as f32, p.y as f32, p.z as f32]);
-        let normal = VNor::new([n.x as f32, n.y as f32, n.z as f32]);
+        let position = VertexPosition::new([p.x as f32, p.y as f32, p.z as f32]);
+        let normal = VertexNormal::new([n.x as f32, n.y as f32, n.z as f32]);
         let vertex = Vertex { position, normal };
         let vertex_index = vertices.len() as VertexIndex;
 
@@ -203,18 +203,18 @@ struct ShaderInterface {
 }
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, Semantics)]
-pub enum Semantics {
-  #[sem(name = "position", repr = "[f32; 3]", wrapper = "VPos")]
+pub enum VertexSemantics {
+  #[sem(name = "position", repr = "[f32; 3]", wrapper = "VertexPosition")]
   Position,
-  #[sem(name = "normal", repr = "[f32; 3]", wrapper = "VNor")]
+  #[sem(name = "normal", repr = "[f32; 3]", wrapper = "VertexNormal")]
   Normal,
 }
 
 #[derive(Clone, Copy, Debug, Vertex)]
-#[vertex(sem = "Semantics")]
+#[vertex(sem = "VertexSemantics")]
 struct Vertex {
-  position: VPos,
-  normal: VNor
+  position: VertexPosition,
+  normal: VertexNormal
 }
 
 type VertexIndex = u32;
@@ -269,8 +269,8 @@ impl Obj {
           } else {
             let p = object.vertices[key.0];
             let n = object.normals[key.2.ok_or("missing normal for a vertex".to_owned())?];
-            let position = VPos::new([p.x as f32, p.y as f32, p.z as f32]);
-            let normal = VNor::new([n.x as f32, n.y as f32, n.z as f32]);
+            let position = VertexPosition::new([p.x as f32, p.y as f32, p.z as f32]);
+            let normal = VertexNormal::new([n.x as f32, n.y as f32, n.z as f32]);
             let vertex = Vertex { position, normal };
             let vertex_index = vertices.len() as VertexIndex;
 
