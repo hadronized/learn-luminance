@@ -473,7 +473,7 @@ can be <em>represented</em> in lots of ways. In our case:</p>
 <li>Each vertex has a position in 2D, represented by two floating point values on 32-bit.</li>
 <li>Each vertex has a color, represented as RGB.</li>
 </ul>
-<p>The first thing to do is to create… types. You will see throughout this wiki that <a href="https://crates.io/crates/luminance">luminance</a> is
+<p>The first thing to do is to create… types. You will see throughout this book that <a href="https://crates.io/crates/luminance">luminance</a> is
 very type-oriented. Don’t freak out. <a href="https://crates.io/crates/luminance">luminance</a> requires you to define your type in a way it can
 acknowledge how vertices’ data are formed. The following, for instance, will not work:</p>
 <pre><pre class="playpen"><code class="language-rust">
@@ -616,7 +616,7 @@ described by the <a href="https://docs.rs/luminance/latest/luminance/tess/struct
 <li>The nature of the topology of the underlying <em>vertex mesh</em>. That is, zero, one or several
 buffers describing the raw topology of the mesh.</li>
 <li>The way vertices are linked to each other. That is done via several ways that are going to be
-explored in this wiki, but so far, we’ll stick to <em>primitive modes</em>, encoded via the <a href="https://docs.rs/luminance/latest/luminance/tess/enum.Mode.html"><code>Mode</code></a>
+explored in this book, but so far, we’ll stick to <em>primitive modes</em>, encoded via the <a href="https://docs.rs/luminance/latest/luminance/tess/enum.Mode.html"><code>Mode</code></a>
 type.</li>
 <li>And a lot of cool features you should be impatient to discover, but everything happens to those
 who wait. ;)</li>
@@ -1005,17 +1005,20 @@ will then only need the position.</p>
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, Semantics)]
 pub enum Semantics {
-  #[sem(name = &quot;position&quot;, repr = &quot;[f32; 3]&quot;, wrapper = &quot;VPos&quot;)]
+  #[sem(name = &quot;position&quot;, repr = &quot;[f32; 3]&quot;, wrapper = &quot;VertexPosition&quot;)]
   Position
 }
 
 #[derive(Clone, Copy, Debug, Vertex)]
 #[vertex(sem = &quot;Semantics&quot;)]
 pub struct Vertex {
-  position: VPos
+  position: VertexPosition
 }
 <span class="boring">}
 </span></code></pre></pre>
+<blockquote>
+<p>Notice that we now have a 3D point instead of a 2D point.</p>
+</blockquote>
 <p>You should be familiar with that code by now. We will just add this for future use:</p>
 <pre><pre class="playpen"><code class="language-rust">
 <span class="boring">#![allow(unused_variables)]
@@ -1028,13 +1031,13 @@ pub struct Vertex {
 but you never know.</p>
 </blockquote>
 <h1><a class="header" href="#loading-an-obj-object" id="loading-an-obj-object">Loading an .obj object</a></h1>
-<p>This is not really the purpose of this wiki but you actually need that code in order to do the rest.
-So here it is. Refer to the <a href="https://crates.io/crates/wavefront_obj">wavefront_obj</a> for further details. The idea here is that we define our
+<p>This is not really the purpose of this book but you actually need the following code in order to get the rest.
+So here it is. Refer to the <a href="https://crates.io/crates/wavefront_obj">wavefront_obj</a> crate for further details. The idea here is that we define our
 own <code>Obj</code> type with our own representation of what an object is. We then use <a href="https://crates.io/crates/wavefront_obj">wavefront_obj</a> to
 load one object and convert it to our representation. Simple.</p>
-<p>All the code above introduces new concepts from <a href="https://crates.io/crates/wavefront_obj">wavefront_obj</a> that will not be explained because
-this is not the place in this current wiki. Nevertheless, no new concept was introduced regarding
-<a href="https://crates.io/crates/luminance">luminance</a>.</p>
+<p>All the code you read so far introduced new concepts from <a href="https://crates.io/crates/wavefront_obj">wavefront_obj</a> that will not be explained
+because this is not the right place in this current book. Nevertheless, no new concept was introduced
+regarding <a href="https://crates.io/crates/luminance">luminance</a>.</p>
 <blockquote>
 <p>Note: we also use the <a href="https://crates.io/crates/try-guard">try-guard</a> crate to convert boolean expression to <em>try</em> values.</p>
 </blockquote>
@@ -1044,8 +1047,12 @@ this is not the place in this current wiki. Nevertheless, no new concept was int
 </span>use std::fs::File;
 use std::io::Read as _;
 use std::path::Path;
+use luminance::tess::{Tess, TessBuilder, TessError};
+use luminance::context::GraphicsContext;
 use try_guard::verify;
 use wavefront_obj::obj;
+
+// …
 
 #[derive(Debug)]
 struct Obj {
@@ -1097,7 +1104,7 @@ impl Obj {
             indices.push(*vertex_index);
           } else {
             let p = object.vertices[key.0];
-            let position = VPos::new([p.x as f32, p.y as f32, p.z as f32]);
+            let position = VertexPosition::new([p.x as f32, p.y as f32, p.z as f32]);
             let vertex = Vertex { position };
             let vertex_index = vertices.len() as VertexIndex;
 
@@ -1718,6 +1725,34 @@ fn main_loop(mut surface: GlfwSurface) {
   }
 }
 </code></pre></pre>
+<p>You’ll also need the vertex and fragment shaders:</p>
+<pre><code class="language-glsl">// vertex shader
+in vec3 position;
+in vec3 normal;
+
+out vec3 v_normal;
+
+uniform mat4 projection;
+uniform mat4 view;
+
+void main() {
+  v_normal = normal;
+  gl_Position = projection * view * vec4(position, 1.);
+}
+</code></pre>
+<pre><code class="language-glsl">// fragment shader
+in vec3 v_normal;
+
+out vec3 frag_color;
+
+void main() {
+  vec3 obj_color = vec3(.6, .6, .6);
+  vec3 light_dir = vec3(0., -1., -.5);
+  float kd = dot(v_normal, -light_dir);
+
+  frag_color = obj_color * kd;
+}
+</code></pre>
 
                     </main>
 

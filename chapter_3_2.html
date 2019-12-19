@@ -159,17 +159,20 @@ will then only need the position.</p>
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, Semantics)]
 pub enum Semantics {
-  #[sem(name = &quot;position&quot;, repr = &quot;[f32; 3]&quot;, wrapper = &quot;VPos&quot;)]
+  #[sem(name = &quot;position&quot;, repr = &quot;[f32; 3]&quot;, wrapper = &quot;VertexPosition&quot;)]
   Position
 }
 
 #[derive(Clone, Copy, Debug, Vertex)]
 #[vertex(sem = &quot;Semantics&quot;)]
 pub struct Vertex {
-  position: VPos
+  position: VertexPosition
 }
 <span class="boring">}
 </span></code></pre></pre>
+<blockquote>
+<p>Notice that we now have a 3D point instead of a 2D point.</p>
+</blockquote>
 <p>You should be familiar with that code by now. We will just add this for future use:</p>
 <pre><pre class="playpen"><code class="language-rust">
 <span class="boring">#![allow(unused_variables)]

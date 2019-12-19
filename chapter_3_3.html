@@ -149,13 +149,13 @@
                 <div id="content" class="content">
                     <main>
                         <h1><a class="header" href="#loading-an-obj-object" id="loading-an-obj-object">Loading an .obj object</a></h1>
-<p>This is not really the purpose of this wiki but you actually need that code in order to do the rest.
-So here it is. Refer to the <a href="https://crates.io/crates/wavefront_obj">wavefront_obj</a> for further details. The idea here is that we define our
+<p>This is not really the purpose of this book but you actually need the following code in order to get the rest.
+So here it is. Refer to the <a href="https://crates.io/crates/wavefront_obj">wavefront_obj</a> crate for further details. The idea here is that we define our
 own <code>Obj</code> type with our own representation of what an object is. We then use <a href="https://crates.io/crates/wavefront_obj">wavefront_obj</a> to
 load one object and convert it to our representation. Simple.</p>
-<p>All the code above introduces new concepts from <a href="https://crates.io/crates/wavefront_obj">wavefront_obj</a> that will not be explained because
-this is not the place in this current wiki. Nevertheless, no new concept was introduced regarding
-<a href="https://crates.io/crates/luminance">luminance</a>.</p>
+<p>All the code you read so far introduced new concepts from <a href="https://crates.io/crates/wavefront_obj">wavefront_obj</a> that will not be explained
+because this is not the right place in this current book. Nevertheless, no new concept was introduced
+regarding <a href="https://crates.io/crates/luminance">luminance</a>.</p>
 <blockquote>
 <p>Note: we also use the <a href="https://crates.io/crates/try-guard">try-guard</a> crate to convert boolean expression to <em>try</em> values.</p>
 </blockquote>
@@ -165,8 +165,12 @@ this is not the place in this current wiki. Nevertheless, no new concept was int
 </span>use std::fs::File;
 use std::io::Read as _;
 use std::path::Path;
+use luminance::tess::{Tess, TessBuilder, TessError};
+use luminance::context::GraphicsContext;
 use try_guard::verify;
 use wavefront_obj::obj;
+
+// …
 
 #[derive(Debug)]
 struct Obj {
@@ -218,7 +222,7 @@ impl Obj {
             indices.push(*vertex_index);
           } else {
             let p = object.vertices[key.0];
-            let position = VPos::new([p.x as f32, p.y as f32, p.z as f32]);
+            let position = VertexPosition::new([p.x as f32, p.y as f32, p.z as f32]);
             let vertex = Vertex { position };
             let vertex_index = vertices.len() as VertexIndex;
 
