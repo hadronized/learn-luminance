@@ -9,16 +9,18 @@ use luminance_derive::{Semantics, Vertex};
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, Semantics)]
 pub enum Semantics {
-  #[sem(name = "position", repr = "[f32; 3]", wrapper = "VPos")]
+  #[sem(name = "position", repr = "[f32; 3]", wrapper = "VertexPosition")]
   Position
 }
 
 #[derive(Clone, Copy, Debug, Vertex)]
 #[vertex(sem = "Semantics")]
 pub struct Vertex {
-  position: VPos
+  position: VertexPosition
 }
 ```
+
+> Notice that we now have a 3D point instead of a 2D point.
 
 You should be familiar with that code by now. We will just add this for future use:
 

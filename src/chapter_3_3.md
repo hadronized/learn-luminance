@@ -1,7 +1,7 @@
 # Loading an .obj object
 
-This is not really the purpose of this wiki but you actually need that code in order to do the rest.
-So here it is. Refer to the [wavefront_obj] for further details. The idea here is that we define our
+This is not really the purpose of this book but you actually need the following code in order to get the rest.
+So here it is. Refer to the [wavefront_obj] crate for further details. The idea here is that we define our
 own `Obj` type with our own representation of what an object is. We then use [wavefront_obj] to
 load one object and convert it to our representation. Simple.
 
@@ -15,8 +15,12 @@ this is not the place in this current wiki. Nevertheless, no new concept was int
 use std::fs::File;
 use std::io::Read as _;
 use std::path::Path;
+use luminance::tess::{Tess, TessBuilder, TessError};
+use luminance::context::GraphicsContext;
 use try_guard::verify;
 use wavefront_obj::obj;
+
+// …
 
 #[derive(Debug)]
 struct Obj {
@@ -68,7 +72,7 @@ impl Obj {
             indices.push(*vertex_index);
           } else {
             let p = object.vertices[key.0];
-            let position = VPos::new([p.x as f32, p.y as f32, p.z as f32]);
+            let position = VertexPosition::new([p.x as f32, p.y as f32, p.z as f32]);
             let vertex = Vertex { position };
             let vertex_index = vertices.len() as VertexIndex;
 
