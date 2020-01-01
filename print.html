@@ -1407,18 +1407,18 @@ definition.</p>
 <span class="boring">#![allow(unused_variables)]
 </span><span class="boring">fn main() {
 </span>#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, Semantics)]
-pub enum Semantics {
-  #[sem(name = &quot;position&quot;, repr = &quot;[f32; 3]&quot;, wrapper = &quot;VPos&quot;)]
+pub enum VertexSemantics {
+  #[sem(name = &quot;position&quot;, repr = &quot;[f32; 3]&quot;, wrapper = &quot;VertexPosition&quot;)]
   Position,
-  #[sem(name = &quot;normal&quot;, repr = &quot;[f32; 3]&quot;, wrapper = &quot;VNor&quot;)]
+  #[sem(name = &quot;normal&quot;, repr = &quot;[f32; 3]&quot;, wrapper = &quot;VertexNormal&quot;)]
   Normal,
 }
 
 #[derive(Clone, Copy, Debug, Vertex)]
-#[vertex(sem = &quot;Semantics&quot;)]
+#[vertex(sem = &quot;VertexSemantics&quot;)]
 struct Vertex {
-  position: VPos,
-  normal: VNor
+  position: VertexPosition,
+  normal: VertexNormal
 }
 <span class="boring">}
 </span></code></pre></pre>
@@ -1443,8 +1443,8 @@ struct Vertex {
       } else {
         let p = object.vertices[key.0];
         let n = object.normals[key.2.ok_or(&quot;missing normal for a vertex&quot;.to_owned())?];
-        let position = VPos::new([p.x as f32, p.y as f32, p.z as f32]);
-        let normal = VNor::new([n.x as f32, n.y as f32, n.z as f32]);
+        let position = VertexPosition::new([p.x as f32, p.y as f32, p.z as f32]);
+        let normal = VertexNormal::new([n.x as f32, n.y as f32, n.z as f32]);
         let vertex = Vertex { position, normal };
         let vertex_index = vertices.len() as VertexIndex;
 
@@ -1578,18 +1578,18 @@ struct ShaderInterface {
 }
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, Semantics)]
-pub enum Semantics {
-  #[sem(name = &quot;position&quot;, repr = &quot;[f32; 3]&quot;, wrapper = &quot;VPos&quot;)]
+pub enum VertexSemantics {
+  #[sem(name = &quot;position&quot;, repr = &quot;[f32; 3]&quot;, wrapper = &quot;VertexPosition&quot;)]
   Position,
-  #[sem(name = &quot;normal&quot;, repr = &quot;[f32; 3]&quot;, wrapper = &quot;VNor&quot;)]
+  #[sem(name = &quot;normal&quot;, repr = &quot;[f32; 3]&quot;, wrapper = &quot;VertexNormal&quot;)]
   Normal,
 }
 
 #[derive(Clone, Copy, Debug, Vertex)]
-#[vertex(sem = &quot;Semantics&quot;)]
+#[vertex(sem = &quot;VertexSemantics&quot;)]
 struct Vertex {
-  position: VPos,
-  normal: VNor
+  position: VertexPosition,
+  normal: VertexNormal
 }
 
 type VertexIndex = u32;
@@ -1644,8 +1644,8 @@ impl Obj {
           } else {
             let p = object.vertices[key.0];
             let n = object.normals[key.2.ok_or(&quot;missing normal for a vertex&quot;.to_owned())?];
-            let position = VPos::new([p.x as f32, p.y as f32, p.z as f32]);
-            let normal = VNor::new([n.x as f32, n.y as f32, n.z as f32]);
+            let position = VertexPosition::new([p.x as f32, p.y as f32, p.z as f32]);
+            let normal = VertexNormal::new([n.x as f32, n.y as f32, n.z as f32]);
             let vertex = Vertex { position, normal };
             let vertex_index = vertices.len() as VertexIndex;
 
@@ -1688,7 +1688,7 @@ fn main_loop(mut surface: GlfwSurface) {
   let start_t = Instant::now();
   let back_buffer = surface.back_buffer().unwrap();
 
-  let program: Program&lt;Semantics, (), ShaderInterface&gt; = Program::from_strings(None, VS_STR, None, FS_STR)
+  let program: Program&lt;VertexSemantics, (), ShaderInterface&gt; = Program::from_strings(None, VS_STR, None, FS_STR)
     .unwrap()
     .ignore_warnings();
 
