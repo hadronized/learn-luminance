@@ -8,15 +8,15 @@ will then only need the position.
 use luminance_derive::{Semantics, Vertex};
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, Semantics)]
-pub enum Semantics {
+pub enum VertexSemantics {
   #[sem(name = "position", repr = "[f32; 3]", wrapper = "VertexPosition")]
-  Position
+  Position,
 }
 
 #[derive(Clone, Copy, Debug, Vertex)]
-#[vertex(sem = "Semantics")]
-pub struct Vertex {
-  position: VertexPosition
+#[vertex(sem = "VertexSemantics")]
+struct Vertex {
+  position: VertexPosition,
 }
 ```
 

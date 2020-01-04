@@ -44,7 +44,7 @@ cgmath = "0.17"
 We will be using several symbols from it:
 
 ```rust
-use cgmath::{EuclideanSpace, Matrix4, Point3, Quaternion, Rad, Rotation3, Vector3, perspective};
+use cgmath::{perspective, EuclideanSpace, Matrix4, Point3, Rad, Vector3};
 ```
 
 Don’t get scared about the heavy-math symbol names. What you must know, however, is this:
@@ -77,7 +77,12 @@ const Z_FAR: f32 = 10.;
 
 // in the main_loop function, before the actual loop
 
-let projection = perspective(FOVY, surface.width() as f32 / surface.height() as f32, Z_NEAR, Z_FAR);
+let projection = perspective(
+  FOVY,
+  surface.width() as f32 / surface.height() as f32,
+  Z_NEAR,
+  Z_FAR,
+);
 ```
 
 This defines a projection matrix with a _field of view_ set to _π ÷ 2_ (wich represents a field of
@@ -260,9 +265,10 @@ All we have to do now is to change the type of our [`Program`] to use the unifor
 we’re done.
 
 ```rust
-let program: Program<Semantics, (), ShaderInterface> = Program::from_strings(None, VS_STR, None, FS_STR)
-  .unwrap()
-  .ignore_warnings();
+let program: Program<VertexSemantics, (), ShaderInterface> =
+  Program::from_strings(None, VS_STR, None, FS_STR)
+    .unwrap()
+    .ignore_warnings();
 ```
 
 [luminance]: https://crates.io/crates/luminance

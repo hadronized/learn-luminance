@@ -1,21 +1,28 @@
 # Shady triangle
 
-[luminance] is not a framework nor a video game engine. By default, it comes with zero data. Hence,
-there is nothing _per se_ that provides _materials_ or that kind of concept. You will have to craft
-it yourself and that is what we are going to do in this section.
+[luminance] is not a framework nor a video game engine. By default, it comes with zero data set.
+Hence, there is nothing _per se_ that provides _materials_ or that kind of concept. You will have
+to craft them yourself and that is what we are going to do in this section.
 
-Remember our pipeline creation from the [previous](Hello,-world!) chapter? We needed to provide a
-closure taking two arguments. It’s time to explain you what those arguments are for. Let’s take
-the pipeline definition again:
+Remember our pipeline creation from the chapter? We needed to provide a closure taking two
+arguments. It’s time to explain you what those arguments are for. Let’s take the pipeline
+definition again:
 
 ```rust
-surface.pipeline_builder().pipeline(&back_buffer, color, |_, _| ());
+surface.pipeline_builder().pipeline(
+  &back_buffer,
+  &PipelineState::default().set_clear_color(color),
+  |_, _| (),
+);
 ```
 
 And rewrite it by using the arguments:
 
 ```rust
-surface.pipeline_builder().pipeline(&back_buffer, color, |pipeline, shd_gate| {
+surface.pipeline_builder().pipeline(
+  &back_buffer,
+  &PipelineState::default().set_clear_color(color),
+  |pipeline, mut shd_gate| (),
   // …
 });
 ```
@@ -153,7 +160,7 @@ let program: Program<VertexSemantics, (), ()> = Program::from_strings(None, VS_S
 As you can see, you need to provide the _vertex semantics type_ you defined earlier. That enables
 [luminance] to check whether your _shader program_ is compatible with the [`Tess`] you intend to use
 it with… at compile-time. Ignore the two `()`, we’ll discuss that later. However, notice the use
-of the [BuiltProgram::ignore_warnings] method: it gives you the actual [`Program`] by ignoring any
+of the [`BuiltProgram::ignore_warnings`] method: it gives you the actual [`Program`] by ignoring any
 _warnings_ that might have happened while creating the shader program. You can inspect them if you
 want to but for the purpose of this example, you will not need to.
 
@@ -166,10 +173,13 @@ The next step is to create a new _shading node_ in your graphics pipeline. This 
 [`ShadingGate`].
 
 ```rust
-surface.pipeline_builder().pipeline(&back_buffer, color, |_, mut shd_gate| {
-  shd_gate.shade(&program, |_, mut rdr_gate| {
-    // …
-  });
+surface.pipeline_builder().pipeline(
+  &back_buffer,
+  &PipelineState::default().set_clear_color(color),
+  |_, mut shd_gate| {
+    shd_gate.shade(&program, |_, mut rdr_gate| {
+      // …
+    });
 });
 ```
 
@@ -197,7 +207,7 @@ You can see we are getting access to a new type of _gate_ here: a [`RenderGate`]
 [`GeometryShader`]: https://docs.rs/luminance/latest/luminance/shader/stage/enum.Type.html#variant.GeometryShader
 [`FragmentShader`]: https://docs.rs/luminance/latest/luminance/shader/stage/enum.Type.html#variant.FragmentShader
 [`Program`]: https://docs.rs/luminance/latest/luminance/shader/program/struct.Program.html
-[`BuiltProgram`]: https://docs.rs/luminance/latest/luminance/shader/program/struct.BuiltProgram.html
+[`BuiltProgram::ignore_warnings`]: https://docs.rs/luminance/latest/luminance/shader/program/struct.BuiltProgram.html#method.ignore_warnings
 [turbofish syntax]: https://doc.rust-lang.org/1.30.0/book/first-edition/generics.html
 [`RenderGate`]: https://docs.rs/luminance/latest/luminance/pipeline/struct.RenderGate.html
 [`RenderState`]: https://docs.rs/luminance/latest/luminance/render_state/struct.RenderState.html

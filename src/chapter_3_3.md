@@ -29,7 +29,10 @@ struct Obj {
 }
 
 impl Obj {
-  fn to_tess<C>(self, ctx: &mut C) -> Result<Tess, TessError> where C: GraphicsContext {
+  fn to_tess<C>(self, ctx: &mut C) -> Result<Tess, TessError>
+  where
+    C: GraphicsContext,
+  {
     TessBuilder::new(ctx)
       .set_mode(Mode::Triangle)
       .add_vertices(self.vertices)
@@ -37,7 +40,10 @@ impl Obj {
       .build()
   }
 
-  fn load<P>(path: P) -> Result<Self, String> where P: AsRef<Path> {
+  fn load<P>(path: P) -> Result<Self, String>
+  where
+    P: AsRef<Path>,
+  {
     let file_content = {
       let mut file = File::open(path).map_err(|e| format!("cannot open file: {}", e))?;
       let mut content = String::new();

@@ -20,7 +20,7 @@ pub enum VertexSemantics {
 #[vertex(sem = "VertexSemantics")]
 struct Vertex {
   position: VertexPosition,
-  normal: VertexNormal
+  normal: VertexNormal,
 }
 ```
 
@@ -169,9 +169,10 @@ And here’s the result:
 Complete code:
 
 ```rust
-use cgmath::{EuclideanSpace, Matrix4, Point3, Rad, Vector3, perspective};
+use cgmath::{perspective, EuclideanSpace, Matrix4, Point3, Rad, Vector3};
 use luminance::context::GraphicsContext;
 use luminance::linear::M44;
+use luminance::pipeline::PipelineState;
 use luminance::render_state::RenderState;
 use luminance::shader::program::{Program, Uniform};
 use luminance::tess::{Mode, Tess, TessBuilder, TessError, TessSliceIndex};
@@ -214,7 +215,7 @@ pub enum VertexSemantics {
 #[vertex(sem = "VertexSemantics")]
 struct Vertex {
   position: VertexPosition,
-  normal: VertexNormal
+  normal: VertexNormal,
 }
 
 type VertexIndex = u32;
@@ -225,7 +226,10 @@ struct Obj {
 }
 
 impl Obj {
-  fn to_tess<C>(self, ctx: &mut C) -> Result<Tess, TessError> where C: GraphicsContext {
+  fn to_tess<C>(self, ctx: &mut C) -> Result<Tess, TessError>
+  where
+    C: GraphicsContext,
+  {
     TessBuilder::new(ctx)
       .set_mode(Mode::Triangle)
       .add_vertices(self.vertices)
@@ -233,7 +237,10 @@ impl Obj {
       .build()
   }
 
-  fn load<P>(path: P) -> Result<Self, String> where P: AsRef<Path> {
+  fn load<P>(path: P) -> Result<Self, String>
+  where
+    P: AsRef<Path>,
+  {
     let file_content = {
       let mut file = File::open(path).map_err(|e| format!("cannot open file: {}", e))?;
       let mut content = String::new();
@@ -289,7 +296,11 @@ impl Obj {
 }
 
 fn main() {
-  let surface = GlfwSurface::new(WindowDim::Windowed(960, 540), "Hello, world!", WindowOpt::default());
+  let surface = GlfwSurface::new(
+    WindowDim::Windowed(960, 540),
+    "Hello, world!",
+    WindowOpt::default(),
+  );
 
   match surface {
     Ok(surface) => {
@@ -305,7 +316,10 @@ fn main() {
 }
 
 fn main_loop(mut surface: GlfwSurface) {
-  let path = env::args().skip(1).next().expect("first argument must be the path of the .obj file to view");
+  let path = env::args()
+    .skip(1)
+    .next()
+    .expect("first argument must be the path of the .obj file to view");
   println!("loading {}", path);
 
   let mesh = Obj::load(path).unwrap().to_tess(&mut surface).unwrap();
@@ -313,11 +327,18 @@ fn main_loop(mut surface: GlfwSurface) {
   let start_t = Instant::now();
   let back_buffer = surface.back_buffer().unwrap();
 
-  let program: Program<VertexSemantics, (), ShaderInterface> = Program::from_strings(None, VS_STR, None, FS_STR)
-    .unwrap()
-    .ignore_warnings();
+  let program: Program<VertexSemantics, (), ShaderInterface> =
+    Program::from_strings(None, VS_STR, None, FS_STR)
+      .unwrap()
+      .ignore_warnings();
 
-  let projection = perspective(FOVY, surface.width() as f32 / surface.height() as f32, Z_NEAR, Z_FAR);
+  let projection = perspective(
+    FOVY,
+    surface.width() as f32 / surface.height() as f32,
+    Z_NEAR,
+    Z_FAR,
+  );
+
   let view = Matrix4::<f32>::look_at(Point3::new(2., 2., 2.), Point3::origin(), Vector3::unit_y());
 
   'app: loop {
@@ -325,7 +346,7 @@ fn main_loop(mut surface: GlfwSurface) {
     for event in surface.poll_events() {
       match event {
         WindowEvent::Close | WindowEvent::Key(Key::Escape, _, Action::Release, _) => break 'app,
-        _ => ()
+        _ => (),
       }
     }
 
@@ -334,53 +355,24 @@ fn main_loop(mut surface: GlfwSurface) {
     let t = start_t.elapsed().as_millis() as f32 * 1e-3;
     let color = [t.cos(), t.sin(), 0.5, 1.];
 
-    surface.pipeline_builder().pipeline(&back_buffer, color, |_, mut shd_gate| {
-      shd_gate.shade(&program, |iface, mut rdr_gate| {
-        iface.projection.update(projection.into());
-        iface.view.update(view.into());
+    surface.pipeline_builder().pipeline(
+      &back_buffer,
+      &PipelineState::default().set_clear_color(color),
+      |_, mut shd_gate| {
+        shd_gate.shade(&program, |iface, mut rdr_gate| {
+          iface.projection.update(projection.into());
+          iface.view.update(view.into());
 
-        rdr_gate.render(RenderState::default(), |mut tess_gate| {
-          tess_gate.render(mesh.slice(..));
+          rdr_gate.render(&RenderState::default(), |mut tess_gate| {
+            tess_gate.render(mesh.slice(..));
+          });
         });
-      });
-    });
+      },
+    );
 
     // swap buffer chains
     surface.swap_buffers();
   }
-}
-```
-
-You’ll also need the vertex and fragment shaders:
-
-```glsl
-// vertex shader
-in vec3 position;
-in vec3 normal;
-
-out vec3 v_normal;
-
-uniform mat4 projection;
-uniform mat4 view;
-
-void main() {
-  v_normal = normal;
-  gl_Position = projection * view * vec4(position, 1.);
-}
-```
-
-```glsl
-// fragment shader
-in vec3 v_normal;
-
-out vec3 frag_color;
-
-void main() {
-  vec3 obj_color = vec3(.6, .6, .6);
-  vec3 light_dir = vec3(0., -1., -.5);
-  float kd = dot(v_normal, -light_dir);
-
-  frag_color = obj_color * kd;
 }
 ```
 
