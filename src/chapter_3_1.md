@@ -10,7 +10,11 @@ of applications. Applications such as Z-Brush, Blender or 3Ds Max have full supp
 format so it’s a perfect match for our community concerns.
 
 Because we do not care about the actual format definition nor implementing a parser, we will use the
-[wavefront_obj] crate for that purpose.
+[wavefront_obj] crate for that purpose:
+
+```toml
+wavefront_obj = "7"
+```
 
 That format is basically divided into several parts (non-exhaustive):
 

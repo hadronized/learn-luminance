@@ -11,18 +11,22 @@ use luminance::render_state::RenderState;
 And alter your pipeline:
 
 ```rust
-surface.pipeline_builder().pipeline(&back_buffer, color, |_, mut shd_gate| {
-  shd_gate.shade(&program, |_, mut rdr_gate| {
-    rdr_gate.render(RenderState::default(), |mut tess_gate| {
-      // …
+surface.pipeline_builder().pipeline(
+  &back_buffer,
+  &PipelineState::default().set_clear_color(color),
+  |_, mut shd_gate| {
+    shd_gate.shade(&program, |_, mut rdr_gate| {
+      rdr_gate.render(&RenderState::default(), |mut tess_gate| {
+        // …
+      });
     });
-  });
-});
+  },
+);
 ```
 
 We’re almost there. We’re getting a [`TessGate`], allowing us to render actual tessellations. In
 order to do so, we will need to create a [`TessSlice`] out of our [`Tess`]. That enables to slice
-GPU tessellation on the fly fro free. In our case, we want the whole thing (the whole triangle),
+GPU tessellation on the fly for free. In our case, we want the whole thing (the whole triangle),
 so we will use the [`..`] operator.
 
 > You will need the [`TessSliceIndex`] trait to do such a thing.
@@ -34,13 +38,17 @@ use luminance::tess::{Mode, TessBuilder, TessSliceIndex as _};
 Let’s go and finish it.
 
 ```rust
-surface.pipeline_builder().pipeline(&back_buffer, color, |_, mut shd_gate| {
-  shd_gate.shade(&program, |_, mut rdr_gate| {
-    rdr_gate.render(RenderState::default(), |mut tess_gate| {
-      tess_gate.render(triangle.slice(..));
+surface.pipeline_builder().pipeline(
+  &back_buffer,
+  &PipelineState::default().set_clear_color(color),
+  |_, mut shd_gate| {
+    shd_gate.shade(&program, |_, mut rdr_gate| {
+      rdr_gate.render(&RenderState::default(), |mut tess_gate| {
+        tess_gate.render(triangle.slice(..));
+      });
     });
-  });
-});
+  },
+);
 ```
 
 Compile and run the code. You should see something similar to this:
@@ -51,6 +59,7 @@ The complete code:
 
 ```rust
 use luminance::context::GraphicsContext as _;
+use luminance::pipeline::PipelineState;
 use luminance::render_state::RenderState;
 use luminance::shader::program::Program;
 use luminance::tess::{Mode, TessBuilder, TessSliceIndex as _};
@@ -64,7 +73,7 @@ pub enum VertexSemantics {
   #[sem(name = "position", repr = "[f32; 2]", wrapper = "VertexPosition")]
   Position,
   #[sem(name = "color", repr = "[u8; 3]", wrapper = "VertexRGB")]
-  Color
+  Color,
 }
 
 #[derive(Vertex)]
@@ -72,20 +81,33 @@ pub enum VertexSemantics {
 pub struct Vertex {
   position: VertexPosition,
   #[vertex(normalized = "true")]
-  color: VertexRGB
+  color: VertexRGB,
 }
 
 const VERTICES: [Vertex; 3] = [
-  Vertex { position: VertexPosition::new([-0.5, -0.5]), color: VertexRGB::new([255,   0,   0]) },
-  Vertex { position: VertexPosition::new([ 0.5, -0.5]), color: VertexRGB::new([  0, 255,   0]) },
-  Vertex { position: VertexPosition::new([  0.,  0.5]), color: VertexRGB::new([  0,   0, 255]) },
+  Vertex {
+    position: VertexPosition::new([-0.5, -0.5]),
+    color: VertexRGB::new([255, 0, 0]),
+  },
+  Vertex {
+    position: VertexPosition::new([0.5, -0.5]),
+    color: VertexRGB::new([0, 255, 0]),
+  },
+  Vertex {
+    position: VertexPosition::new([0., 0.5]),
+    color: VertexRGB::new([0, 0, 255]),
+  },
 ];
 
 const VS_STR: &str = include_str!("vs.glsl");
 const FS_STR: &str = include_str!("fs.glsl");
 
 fn main() {
-  let surface = GlfwSurface::new(WindowDim::Windowed(960, 540), "Hello, world!", WindowOpt::default());
+  let surface = GlfwSurface::new(
+    WindowDim::Windowed(960, 540),
+    "Hello, world!",
+    WindowOpt::default(),
+  );
 
   match surface {
     Ok(surface) => {
@@ -120,7 +142,7 @@ fn main_loop(mut surface: GlfwSurface) {
     for event in surface.poll_events() {
       match event {
         WindowEvent::Close | WindowEvent::Key(Key::Escape, _, Action::Release, _) => break 'app,
-        _ => ()
+        _ => (),
       }
     }
 
@@ -129,13 +151,17 @@ fn main_loop(mut surface: GlfwSurface) {
     let t = start_t.elapsed().as_millis() as f32 * 1e-3;
     let color = [t.cos(), t.sin(), 0.5, 1.];
 
-    surface.pipeline_builder().pipeline(&back_buffer, color, |_, mut shd_gate| {
-      shd_gate.shade(&program, |_, mut rdr_gate| {
-        rdr_gate.render(RenderState::default(), |mut tess_gate| {
-          tess_gate.render(triangle.slice(..));
+    surface.pipeline_builder().pipeline(
+      &back_buffer,
+      &PipelineState::default().set_clear_color(color),
+      |_, mut shd_gate| {
+        shd_gate.shade(&program, |_, mut rdr_gate| {
+          rdr_gate.render(&RenderState::default(), |mut tess_gate| {
+            tess_gate.render(triangle.slice(..));
+          });
         });
-      });
-    });
+      },
+    );
 
     // swap buffer chains
     surface.swap_buffers();

@@ -2,28 +2,29 @@
 
 The first thing you want to do is to create a window. This is done via a type you can find in
 [luminance-glfw]: `GlfwSurface`. A _graphics surface_ is a common term yet a bit opaque describing
-a region of memory that accepts getting rendered into. In [luminance], it’s also responsible in
+a region of memory that accepts getting rendered to. In [luminance], it’s also responsible for
 handling all the events related to that surface.
 
 Creating a new _graphics surface_ relies on several objects you need to decide values for:
 
-  - The dimensions of the surface. In our case, we will use a screen resolution of _960×540_ just
-    for the sake of the introduction. You create such dimensions with the `WindowDim::Windowed`
-    variant.
-  - The title of the window. Whether it will get displayed depends on your compositor and window
-    manager but pretty much all of them display the title in the top-level location of your window
-    as a _window decoration property_. Titles are encoded as simple `&str`.
-  - A set of options to tune the window and system-related features. For now, that last part is too
-    advanced and we’ll stick to using the defaults. Use `WindowOpt::default()`.
+- The dimensions of the surface. In our case, we will use a screen resolution of _960×540_ just
+  for the sake of the introduction. You create such dimensions with the `WindowDim::Windowed`
+  variant.
+- The title of the window. Whether it will get displayed depends on your compositor and window
+  manager but pretty much all of them display the title in the top-level location of your window
+  as a _window decoration property_. Titles are encoded as simple `&str`.
+- A set of options to tweaq the window and system-related properties. For now, that last part is
+  too advanced and we’ll stick to using the defaults. Use `WindowOpt::default()`.
 
-Getting a `GlfwSurface` might fail, so you need to handle when it fails.
+Getting a `GlfwSurface` might fail, so you need to handle failures via the `Result` type.
 
 Once you get your surface, you can start playing with it. How depends on what kind of application
 you want to write. For a video game, a simulation, a demo or an animation program, the following
 _event-render_ loop is enough. You ask for the event handler to check whether events have occurred
 and dequeue them all. Once you’re done, you render a frame, and you loop back.
 
-You quit the application if the window gets closed by the user or if they enter the _escape_ key.
+You quit the application if the window gets closed by the user or if they enter the _escape_ key,
+for instance.
 
 ```rust
 use luminance_glfw::{Action, GlfwSurface, Key, Surface as _, WindowDim, WindowEvent, WindowOpt};
@@ -81,14 +82,6 @@ into the back buffer. More on that later… ;)
 
 [luminance]: https://crates.io/crates/luminance
 [luminance-glfw]: https://crates.io/crates/luminance-glfw
-[cargo-watch]: https://crates.io/crates/cargo-watch
 [double buffering]: https://en.wikipedia.org/wiki/Multiple_buffering
 [`Surface::poll_events`]: https://docs.rs/luminance-windowing/latest/luminance_windowing/trait.Surface.html#tymethod.poll_events
 [`Surface::swap_buffers`]: https://docs.rs/luminance-windowing/latest/luminance_windowing/trait.Surface.html#tymethod.swap_buffers
-[`Framebuffer`]: https://docs.rs/luminance/latest/luminance/framebuffer/struct.Framebuffer.html
-[`Surface::back_buffer`]: https://docs.rs/luminance-windowing/latest/luminance_windowing/trait.Surface.html#method.back_buffer
-[`GraphicsContext`]: https://docs.rs/luminance/latest/luminance/context/trait.GraphicsContext.html
-[`Instant`]: https://doc.rust-lang.org/std/time/struct.Instant.html
-[`Builder`]: https://docs.rs/luminance/latest/luminance/pipeline/struct.Builder.html
-[`Builder::pipeline`]: https://docs.rs/luminance/latest/luminance/pipeline/struct.Builder.html#method.pipeline
-[AST]: https://en.wikipedia.org/wiki/Abstract_syntax_tree

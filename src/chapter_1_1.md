@@ -21,19 +21,19 @@ change the `[dependencies]` section according to the following:
 
 ```toml
 [dependencies]
-luminance = "0.37"
-luminance-glfw = "0.11"
+luminance = "0.38"
+luminance-glfw = "0.12"
 ```
 
 Some explanations here:
 
-  - [luminance] is the core crate and contains everything that abstracts over GPU graphics
-    capabilities. You will mostly use that crate to write graphics code.
-  - [luminance-glfw] is a _windowing_ implementation crate for [luminance]. There are several crates
-    available for that, depending on the platform you expect to run on. [luminance-glfw] supports a
-    lot of platforms so you should be good to start (plus it’s pretty easy). Windowing code allows
-    to ask your system create a window, handle inputs such as keypresses, mouse movements, touch,
-    etc. etc.
+- [luminance] is the core crate and contains everything that abstracts over GPU graphics
+  capabilities. You will mostly use that crate to write graphics code.
+- [luminance-glfw] is a _windowing_ implementation crate for [luminance]. There are several crates
+  available for that, depending on the platform you expect to run on. [luminance-glfw] supports a
+  lot of platforms so you should be good to start (plus it’s pretty easy). Windowing code allows
+  to ask your system create a window, handle inputs such as keypresses, mouse movements, touch,
+  etc. etc.
 
 Optional but highly recommended: install [cargo-watch]. That tool allows you to have a `cargo`
 loop updating every time a code file in your project changes. You can set it up to re-compile,

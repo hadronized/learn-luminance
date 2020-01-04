@@ -1,0 +1,13 @@
+[package]
+name = "chapter-3"
+version = "0.1.0"
+authors = ["Dimitri Sabadie <dimitri.sabadie@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+cgmath = "0.17"
+luminance = "0.38"
+luminance-derive = "0.5"
+luminance-glfw = "0.12"
+try-guard = "0.2"
+wavefront_obj = "7"

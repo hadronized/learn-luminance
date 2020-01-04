@@ -17,16 +17,20 @@ you’re interested, though.
 fields. You update a uniform by using the [`Uniform::update`] method.
 
 ```rust
-surface.pipeline_builder().pipeline(&back_buffer, color, |_, mut shd_gate| {
-  shd_gate.shade(&program, |iface, mut rdr_gate| {
-    iface.projection.update(projection.into()); // here
-    iface.view.update(view.into()); // and here
+surface.pipeline_builder().pipeline(
+  &back_buffer,
+  &PipelineState::default().set_clear_color(color),
+  |_, mut shd_gate| {
+    shd_gate.shade(&program, |iface, mut rdr_gate| {
+      iface.projection.update(projection.into());
+      iface.view.update(view.into());
 
-    rdr_gate.render(RenderState::default(), |mut tess_gate| {
-      tess_gate.render(mesh.slice(..));
+      rdr_gate.render(&RenderState::default(), |mut tess_gate| {
+        tess_gate.render(mesh.slice(..));
+      });
     });
-  });
-});
+  },
+);
 ```
 
 It’s as simple as that.
