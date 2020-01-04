@@ -158,15 +158,15 @@ will then only need the position.</p>
 </span>use luminance_derive::{Semantics, Vertex};
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, Semantics)]
-pub enum Semantics {
+pub enum VertexSemantics {
   #[sem(name = &quot;position&quot;, repr = &quot;[f32; 3]&quot;, wrapper = &quot;VertexPosition&quot;)]
-  Position
+  Position,
 }
 
 #[derive(Clone, Copy, Debug, Vertex)]
-#[vertex(sem = &quot;Semantics&quot;)]
-pub struct Vertex {
-  position: VertexPosition
+#[vertex(sem = &quot;VertexSemantics&quot;)]
+struct Vertex {
+  position: VertexPosition,
 }
 <span class="boring">}
 </span></code></pre></pre>

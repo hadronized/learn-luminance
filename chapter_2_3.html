@@ -162,18 +162,22 @@ chapter. Currently, we will just use the default one.</p>
 <pre><pre class="playpen"><code class="language-rust">
 <span class="boring">#![allow(unused_variables)]
 </span><span class="boring">fn main() {
-</span>surface.pipeline_builder().pipeline(&amp;back_buffer, color, |_, mut shd_gate| {
-  shd_gate.shade(&amp;program, |_, mut rdr_gate| {
-    rdr_gate.render(RenderState::default(), |mut tess_gate| {
-      // …
+</span>surface.pipeline_builder().pipeline(
+  &amp;back_buffer,
+  &amp;PipelineState::default().set_clear_color(color),
+  |_, mut shd_gate| {
+    shd_gate.shade(&amp;program, |_, mut rdr_gate| {
+      rdr_gate.render(&amp;RenderState::default(), |mut tess_gate| {
+        // …
+      });
     });
-  });
-});
+  },
+);
 <span class="boring">}
 </span></code></pre></pre>
 <p>We’re almost there. We’re getting a <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.TessGate.html"><code>TessGate</code></a>, allowing us to render actual tessellations. In
 order to do so, we will need to create a <a href="https://docs.rs/luminance/latest/luminance/tess/struct.TessSlice.html"><code>TessSlice</code></a> out of our <a href="https://docs.rs/luminance/latest/luminance/tess/struct.Tess.html"><code>Tess</code></a>. That enables to slice
-GPU tessellation on the fly fro free. In our case, we want the whole thing (the whole triangle),
+GPU tessellation on the fly for free. In our case, we want the whole thing (the whole triangle),
 so we will use the [<code>..</code>] operator.</p>
 <blockquote>
 <p>You will need the <a href="https://docs.rs/luminance/latest/luminance/tess/struct.TessSliceIndex.html"><code>TessSliceIndex</code></a> trait to do such a thing.</p>
@@ -188,19 +192,24 @@ so we will use the [<code>..</code>] operator.</p>
 <pre><pre class="playpen"><code class="language-rust">
 <span class="boring">#![allow(unused_variables)]
 </span><span class="boring">fn main() {
-</span>surface.pipeline_builder().pipeline(&amp;back_buffer, color, |_, mut shd_gate| {
-  shd_gate.shade(&amp;program, |_, mut rdr_gate| {
-    rdr_gate.render(RenderState::default(), |mut tess_gate| {
-      tess_gate.render(triangle.slice(..));
+</span>surface.pipeline_builder().pipeline(
+  &amp;back_buffer,
+  &amp;PipelineState::default().set_clear_color(color),
+  |_, mut shd_gate| {
+    shd_gate.shade(&amp;program, |_, mut rdr_gate| {
+      rdr_gate.render(&amp;RenderState::default(), |mut tess_gate| {
+        tess_gate.render(triangle.slice(..));
+      });
     });
-  });
-});
+  },
+);
 <span class="boring">}
 </span></code></pre></pre>
 <p>Compile and run the code. You should see something similar to this:</p>
 <p><img src="imgs/your_first_triangle.png" alt="" /></p>
 <p>The complete code:</p>
 <pre><pre class="playpen"><code class="language-rust">use luminance::context::GraphicsContext as _;
+use luminance::pipeline::PipelineState;
 use luminance::render_state::RenderState;
 use luminance::shader::program::Program;
 use luminance::tess::{Mode, TessBuilder, TessSliceIndex as _};
@@ -214,7 +223,7 @@ pub enum VertexSemantics {
   #[sem(name = &quot;position&quot;, repr = &quot;[f32; 2]&quot;, wrapper = &quot;VertexPosition&quot;)]
   Position,
   #[sem(name = &quot;color&quot;, repr = &quot;[u8; 3]&quot;, wrapper = &quot;VertexRGB&quot;)]
-  Color
+  Color,
 }
 
 #[derive(Vertex)]
@@ -222,20 +231,33 @@ pub enum VertexSemantics {
 pub struct Vertex {
   position: VertexPosition,
   #[vertex(normalized = &quot;true&quot;)]
-  color: VertexRGB
+  color: VertexRGB,
 }
 
 const VERTICES: [Vertex; 3] = [
-  Vertex { position: VertexPosition::new([-0.5, -0.5]), color: VertexRGB::new([255,   0,   0]) },
-  Vertex { position: VertexPosition::new([ 0.5, -0.5]), color: VertexRGB::new([  0, 255,   0]) },
-  Vertex { position: VertexPosition::new([  0.,  0.5]), color: VertexRGB::new([  0,   0, 255]) },
+  Vertex {
+    position: VertexPosition::new([-0.5, -0.5]),
+    color: VertexRGB::new([255, 0, 0]),
+  },
+  Vertex {
+    position: VertexPosition::new([0.5, -0.5]),
+    color: VertexRGB::new([0, 255, 0]),
+  },
+  Vertex {
+    position: VertexPosition::new([0., 0.5]),
+    color: VertexRGB::new([0, 0, 255]),
+  },
 ];
 
 const VS_STR: &amp;str = include_str!(&quot;vs.glsl&quot;);
 const FS_STR: &amp;str = include_str!(&quot;fs.glsl&quot;);
 
 fn main() {
-  let surface = GlfwSurface::new(WindowDim::Windowed(960, 540), &quot;Hello, world!&quot;, WindowOpt::default());
+  let surface = GlfwSurface::new(
+    WindowDim::Windowed(960, 540),
+    &quot;Hello, world!&quot;,
+    WindowOpt::default(),
+  );
 
   match surface {
     Ok(surface) =&gt; {
@@ -270,7 +292,7 @@ fn main_loop(mut surface: GlfwSurface) {
     for event in surface.poll_events() {
       match event {
         WindowEvent::Close | WindowEvent::Key(Key::Escape, _, Action::Release, _) =&gt; break 'app,
-        _ =&gt; ()
+        _ =&gt; (),
       }
     }
 
@@ -279,13 +301,17 @@ fn main_loop(mut surface: GlfwSurface) {
     let t = start_t.elapsed().as_millis() as f32 * 1e-3;
     let color = [t.cos(), t.sin(), 0.5, 1.];
 
-    surface.pipeline_builder().pipeline(&amp;back_buffer, color, |_, mut shd_gate| {
-      shd_gate.shade(&amp;program, |_, mut rdr_gate| {
-        rdr_gate.render(RenderState::default(), |mut tess_gate| {
-          tess_gate.render(triangle.slice(..));
+    surface.pipeline_builder().pipeline(
+      &amp;back_buffer,
+      &amp;PipelineState::default().set_clear_color(color),
+      |_, mut shd_gate| {
+        shd_gate.shade(&amp;program, |_, mut rdr_gate| {
+          rdr_gate.render(&amp;RenderState::default(), |mut tess_gate| {
+            tess_gate.render(triangle.slice(..));
+          });
         });
-      });
-    });
+      },
+    );
 
     // swap buffer chains
     surface.swap_buffers();

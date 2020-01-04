@@ -181,7 +181,7 @@ and raw speed of <a href="https://crates.io/crates/cgmath">cgmath</a>.</p>
 <pre><pre class="playpen"><code class="language-rust">
 <span class="boring">#![allow(unused_variables)]
 </span><span class="boring">fn main() {
-</span>use cgmath::{EuclideanSpace, Matrix4, Point3, Quaternion, Rad, Rotation3, Vector3, perspective};
+</span>use cgmath::{perspective, EuclideanSpace, Matrix4, Point3, Rad, Vector3};
 <span class="boring">}
 </span></code></pre></pre>
 <p>Don’t get scared about the heavy-math symbol names. What you must know, however, is this:</p>
@@ -217,7 +217,12 @@ const Z_FAR: f32 = 10.;
 
 // in the main_loop function, before the actual loop
 
-let projection = perspective(FOVY, surface.width() as f32 / surface.height() as f32, Z_NEAR, Z_FAR);
+let projection = perspective(
+  FOVY,
+  surface.width() as f32 / surface.height() as f32,
+  Z_NEAR,
+  Z_FAR,
+);
 <span class="boring">}
 </span></code></pre></pre>
 <p>This defines a projection matrix with a <em>field of view</em> set to <em>π ÷ 2</em> (wich represents a field of
@@ -371,9 +376,10 @@ we’re done.</p>
 <pre><pre class="playpen"><code class="language-rust">
 <span class="boring">#![allow(unused_variables)]
 </span><span class="boring">fn main() {
-</span>let program: Program&lt;Semantics, (), ShaderInterface&gt; = Program::from_strings(None, VS_STR, None, FS_STR)
-  .unwrap()
-  .ignore_warnings();
+</span>let program: Program&lt;VertexSemantics, (), ShaderInterface&gt; =
+  Program::from_strings(None, VS_STR, None, FS_STR)
+    .unwrap()
+    .ignore_warnings();
 <span class="boring">}
 </span></code></pre></pre>
 

@@ -166,16 +166,20 @@ fields. You update a uniform by using the <a href="https://docs.rs/luminance/lat
 <pre><pre class="playpen"><code class="language-rust">
 <span class="boring">#![allow(unused_variables)]
 </span><span class="boring">fn main() {
-</span>surface.pipeline_builder().pipeline(&amp;back_buffer, color, |_, mut shd_gate| {
-  shd_gate.shade(&amp;program, |iface, mut rdr_gate| {
-    iface.projection.update(projection.into()); // here
-    iface.view.update(view.into()); // and here
+</span>surface.pipeline_builder().pipeline(
+  &amp;back_buffer,
+  &amp;PipelineState::default().set_clear_color(color),
+  |_, mut shd_gate| {
+    shd_gate.shade(&amp;program, |iface, mut rdr_gate| {
+      iface.projection.update(projection.into());
+      iface.view.update(view.into());
 
-    rdr_gate.render(RenderState::default(), |mut tess_gate| {
-      tess_gate.render(mesh.slice(..));
+      rdr_gate.render(&amp;RenderState::default(), |mut tess_gate| {
+        tess_gate.render(mesh.slice(..));
+      });
     });
-  });
-});
+  },
+);
 <span class="boring">}
 </span></code></pre></pre>
 <p>It’s as simple as that.</p>

@@ -149,23 +149,30 @@
                 <div id="content" class="content">
                     <main>
                         <h1><a class="header" href="#shady-triangle" id="shady-triangle">Shady triangle</a></h1>
-<p><a href="https://crates.io/crates/luminance">luminance</a> is not a framework nor a video game engine. By default, it comes with zero data. Hence,
-there is nothing <em>per se</em> that provides <em>materials</em> or that kind of concept. You will have to craft
-it yourself and that is what we are going to do in this section.</p>
-<p>Remember our pipeline creation from the <a href="Hello,-world!">previous</a> chapter? We needed to provide a
-closure taking two arguments. It’s time to explain you what those arguments are for. Let’s take
-the pipeline definition again:</p>
+<p><a href="https://crates.io/crates/luminance">luminance</a> is not a framework nor a video game engine. By default, it comes with zero data set.
+Hence, there is nothing <em>per se</em> that provides <em>materials</em> or that kind of concept. You will have
+to craft them yourself and that is what we are going to do in this section.</p>
+<p>Remember our pipeline creation from the chapter? We needed to provide a closure taking two
+arguments. It’s time to explain you what those arguments are for. Let’s take the pipeline
+definition again:</p>
 <pre><pre class="playpen"><code class="language-rust">
 <span class="boring">#![allow(unused_variables)]
 </span><span class="boring">fn main() {
-</span>surface.pipeline_builder().pipeline(&amp;back_buffer, color, |_, _| ());
+</span>surface.pipeline_builder().pipeline(
+  &amp;back_buffer,
+  &amp;PipelineState::default().set_clear_color(color),
+  |_, _| (),
+);
 <span class="boring">}
 </span></code></pre></pre>
 <p>And rewrite it by using the arguments:</p>
 <pre><pre class="playpen"><code class="language-rust">
 <span class="boring">#![allow(unused_variables)]
 </span><span class="boring">fn main() {
-</span>surface.pipeline_builder().pipeline(&amp;back_buffer, color, |pipeline, shd_gate| {
+</span>surface.pipeline_builder().pipeline(
+  &amp;back_buffer,
+  &amp;PipelineState::default().set_clear_color(color),
+  |pipeline, mut shd_gate| (),
   // …
 });
 <span class="boring">}
@@ -287,7 +294,7 @@ chapter. Let’s focus on the simple stuff first.</p>
 <p>As you can see, you need to provide the <em>vertex semantics type</em> you defined earlier. That enables
 <a href="https://crates.io/crates/luminance">luminance</a> to check whether your <em>shader program</em> is compatible with the <a href="https://docs.rs/luminance/latest/luminance/tess/struct.Tess.html"><code>Tess</code></a> you intend to use
 it with… at compile-time. Ignore the two <code>()</code>, we’ll discuss that later. However, notice the use
-of the [BuiltProgram::ignore_warnings] method: it gives you the actual <a href="https://docs.rs/luminance/latest/luminance/shader/program/struct.Program.html"><code>Program</code></a> by ignoring any
+of the <a href="https://docs.rs/luminance/latest/luminance/shader/program/struct.BuiltProgram.html#method.ignore_warnings"><code>BuiltProgram::ignore_warnings</code></a> method: it gives you the actual <a href="https://docs.rs/luminance/latest/luminance/shader/program/struct.Program.html"><code>Program</code></a> by ignoring any
 <em>warnings</em> that might have happened while creating the shader program. You can inspect them if you
 want to but for the purpose of this example, you will not need to.</p>
 <blockquote>
@@ -300,10 +307,13 @@ drive behavior with types (the <a href="https://doc.rust-lang.org/1.30.0/book/fi
 <pre><pre class="playpen"><code class="language-rust">
 <span class="boring">#![allow(unused_variables)]
 </span><span class="boring">fn main() {
-</span>surface.pipeline_builder().pipeline(&amp;back_buffer, color, |_, mut shd_gate| {
-  shd_gate.shade(&amp;program, |_, mut rdr_gate| {
-    // …
-  });
+</span>surface.pipeline_builder().pipeline(
+  &amp;back_buffer,
+  &amp;PipelineState::default().set_clear_color(color),
+  |_, mut shd_gate| {
+    shd_gate.shade(&amp;program, |_, mut rdr_gate| {
+      // …
+    });
 });
 <span class="boring">}
 </span></code></pre></pre>

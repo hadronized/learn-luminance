@@ -154,10 +154,10 @@ can be <em>represented</em> in lots of ways. In our case:</p>
 <ul>
 <li>A triangle has three vertices.</li>
 <li>Each vertex has a position in 2D, represented by two floating point values on 32-bit.</li>
-<li>Each vertex has a color, represented as RGB.</li>
+<li>Each vertex has a color, represented as RGB on 8-bit unsigned integers.</li>
 </ul>
 <p>The first thing to do is to create… types. You will see throughout this book that <a href="https://crates.io/crates/luminance">luminance</a> is
-very type-oriented. Don’t freak out. <a href="https://crates.io/crates/luminance">luminance</a> requires you to define your type in a way it can
+heavily type-oriented. Don’t freak out. <a href="https://crates.io/crates/luminance">luminance</a> requires you to define your type in a way it can
 acknowledge how vertices’ data are formed. The following, for instance, will not work:</p>
 <pre><pre class="playpen"><code class="language-rust">
 <span class="boring">#![allow(unused_variables)]
@@ -180,7 +180,7 @@ have to worry about those because a crate exists to automatically implement such
 a <em>vertex semantics</em> type, implementing the <a href="https://docs.rs/luminance/latest/luminance/vertex/trait.Semantics.html"><code>Semantics</code></a> trait. Again, you don’t have to implement
 such a trait by hand: <a href="https://crates.io/crates/luminance-derive">luminance-derive</a> will handle all that for you.</p>
 <p>Vertex semantics are a way to tell <a href="https://crates.io/crates/luminance">luminance</a> what the relationship between <em>all</em> objects you
-intend to create and the way they will be rendered is about. In our case, we just only need two
+intend to create and the way they will be rendered is. In our case, we just only need two
 semantics: <em>vertex positions</em> and <em>vertex colors</em>. Let’s create our semantics type:</p>
 <pre><pre class="playpen"><code class="language-rust">
 <span class="boring">#![allow(unused_variables)]
@@ -197,7 +197,7 @@ pub enum VertexSemantics {
   #[sem(name = &quot;position&quot;, repr = &quot;[f32; 2]&quot;, wrapper = &quot;VertexPosition&quot;)]
   Position,
   #[sem(name = &quot;color&quot;, repr = &quot;[u8; 3]&quot;, wrapper = &quot;VertexRGB&quot;)]
-  Color
+  Color,
 }
 <span class="boring">}
 </span></code></pre></pre>
@@ -207,32 +207,32 @@ pub enum VertexSemantics {
 <p>Indeed, let’s dig the syntax:</p>
 <ul>
 <li>The <code>Semantics</code> derive annotation marks an <code>enum</code> as being representative of <em>vertex semantics</em>.
-Currently, nothing else than <code>enum</code>s are supported.</li>
+Currently, nothing else than <code>enum</code> is supported.</li>
 <li>The type implementing <code>Semantics</code> must also implement <a href="https://doc.rust-lang.org/std/marker/trait.Copy.html"><code>Copy</code></a>, <a href="https://doc.rust-lang.org/std/clone/trait.Clone.html"><code>Clone</code></a> and <a href="https://doc.rust-lang.org/std/fmt/trait.Debug.html"><code>Debug</code></a>.</li>
 <li>Each variant of the <code>enum</code> represents a distinct <em>vertex semantics</em>.</li>
 <li>The syntax <code>#[sem(..)]</code> provides several mandatory information:
 <ul>
 <li>The <code>name = &quot;position&quot;</code> annotation gives <a href="https://crates.io/crates/luminance">luminance</a> a way to recognize the semantics in
 <em>shader stages</em>. You don’t have to worry about what it means so far but keep in mind that
-identifier must be unique.</li>
+that identifier must be unique.</li>
 <li><code>repr = &quot;[f32; 2]&quot;</code> tells which is the underlying expected type of the semantics. That
 constructs a strongly-typed assumption about the semantics. A <code>&quot;position&quot;</code> is a 2D <code>f32</code>.
-Period. You have a large list of type you can use here but you are limited to the implementors
+Period. You have a large list of types you can use here but you are limited to the implementors
 of <a href="https://docs.rs/luminance/latest/luminance/vertex/trait.VertexAttrib.html"><code>VertexAttrib</code></a>.</li>
 <li>The <code>wrapper = &quot;VertexPosition&quot;</code> annotation generates a new type called <code>VertexPosition</code> and
-in scope in the module you declared the <code>enum</code>. That type is the only one which is recognized
-as being usable with the <code>Semantics</code> <code>enum</code> you just declared — it implements the
+in scope in the module you declared the <code>enum</code>. That type is one of the only ones which are
+recognized as being usable with the <code>Semantics</code> <code>enum</code> you just declared — it implements the
 <a href="https://docs.rs/luminance/latest/luminance/vertex/trait.HasSemantics.html"><code>HasSemantics</code></a> trait for which <code>HasSemantics::Sem = VertexSemantics</code>.</li>
 </ul>
 </li>
 </ul>
 <p>All of this might be a bit confusing; let’s clarify even further. When you declare an <code>enum</code>
 annotated with <code>#[derive(Copy, Clone, Debug, Semantics)]</code>, <a href="https://crates.io/crates/luminance-derive">luminance-derive</a> does automatically
-implement <a href="https://docs.rs/luminance/latest/luminance/vertex/trait.Semantics.html"><code>Semantics</code></a> for you and generate as many types as variants in your <code>enum</code>. Those types
+implement <a href="https://docs.rs/luminance/latest/luminance/vertex/trait.Semantics.html"><code>Semantics</code></a> for you and generates as many types as variants in your <code>enum</code>. Those types
 represent <em>vertex attributes</em> types you will be able to use to construct types that will correctly
 implement the <a href="https://docs.rs/luminance/latest/luminance/vertex/trait.Vertex.html"><code>Vertex</code></a> trait.</p>
 <p>Talking about <a href="https://docs.rs/luminance/latest/luminance/vertex/trait.Vertex.html"><code>Vertex</code></a>, let’s go and define our vertex type. The <code>Vertex</code> derive annotation works
-only on <code>struct</code>s, so let’s create one. Import the <code>Vertex</code> proc-macro first:</p>
+on both <code>struct</code>s and tuple-<code>struct</code>. Import the <code>Vertex</code> proc-macro first:</p>
 <pre><pre class="playpen"><code class="language-rust">
 <span class="boring">#![allow(unused_variables)]
 </span><span class="boring">fn main() {
@@ -249,28 +249,28 @@ clash with types):</p>
 pub struct Vertex {
   position: VertexPosition,
   #[vertex(normalized = &quot;true&quot;)]
-  color: VertexRGB
+  color: VertexRGB,
 }
 <span class="boring">}
 </span></code></pre></pre>
 <p>A new syntax! So:</p>
 <ul>
 <li>The <code>Vertex</code> derive annotation marks a <code>struct</code> as being a valid <em>vertex</em> type. Currently, only
-<code>struct</code> with fields are supported.</li>
+<code>struct</code> with fields and tuple-<code>struct</code> are supported.</li>
 <li>The <code>#[vertex(sem = &quot;VertexSemantics&quot;)]</code> provides a mapping to a type that represents your
 <em>vertex semantics</em>.</li>
 <li>Each field must have a type that implements <code>HasSemantics&lt;Sem = VertexSemantics&gt;</code> in that case.
 Don’t forget about the <code>wrapper</code> types that got generated with the <code>Semantics</code> derive: those
 types are valid as fields’ types here.</li>
 <li>The special <code>#[vertex(normalized = &quot;true&quot;)]</code> annotation marks a field as being <em>normalized</em>.
-Normalized fields make sense when the field has an integral type, such as <code>[u8; 3]</code>, which is
+Normalized fields make sense when the field is of an integral type, such as <code>[u8; 3]</code>, which is
 <em>unsigned integral</em>. When trying to fetch normalized vertex attribute, a <em>shader stage</em> will get
 normalized floating point numbers (lying in <code>[0; 1]</code>) instead of the typical e.g. <code>[0; 255]</code>.</li>
 </ul>
 <p>And we are good to go as our vertex type is now live!</p>
 <blockquote>
-<p>Some notes: the generated wrapper types have some useful methods and implementors. You can get
-a list easily by running <code>cargo doc --open</code>.</p>
+<p>Some notes: the generated wrapper types have some useful methods and implementors. You can easily
+get a list by running <code>cargo doc --open</code>.</p>
 </blockquote>
 <h2><a class="header" href="#defining-a-triangle" id="defining-a-triangle">Defining a triangle</a></h2>
 <p>A triangle is just three points — three vertices. Let’s define them.</p>
@@ -278,9 +278,18 @@ a list easily by running <code>cargo doc --open</code>.</p>
 <span class="boring">#![allow(unused_variables)]
 </span><span class="boring">fn main() {
 </span>const VERTICES: [Vertex; 3] = [
-  Vertex { position: VertexPosition::new([-0.5, -0.5]), color: VertexRGB::new([255,   0,   0]) },
-  Vertex { position: VertexPosition::new([ 0.5, -0.5]), color: VertexRGB::new([  0, 255,   0]) },
-  Vertex { position: VertexPosition::new([  0.,  0.5]), color: VertexRGB::new([  0,   0, 255]) },
+  Vertex {
+    position: VertexPosition::new([-0.5, -0.5]),
+    color: VertexRGB::new([255, 0, 0]),
+  },
+  Vertex {
+    position: VertexPosition::new([0.5, -0.5]),
+    color: VertexRGB::new([0, 255, 0]),
+  },
+  Vertex {
+    position: VertexPosition::new([0., 0.5]),
+    color: VertexRGB::new([0, 0, 255]),
+  },
 ];
 <span class="boring">}
 </span></code></pre></pre>
@@ -293,8 +302,8 @@ level too; not only the vertex attributes.</p>
 <blockquote>
 <p>Tessellations?</p>
 </blockquote>
-<p>In <a href="https://crates.io/crates/luminance">luminance</a>, everything that has a <em>vertex</em> or <em>must be rendered</em> is done via a <em>tessellation</em> as
-described by the <a href="https://docs.rs/luminance/latest/luminance/tess/struct.Tess.html"><code>Tess</code></a> type. GPU tessellations provide information about:</p>
+<p>In <a href="https://crates.io/crates/luminance">luminance</a>, everything that has a <em>vertex</em> or that <em>must be rendered</em> is done via a
+<em>tessellation</em> as described by the <a href="https://docs.rs/luminance/latest/luminance/tess/struct.Tess.html"><code>Tess</code></a> type. GPU tessellations provide information about:</p>
 <ul>
 <li>The nature of the topology of the underlying <em>vertex mesh</em>. That is, zero, one or several
 buffers describing the raw topology of the mesh.</li>

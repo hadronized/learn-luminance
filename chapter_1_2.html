@@ -151,7 +151,7 @@
                         <h2><a class="header" href="#creating-a-window-and-preparing-graphics-code" id="creating-a-window-and-preparing-graphics-code">Creating a window and preparing graphics code</a></h2>
 <p>The first thing you want to do is to create a window. This is done via a type you can find in
 <a href="https://crates.io/crates/luminance-glfw">luminance-glfw</a>: <code>GlfwSurface</code>. A <em>graphics surface</em> is a common term yet a bit opaque describing
-a region of memory that accepts getting rendered into. In <a href="https://crates.io/crates/luminance">luminance</a>, it’s also responsible in
+a region of memory that accepts getting rendered to. In <a href="https://crates.io/crates/luminance">luminance</a>, it’s also responsible for
 handling all the events related to that surface.</p>
 <p>Creating a new <em>graphics surface</em> relies on several objects you need to decide values for:</p>
 <ul>
@@ -161,15 +161,16 @@ variant.</li>
 <li>The title of the window. Whether it will get displayed depends on your compositor and window
 manager but pretty much all of them display the title in the top-level location of your window
 as a <em>window decoration property</em>. Titles are encoded as simple <code>&amp;str</code>.</li>
-<li>A set of options to tune the window and system-related features. For now, that last part is too
-advanced and we’ll stick to using the defaults. Use <code>WindowOpt::default()</code>.</li>
+<li>A set of options to tweaq the window and system-related properties. For now, that last part is
+too advanced and we’ll stick to using the defaults. Use <code>WindowOpt::default()</code>.</li>
 </ul>
-<p>Getting a <code>GlfwSurface</code> might fail, so you need to handle when it fails.</p>
+<p>Getting a <code>GlfwSurface</code> might fail, so you need to handle failures via the <code>Result</code> type.</p>
 <p>Once you get your surface, you can start playing with it. How depends on what kind of application
 you want to write. For a video game, a simulation, a demo or an animation program, the following
 <em>event-render</em> loop is enough. You ask for the event handler to check whether events have occurred
 and dequeue them all. Once you’re done, you render a frame, and you loop back.</p>
-<p>You quit the application if the window gets closed by the user or if they enter the <em>escape</em> key.</p>
+<p>You quit the application if the window gets closed by the user or if they enter the <em>escape</em> key,
+for instance.</p>
 <pre><pre class="playpen"><code class="language-rust">use luminance_glfw::{Action, GlfwSurface, Key, Surface as _, WindowDim, WindowEvent, WindowOpt};
 use std::process::exit;
 

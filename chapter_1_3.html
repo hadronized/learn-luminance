@@ -150,17 +150,18 @@
                     <main>
                         <h2><a class="header" href="#changing-the-background-color" id="changing-the-background-color">Changing the background color</a></h2>
 <p>We’re getting to the interesting things. Before trying to render cool rotating cubes, we need to
-understand how graphics rendering works with <a href="https://crates.io/crates/luminance">luminance</a>.</p>
+understand how graphics rendering works in <a href="https://crates.io/crates/luminance">luminance</a>.</p>
 <p><a href="https://crates.io/crates/luminance">luminance</a> has a special way of encoding renders. Instead of giving you all the GPU power right
 away, it constrains you to pretty much none. That seems insane but you will eventually recognize
-that such a way of doing is actually pretty useful.</p>
+that such a way of doing is actually pretty useful. What it means is that by default, you cannot
+do anything and you are required to build up types to unlock new GPU features.</p>
 <p>To render something, you need several resources. The first resource is a <em>frame buffer</em>. A frame
 buffer, encoded with <a href="https://docs.rs/luminance/latest/luminance/framebuffer/struct.Framebuffer.html"><code>Framebuffer</code></a>, is a special GPU resource that holds <em>frames</em>, i.e. the
 pixel storage for renders!</p>
 <blockquote>
 <p>So… is the <em>back</em> buffer you told us earlier some kind of <a href="https://docs.rs/luminance/latest/luminance/framebuffer/struct.Framebuffer.html"><code>Framebuffer</code></a>?</p>
 </blockquote>
-<p>It’s not <em>some</em> kind: it’s a <a href="https://docs.rs/luminance/latest/luminance/framebuffer/struct.Framebuffer.html"><code>Framebuffer</code></a>. And guess what: you can access it via the
+<p>It’s not <em>some</em> kind: it <strong>is</strong> a <a href="https://docs.rs/luminance/latest/luminance/framebuffer/struct.Framebuffer.html"><code>Framebuffer</code></a>. And guess what: you can access it via the
 <a href="https://docs.rs/luminance-windowing/latest/luminance_windowing/trait.Surface.html#method.back_buffer"><code>Surface::back_buffer</code></a> method.</p>
 <p>So, let’s make our first cool render and make a color-varying background! First, you will need to
 import one symbol from <a href="https://crates.io/crates/luminance">luminance</a>: <a href="https://docs.rs/luminance/latest/luminance/context/trait.GraphicsContext.html"><code>GraphicsContext</code></a>, which is a trait that allows you to run
@@ -194,7 +195,11 @@ implementors.</p>
     let t = start_t.elapsed().as_millis() as f32 * 1e-3;
     let color = [t.cos(), t.sin(), 0.5, 1.];
 
-    surface.pipeline_builder().pipeline(&amp;back_buffer, color, |_, _| ());
+    surface.pipeline_builder().pipeline(
+      &amp;back_buffer,
+      &amp;PipelineState::default().set_clear_color(color),
+      |_, _| (),
+    );
 
     // swap buffer chains
     surface.swap_buffers();
@@ -214,10 +219,10 @@ represents a given resource sharing and leaves are actual renders.</p>
 <p>In our case, we don’t want to render anything, we just want to modify the <em>back</em> buffer background
 color. That is done with the arguments you pass to <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.Builder.html#method.pipeline"><code>Builder::pipeline</code></a>. The first one is the
 frame buffer to render to. In our case, it’s our <em>back</em> buffer.</p>
-<p>The second argument is the background color. Everytime you perform a render into a frame buffer, you
-<em>need</em> to provide that color as the frame buffer’s storage will be cleared with that value (color
-buffer, for short). It is possible to tell <a href="https://crates.io/crates/luminance">luminance</a> not to clear color buffers but this is off
-topic.</p>
+<p>The second argument is the <em>pipeline state</em> to use when running our pipeline. Everytime you perform a
+render into a frame buffer, you <em>need</em> to provide such an object, which contains the color to use when
+clearing the framebuffer’s color buffers. It is possible to tell <a href="https://crates.io/crates/luminance">luminance</a> not to clear color buffers
+but this is off topic.</p>
 <p>The third and last argument is a <em>closure</em> you need to pass. That closure will be called as soon as
 the frame buffer is ready to receive a render. All this code is fully <em>synchronous</em> though, so
 lifetimes are enforced. In our case, since we’re not interested into making any actual render,
@@ -226,12 +231,17 @@ we just pass a closure that does nothing. More on its two arguments later.</p>
 <p><img src="./imgs/hello-world.png" alt="" /></p>
 <p>The complete code is:</p>
 <pre><pre class="playpen"><code class="language-rust">use luminance::context::GraphicsContext as _;
+use luminance::pipeline::PipelineState;
 use luminance_glfw::{Action, GlfwSurface, Key, Surface as _, WindowDim, WindowEvent, WindowOpt};
 use std::process::exit;
 use std::time::Instant;
 
 fn main() {
-  let surface = GlfwSurface::new(WindowDim::Windowed(960, 540), &quot;Hello, world!&quot;, WindowOpt::default());
+  let surface = GlfwSurface::new(
+    WindowDim::Windowed(960, 540),
+    &quot;Hello, world!&quot;,
+    WindowOpt::default(),
+  );
 
   match surface {
     Ok(surface) =&gt; {
@@ -255,7 +265,7 @@ fn main_loop(mut surface: GlfwSurface) {
     for event in surface.poll_events() {
       match event {
         WindowEvent::Close | WindowEvent::Key(Key::Escape, _, Action::Release, _) =&gt; break 'app,
-        _ =&gt; ()
+        _ =&gt; (),
       }
     }
 
@@ -264,7 +274,11 @@ fn main_loop(mut surface: GlfwSurface) {
     let t = start_t.elapsed().as_millis() as f32 * 1e-3;
     let color = [t.cos(), t.sin(), 0.5, 1.];
 
-    surface.pipeline_builder().pipeline(&amp;back_buffer, color, |_, _| ());
+    surface.pipeline_builder().pipeline(
+      &amp;back_buffer,
+      &amp;PipelineState::default().set_clear_color(color),
+      |_, _| (),
+    );
 
     // swap buffer chains
     surface.swap_buffers();

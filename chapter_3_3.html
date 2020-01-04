@@ -179,7 +179,10 @@ struct Obj {
 }
 
 impl Obj {
-  fn to_tess&lt;C&gt;(self, ctx: &amp;mut C) -&gt; Result&lt;Tess, TessError&gt; where C: GraphicsContext {
+  fn to_tess&lt;C&gt;(self, ctx: &amp;mut C) -&gt; Result&lt;Tess, TessError&gt;
+  where
+    C: GraphicsContext,
+  {
     TessBuilder::new(ctx)
       .set_mode(Mode::Triangle)
       .add_vertices(self.vertices)
@@ -187,7 +190,10 @@ impl Obj {
       .build()
   }
 
-  fn load&lt;P&gt;(path: P) -&gt; Result&lt;Self, String&gt; where P: AsRef&lt;Path&gt; {
+  fn load&lt;P&gt;(path: P) -&gt; Result&lt;Self, String&gt;
+  where
+    P: AsRef&lt;Path&gt;,
+  {
     let file_content = {
       let mut file = File::open(path).map_err(|e| format!(&quot;cannot open file: {}&quot;, e))?;
       let mut content = String::new();
