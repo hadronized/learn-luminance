@@ -19,7 +19,9 @@ pub enum VertexSemantics {
 #[derive(Vertex)]
 #[vertex(sem = "VertexSemantics")]
 pub struct Vertex {
+  #[allow(dead_code)]
   position: VertexPosition,
+  #[allow(dead_code)]
   #[vertex(normalized = "true")]
   color: VertexRGB,
 }
