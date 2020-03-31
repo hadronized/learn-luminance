@@ -26,7 +26,7 @@ jobs:
           git switch gh-pages
           git rm -rf .
           git restore --source=origin/master . # restore as if we were on master
-          git remote add upstream github.com:phaazon/$GITHUB_REPOSITORY.git
+          git remote add upstream github.com:$GITHUB_REPOSITORY.git
       - name: Build
         run: |
           mdbook build
