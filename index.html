@@ -150,6 +150,21 @@
                     <main>
                         <h1><a class="header" href="#learn-luminance" id="learn-luminance">Learn luminance</a></h1>
 <p>You’re here because you want to learn luminance. Here is the chapter summary.</p>
+<h2><a class="header" href="#plan-of-the-book" id="plan-of-the-book">Plan of the book</a></h2>
+<p>The book is written in chapters. It is highly recommended to read them in order, as they will
+reference code introduced in previous chapters. Also, each chapter has a dedicated Rust project
+containing the final solution <a href="https://github.com/rust-tutorials/learn-luminance/tree/master/examples">here</a>.
+Feel free to consult the code if you would like to build each chapters on your own without having
+to write the code.</p>
+<p>You can compile all chapters by cloning the repository and building them all at once. Then use
+the <code>cargo run --release --bin chapter-X</code> to run the chapter you want:</p>
+<pre><code class="language-sh">git clone --depth 1 https://github.com/rust-tutorials/learn-luminance
+cd learn-luminance/examples
+cargo build --release
+
+# Run the chapter 3
+cargo run --release --bin chapter-3 ~/Downloads/torus.obj
+</code></pre>
 <h2><a class="header" href="#everything-you-should-know-before-jumping-in" id="everything-you-should-know-before-jumping-in">Everything you should know before jumping in</a></h2>
 <p><strong>luminance</strong> is an effort to make graphics rendering simple and elegant. It was originally imagined,
 designed and implemented by <a href="https://github.com/phaazon">@phaazon</a> in Haskell (<a href="https://hackage.haskell.org/package/luminance">here</a>)

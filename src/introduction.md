@@ -2,6 +2,26 @@
 
 You’re here because you want to learn luminance. Here is the chapter summary.
 
+## Plan of the book
+
+The book is written in chapters. It is highly recommended to read them in order, as they will
+reference code introduced in previous chapters. Also, each chapter has a dedicated Rust project
+containing the final solution [here](https://github.com/rust-tutorials/learn-luminance/tree/master/examples).
+Feel free to consult the code if you would like to build each chapters on your own without having
+to write the code.
+
+You can compile all chapters by cloning the repository and building them all at once. Then use
+the `cargo run --release --bin chapter-X` to run the chapter you want:
+
+```sh
+git clone --depth 1 https://github.com/rust-tutorials/learn-luminance
+cd learn-luminance/examples
+cargo build --release
+
+# Run the chapter 3
+cargo run --release --bin chapter-3 ~/Downloads/torus.obj
+```
+
 ## Everything you should know before jumping in
 
 **luminance** is an effort to make graphics rendering simple and elegant. It was originally imagined,
