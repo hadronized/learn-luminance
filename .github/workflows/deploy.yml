@@ -24,7 +24,7 @@ jobs:
       - name: Cleanup GitHub Pages
         run: |
           git switch gh-pages
-          ls -A | grep -v "^\.git$" | xargs rm -r # remove everything
+          git rm -rf .
           git restore --source=origin/master . # restore as if we were on master
           git remote add upstream https://$GH_PAT@github.com:$GITHUB_REPOSITORY.git
       - name: Build
