@@ -26,16 +26,20 @@ jobs:
           git switch gh-pages
           git rm -rf .
           git restore --source=origin/master . # restore as if we were on master
-          git remote add upstream https://$GH_PAT@github.com:$GITHUB_REPOSITORY.git
+          git remote add upstream github.com:phaazon/$GITHUB_REPOSITORY.git
       - name: Build
-        run: mdbook build
+        run: |
+          mdbook build
+          cp -rv book/* .
       - name: Deploy
         env:
-          GH_PAT: ${{ secrets.GH_PAT }}
+          GH_PAGES_SEC_KEY: ${{ secrets.GH_PAGES_SEC_KEY }}
         run: |
           git branch
           git add * || true # add all the changes
           git config --local user.name "$GITHUB_ACTOR"
           git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
           git commit -am "Deploy to GitHub Pages."
-          git push upstream HEAD:gh-pages # add the new deployment
+          echo "$GH_PAGES_SEC_KEY" > sec_key.rsa
+          chmod 600 sec_key.rsa
+          GIT_SSH_COMMAND="ssh -i sec_key.rsa" git push upstream gh-pages
