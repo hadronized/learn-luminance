@@ -27,6 +27,7 @@ jobs:
           git rm -rf .
           git restore --source=origin/master . # restore as if we were on master
           git remote add upstream github.com:$GITHUB_REPOSITORY.git
+          echo "Adding upstream = github.com:$GITHUB_REPOSITORY.git"
       - name: Build
         run: |
           mdbook build
