@@ -17,13 +17,21 @@ pixel storage for renders!
 It’s not _some_ kind: it **is** a [`Framebuffer`]. And guess what: you can access it via the
 [`Surface::back_buffer`] method.
 
-So, let’s make our first cool render and make a color-varying background! First, you will need to
+So, let’s make our first cool render and make a color-varying background!  First, you will need to
 import one symbol from [luminance]: [`GraphicsContext`], which is a trait that allows you to run
-[luminance] code and talk to the GPU. We will also use [`Instant`], from the standard library, to
+[luminance] code and talk to the GPU. We will be using pipelines for our rendering. A graphics
+pipeline is just a strongly typed description of what a GPU should do in order to render _things_
+into a [`Framebuffer`]. You can picture pipelines as [AST]s in which each node represents a given
+resource sharing and leaves are actual renders.
+
+> More on [pipelines here](https://docs.rs/luminance/latest/luminance/index.html#understanding-the-pipeline-architecture).
+
+We will also use [`Instant`], from the standard library, to
 handle low-precision yet sufficient time points.
 
 ```rust
 use luminance::context::GraphicsContext as _;
+use luminance::pipeline::PipelineState;
 use std::time::Instant;
 ```
 
@@ -65,13 +73,7 @@ once and for all and keep it around if you want to but in our case, since we’r
 a single pipeline, we’ll just chain everything.
 
 Then, the [`Builder::pipeline`] function, applied to the [`Builder`] object, creates a graphics
-pipeline. A graphics pipeline is just a strongly typed description of what a GPU should do in order
-to render _things_ into a [`Framebuffer`]. You can picture pipelines as [AST]s in which each node
-represents a given resource sharing and leaves are actual renders.
-
-> More on [pipelines here](https://docs.rs/luminance/latest/luminance/index.html#understanding-the-pipeline-architecture).
-
-In our case, we don’t want to render anything, we just want to modify the _back_ buffer background
+pipeline. In our case, we don’t want to render anything, we just want to modify the _back_ buffer background
 color. That is done with the arguments you pass to [`Builder::pipeline`]. The first one is the
 frame buffer to render to. In our case, it’s our _back_ buffer.
 
