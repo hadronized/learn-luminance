@@ -13,7 +13,7 @@ Creating a new _graphics surface_ relies on several objects you need to decide v
 - The title of the window. Whether it will get displayed depends on your compositor and window
   manager but pretty much all of them display the title in the top-level location of your window
   as a _window decoration property_. Titles are encoded as simple `&str`.
-- A set of options to tweaq the window and system-related properties. For now, that last part is
+- A set of options to tweak the window and system-related properties. For now, that last part is
   too advanced and we’ll stick to using the defaults. Use `WindowOpt::default()`.
 
 Getting a `GlfwSurface` might fail, so you need to handle failures via the `Result` type.
