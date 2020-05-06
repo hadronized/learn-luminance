@@ -19,10 +19,12 @@ It’s not _some_ kind: it **is** a [`Framebuffer`]. And guess what: you can acc
 
 So, let’s make our first cool render and make a color-varying background!  First, you will need to
 import one symbol from [luminance]: [`GraphicsContext`], which is a trait that allows you to run
-[luminance] code and talk to the GPU. We will be using pipelines for our rendering. A graphics
-pipeline is just a strongly typed description of what a GPU should do in order to render _things_
-into a [`Framebuffer`]. You can picture pipelines as [AST]s in which each node represents a given
-resource sharing and leaves are actual renders.
+[luminance] code and talk to the GPU. We will be using pipelines for our rendering, and therefore
+need access to the `PipelineState` `enum`.
+
+A graphics pipeline is just a strongly typed description of what a GPU should do in order to render
+_things_ into a [`Framebuffer`]. You can picture pipelines as [AST]s in which each node represents a
+given resource sharing and leaves are actual renders.
 
 > More on [pipelines here](https://docs.rs/luminance/latest/luminance/index.html#understanding-the-pipeline-architecture).
 
