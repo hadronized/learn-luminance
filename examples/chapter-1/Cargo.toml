@@ -5,5 +5,6 @@ authors = ["Dimitri Sabadie <dimitri.sabadie@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-luminance = "0.39"
-luminance-glfw = "0.12"
+luminance = "0.40"
+luminance-glfw = "0.13"
+glfw = "0.39"
