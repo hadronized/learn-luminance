@@ -15,7 +15,7 @@ pixel storage for renders!
 > So… is the _back_ buffer you told us earlier some kind of [`Framebuffer`]?
 
 It’s not _some_ kind: it **is** a [`Framebuffer`]. And guess what: you can access it via the
-[`Surface::back_buffer`] method.
+`surface.back_buffer()` method.
 
 So, let’s make our first cool render and make a color-varying background! First, you will need to
 import one symbol from [luminance]: [`GraphicsContext`], which is a trait that allows you to run
@@ -49,30 +49,32 @@ As you can see, getting the _back_ buffer is piece of cake. Now let’s handle t
     let t = start_t.elapsed().as_millis() as f32 * 1e-3;
     let color = [t.cos(), t.sin(), 0.5, 1.];
 
-    surface.pipeline_builder().pipeline(
+    let render = surface.new_pipeline_gate().pipeline(
       &back_buffer,
       &PipelineState::default().set_clear_color(color),
       |_, _| (),
     );
 
     // swap buffer chains
-    surface.swap_buffers();
+    if render.is_ok() {
+      surface.window.swap_buffers();
+    } else {
+      break 'app;
+    }
 ```
 
-That’s already a lot of code to discuss. `surface.pipeline_builder()` gets a lightweight object
-that you can use to create _graphics pipelines_ — its type is [`Builder`]. You can get that type
+That’s already a lot of code to discuss. `surface.new_pipeline_gate()` gets a lightweight object
+that you can use to create _graphics pipelines_ — its type is [`PipelineGate`]. You can get that type
 once and for all and keep it around if you want to but in our case, since we’re only going to create
 a single pipeline, we’ll just chain everything.
 
-Then, the [`Builder::pipeline`] function, applied to the [`Builder`] object, creates a graphics
+Then, the [`PipelineGate::pipeline`] function, applied to the [`PipelineGate`] object, creates a graphics
 pipeline. A graphics pipeline is just a strongly typed description of what a GPU should do in order
 to render _things_ into a [`Framebuffer`]. You can picture pipelines as [AST]s in which each node
 represents a given resource sharing and leaves are actual renders.
 
-> More on [pipelines here](https://docs.rs/luminance/latest/luminance/index.html#understanding-the-pipeline-architecture).
-
 In our case, we don’t want to render anything, we just want to modify the _back_ buffer background
-color. That is done with the arguments you pass to [`Builder::pipeline`]. The first one is the
+color. That is done with the arguments you pass to [`PipelineGate::pipeline`]. The first one is the
 frame buffer to render to. In our case, it’s our _back_ buffer.
 
 The second argument is the _pipeline state_ to use when running our pipeline. Everytime you perform a
@@ -92,18 +94,19 @@ You should obtain a window with a varying color, such as the following screensho
 The complete code is:
 
 ```rust
+use glfw::{Action, Context as _, Key, WindowEvent};
 use luminance::context::GraphicsContext as _;
 use luminance::pipeline::PipelineState;
-use luminance_glfw::{Action, GlfwSurface, Key, Surface as _, WindowDim, WindowEvent, WindowOpt};
+use luminance_glfw::{GlfwSurface, WindowDim, WindowOpt};
 use std::process::exit;
 use std::time::Instant;
 
 fn main() {
-  let surface = GlfwSurface::new(
-    WindowDim::Windowed(960, 540),
-    "Hello, world!",
-    WindowOpt::default(),
-  );
+  let dim = WindowDim::Windowed {
+    width: 960,
+    height: 540,
+  };
+  let surface = GlfwSurface::new_gl33("Hello, world!", WindowOpt::default().set_dim(dim));
 
   match surface {
     Ok(surface) => {
@@ -124,7 +127,8 @@ fn main_loop(mut surface: GlfwSurface) {
 
   'app: loop {
     // handle events
-    for event in surface.poll_events() {
+    surface.window.glfw.poll_events();
+    for (_, event) in surface.events_rx.try_iter() {
       match event {
         WindowEvent::Close | WindowEvent::Key(Key::Escape, _, Action::Release, _) => break 'app,
         _ => (),
@@ -136,14 +140,18 @@ fn main_loop(mut surface: GlfwSurface) {
     let t = start_t.elapsed().as_millis() as f32 * 1e-3;
     let color = [t.cos(), t.sin(), 0.5, 1.];
 
-    surface.pipeline_builder().pipeline(
+    let render = surface.new_pipeline_gate().pipeline(
       &back_buffer,
       &PipelineState::default().set_clear_color(color),
       |_, _| (),
     );
 
     // swap buffer chains
-    surface.swap_buffers();
+    if render.is_ok() {
+      surface.window.swap_buffers();
+    } else {
+      break 'app;
+    }
   }
 }
 ```
@@ -158,6 +166,6 @@ fn main_loop(mut surface: GlfwSurface) {
 [`Surface::back_buffer`]: https://docs.rs/luminance-windowing/latest/luminance_windowing/trait.Surface.html#method.back_buffer
 [`GraphicsContext`]: https://docs.rs/luminance/latest/luminance/context/trait.GraphicsContext.html
 [`Instant`]: https://doc.rust-lang.org/std/time/struct.Instant.html
-[`Builder`]: https://docs.rs/luminance/latest/luminance/pipeline/struct.Builder.html
-[`Builder::pipeline`]: https://docs.rs/luminance/latest/luminance/pipeline/struct.Builder.html#method.pipeline
+[`PipelineGate`]: https://docs.rs/luminance/latest/luminance/pipeline/struct.PipelineGate.html
+[`PipelineGate::pipeline`]: https://docs.rs/luminance/latest/luminance/pipeline/struct.PipelineGate.html#method.pipeline
 [AST]: https://en.wikipedia.org/wiki/Abstract_syntax_tree
