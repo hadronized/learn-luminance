@@ -4,7 +4,8 @@ Everyone knows what a triangle is… but what is a triangle on your GPU? In [lum
 can be _represented_ in lots of ways. In our case:
 
 - A triangle has three vertices.
-- Each vertex has a position in 2D, represented by two floating point values on 32-bit.
+- We decide that each vertex has a position in **2D**, represented by two floating point values on
+  32-bit.
 - Each vertex has a color, represented as RGB on 8-bit unsigned integers.
 
 The first thing to do is to create… types. You will see throughout this book that [luminance] is
@@ -22,14 +23,14 @@ But the real vertex definition is very, very similar. Hang on.
 ## Defining your vertex type
 
 In order to define our vertex type, we need to create a `struct` that will implement the [`Vertex`]
-trait. That trait requires various information to be provided by the implementor and you don’t even
-have to worry about those because a crate exists to automatically implement such a trait:
+trait. That trait requires various information to be provided by the implementor. You don’t have
+to worry about those, because a crate exists to automatically implement such a trait:
 [luminance-derive].
 
 First thing first: add [luminance-derive] to your project’s `[dependencies]` section:
 
 ```toml
-luminance-derive = "0.5"
+luminance-derive = "0.6"
 ```
 
 Simple. One last thing: when you will use the `Vertex` derive annotation, you will have to provide
@@ -38,7 +39,8 @@ such a trait by hand: [luminance-derive] will handle all that for you.
 
 Vertex semantics are a way to tell [luminance] what the relationship between _all_ objects you
 intend to create and the way they will be rendered is. In our case, we just only need two
-semantics: _vertex positions_ and _vertex colors_. Let’s create our semantics type:
+semantics: _vertex positions_ and _vertex colors_. Let’s create our semantics type by using a
+proc-macro derive from [luminance-derive]:
 
 ```rust
 use luminance_derive::Semantics;
@@ -75,7 +77,8 @@ Indeed, let’s dig the syntax:
   - The `wrapper = "VertexPosition"` annotation generates a new type called `VertexPosition` and
     in scope in the module you declared the `enum`. That type is one of the only ones which are
     recognized as being usable with the `Semantics` `enum` you just declared — it implements the
-    [`HasSemantics`] trait for which `HasSemantics::Sem = VertexSemantics`.
+    [`HasSemantics`] trait for which `HasSemantics::Sem = VertexSemantics`. This type is also
+    equipped with some functions and implementors, such as `new`, `From / Into`, etc.
 
 All of this might be a bit confusing; let’s clarify even further. When you declare an `enum`
 annotated with `#[derive(Copy, Clone, Debug, Semantics)]`, [luminance-derive] does automatically
@@ -84,7 +87,7 @@ represent _vertex attributes_ types you will be able to use to construct types t
 implement the [`Vertex`] trait.
 
 Talking about [`Vertex`], let’s go and define our vertex type. The `Vertex` derive annotation works
-on both `struct`s and tuple-`struct`. Import the `Vertex` proc-macro first:
+on both `struct`s and tuple-`struct`. Import the `Vertex` proc-macro derive first:
 
 ```rust
 use luminance_derive::{Semantics, Vertex};
@@ -97,7 +100,10 @@ clash with types):
 #[derive(Vertex)]
 #[vertex(sem = "VertexSemantics")]
 pub struct Vertex {
+  #[allow(dead_code)]
   position: VertexPosition,
+
+  #[allow(dead_code)]
   #[vertex(normalized = "true")]
   color: VertexRGB,
 }
@@ -105,17 +111,17 @@ pub struct Vertex {
 
 A new syntax! So:
 
-  - The `Vertex` derive annotation marks a `struct` as being a valid _vertex_ type. Currently, only
-    `struct` with fields and tuple-`struct` are supported.
-  - The `#[vertex(sem = "VertexSemantics")]` provides a mapping to a type that represents your
-    _vertex semantics_.
-  - Each field must have a type that implements `HasSemantics<Sem = VertexSemantics>` in that case.
-    Don’t forget about the `wrapper` types that got generated with the `Semantics` derive: those
-    types are valid as fields’ types here.
-  - The special `#[vertex(normalized = "true")]` annotation marks a field as being _normalized_.
-    Normalized fields make sense when the field is of an integral type, such as `[u8; 3]`, which is
-    _unsigned integral_. When trying to fetch normalized vertex attribute, a _shader stage_ will get
-    normalized floating point numbers (lying in `[0; 1]`) instead of the typical e.g. `[0; 255]`.
+- The `Vertex` derive annotation marks a `struct` as being a valid _vertex_ type. Currently, only
+  `struct` with fields and tuple-`struct` are supported.
+- The `#[vertex(sem = "VertexSemantics")]` provides a mapping to a type that represents your
+  _vertex semantics_.
+- Each field must have a type that implements `HasSemantics<Sem = VertexSemantics>` in that case.
+  Don’t forget about the `wrapper` types that got generated with the `Semantics` derive: those
+  types are valid as fields’ types here.
+- The special `#[vertex(normalized = "true")]` annotation marks a field as being _normalized_.
+  Normalized fields make sense when the field is of an integral type, such as `[u8; 3]`, which is
+  _unsigned integral_. When trying to fetch normalized vertex attributes, a _vertex stage_ will get
+  normalized floating point numbers (lying in `[0.; 1.]`) instead of the typical e.g. `[0; 255]`.
 
 And we are good to go as our vertex type is now live!
 
@@ -128,25 +134,22 @@ A triangle is just three points — three vertices. Let’s define them.
 
 ```rust
 const VERTICES: [Vertex; 3] = [
-  Vertex {
-    position: VertexPosition::new([-0.5, -0.5]),
-    color: VertexRGB::new([255, 0, 0]),
-  },
-  Vertex {
-    position: VertexPosition::new([0.5, -0.5]),
-    color: VertexRGB::new([0, 255, 0]),
-  },
-  Vertex {
-    position: VertexPosition::new([0., 0.5]),
-    color: VertexRGB::new([0, 0, 255]),
-  },
+  Vertex::new(
+    VertexPosition::new([-0.5, -0.5]),
+    VertexRGB::new([255, 0, 0]),
+  ),
+  Vertex::new(
+    VertexPosition::new([0.5, -0.5]),
+    VertexRGB::new([0, 255, 0]),
+  ),
+  Vertex::new(
+    VertexPosition::new([0., 0.5]),
+    VertexRGB::new([0, 0, 255])
+  ),
 ];
 ```
 
 It’s that simple.
-
-> Disclaimer: an on-going patch will soon allow to build vertices with `const fn` at the vertex type
-> level too; not only the vertex attributes.
 
 ## The final part of the recipe: GPU tessellations
 
@@ -155,13 +158,13 @@ It’s that simple.
 In [luminance], everything that has a _vertex_ or that _must be rendered_ is done via a
 _tessellation_ as described by the [`Tess`] type. GPU tessellations provide information about:
 
-  - The nature of the topology of the underlying _vertex mesh_. That is, zero, one or several
-    buffers describing the raw topology of the mesh.
-  - The way vertices are linked to each other. That is done via several ways that are going to be
-    explored in this book, but so far, we’ll stick to _primitive modes_, encoded via the [`Mode`]
-    type.
-  - And a lot of cool features you should be impatient to discover, but everything happens to those
-    who wait. ;)
+- The nature of the topology of the underlying _vertex mesh_. That is, zero, one or several
+  buffers describing the raw topology of the mesh.
+- The way vertices are linked to each other. That is done via several ways that are going to be
+  explored in this book, but so far, we’ll stick to _primitive modes_, encoded via the [`Mode`]
+  type.
+- And a lot of cool features you should be impatient to discover, but everything happens to those
+  who wait. ;)
 
 Creating a [`Tess`] will upload our vertices to the GPU so that we have an object (i.e. [`Tess`]) to
 manipulate and render our triangle. However, one does not simply create a [`Tess`]: we need
@@ -172,18 +175,19 @@ manipulate and render our triangle. However, one does not simply create a [`Tess
 Let’s see the code to create our [`Tess`] via [`TessBuilder`].
 
 ```rust
-use luminance::tess::{Mode, TessBuilder};
+use luminance::tess::Mode;
 ```
 
-You really thought you wouldn’t need to import those?
+Then:
 
 ```rust
-// at the beginning of main_loop
-let triangle = TessBuilder::new(&mut surface)
-  .add_vertices(VERTICES)
-  .set_mode(Mode::Triangle)
-  .build()
-  .unwrap();
+  // at the beginning of main_loop
+  let triangle = surface
+    .new_tess()
+    .set_vertices(&VERTICES[..])
+    .set_mode(Mode::Triangle)
+    .build()
+    .unwrap();
 ```
 
 If you don’t specify the [`Mode`], the [`TessBuilder`] defaults to [`Mode::Point`], which will not
@@ -207,19 +211,3 @@ how we can render it into our frame buffer.
 [`TessBuilder`]: https://docs.rs/luminance/latest/luminance/tess/struct.TessBuilder.html
 [`Mode`]: https://docs.rs/luminance/latest/luminance/tess/enum.Mode.html
 [`Mode::Point`]: https://docs.rs/luminance/latest/luminance/tess/enum.Mode.html#variant.Point
-[`Pipeline`]: https://docs.rs/luminance/latest/luminance/pipeline/struct.Pipeline.html
-[`ShadingGate`]: https://docs.rs/luminance/latest/luminance/pipeline/struct.ShadingGate.html
-[GLSL]: https://www.khronos.org/opengl/wiki/Core_Language_(GLSL)
-[`TessellationControlShader`]: https://docs.rs/luminance/latest/luminance/shader/stage/enum.Type.html#variant.TessellationControlShader
-[`TessellationEvaluationShader`]: https://docs.rs/luminance/latest/luminance/shader/stage/enum.Type.html#variant.TessellationEvaluationShader
-[`VertexShader`]: https://docs.rs/luminance/latest/luminance/shader/stage/enum.Type.html#variant.VertexShader
-[`GeometryShader`]: https://docs.rs/luminance/latest/luminance/shader/stage/enum.Type.html#variant.GeometryShader
-[`FragmentShader`]: https://docs.rs/luminance/latest/luminance/shader/stage/enum.Type.html#variant.FragmentShader
-[`Program`]: https://docs.rs/luminance/latest/luminance/shader/program/struct.Program.html
-[`BuiltProgram`]: https://docs.rs/luminance/latest/luminance/shader/program/struct.BuiltProgram.html
-[turbofish syntax]: https://doc.rust-lang.org/1.30.0/book/first-edition/generics.html
-[`RenderGate`]: https://docs.rs/luminance/latest/luminance/pipeline/struct.RenderGate.html
-[`RenderState`]: https://docs.rs/luminance/latest/luminance/render_state/struct.RenderState.html
-[`TessGate`]: https://docs.rs/luminance/latest/luminance/pipeline/struct.TessGate.html
-[`TessSlice`]: https://docs.rs/luminance/latest/luminance/tess/struct.TessSlice.html
-[`TessSliceIndex`]: https://docs.rs/luminance/latest/luminance/tess/struct.TessSliceIndex.html

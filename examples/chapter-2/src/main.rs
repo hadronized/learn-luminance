@@ -1,10 +1,10 @@
-use glfw::Context as _;
+use glfw::{Action, Context as _, Key, WindowEvent};
 use luminance::context::GraphicsContext as _;
 use luminance::pipeline::PipelineState;
 use luminance::render_state::RenderState;
 use luminance::tess::Mode;
 use luminance_derive::{Semantics, Vertex};
-use luminance_glfw::{Action, GlfwSurface, Key, WindowDim, WindowEvent, WindowOpt};
+use luminance_glfw::{GlfwSurface, WindowDim, WindowOpt};
 use std::process::exit;
 use std::time::Instant;
 
@@ -21,24 +21,22 @@ pub enum VertexSemantics {
 pub struct Vertex {
   #[allow(dead_code)]
   position: VertexPosition,
+
   #[allow(dead_code)]
   #[vertex(normalized = "true")]
   color: VertexRGB,
 }
 
 const VERTICES: [Vertex; 3] = [
-  Vertex {
-    position: VertexPosition::new([-0.5, -0.5]),
-    color: VertexRGB::new([255, 0, 0]),
-  },
-  Vertex {
-    position: VertexPosition::new([0.5, -0.5]),
-    color: VertexRGB::new([0, 255, 0]),
-  },
-  Vertex {
-    position: VertexPosition::new([0., 0.5]),
-    color: VertexRGB::new([0, 0, 255]),
-  },
+  Vertex::new(
+    VertexPosition::new([-0.5, -0.5]),
+    VertexRGB::new([255, 0, 0]),
+  ),
+  Vertex::new(
+    VertexPosition::new([0.5, -0.5]),
+    VertexRGB::new([0, 255, 0]),
+  ),
+  Vertex::new(VertexPosition::new([0., 0.5]), VertexRGB::new([0, 0, 255])),
 ];
 
 const VS_STR: &str = include_str!("vs.glsl");
