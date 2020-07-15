@@ -10,6 +10,8 @@ members = [
 [patch.crates-io]
 luminance = { path = "../../luminance/luminance" }
 luminance-derive = { path = "../../luminance/luminance-derive" }
+luminance-front = { path = "../../luminance/luminance-front" }
 luminance-gl = { path = "../../luminance/luminance-gl" }
 luminance-glfw = { path = "../../luminance/luminance-glfw" }
+luminance-webgl = { path = "../../luminance/luminance-webgl" }
 luminance-windowing = { path = "../../luminance/luminance-windowing" }

@@ -37,6 +37,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cf1de2fe8c75bc145a2f577add951f8134889b4795d47466a54a5c846d691693"
 
 [[package]]
+name = "bumpalo"
+version = "3.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2e8c087f005730276d1096a652e92a8bacee2e2472bcc9715a74d2bec38b5820"
+
+[[package]]
 name = "cc"
 version = "1.0.58"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -63,19 +69,19 @@ dependencies = [
 name = "chapter-1"
 version = "0.1.0"
 dependencies = [
- "glfw 0.39.0",
- "luminance 0.40.0",
- "luminance-glfw 0.13.0",
+ "glfw",
+ "luminance",
+ "luminance-glfw",
 ]
 
 [[package]]
 name = "chapter-2"
 version = "0.1.0"
 dependencies = [
- "glfw 0.39.0",
- "luminance 0.40.0",
- "luminance-derive 0.6.0",
- "luminance-glfw 0.13.0",
+ "glfw",
+ "luminance",
+ "luminance-derive",
+ "luminance-glfw",
 ]
 
 [[package]]
@@ -83,9 +89,11 @@ name = "chapter-3"
 version = "0.1.0"
 dependencies = [
  "cgmath",
- "luminance 0.39.0",
- "luminance-derive 0.5.3",
- "luminance-glfw 0.12.2",
+ "glfw",
+ "luminance",
+ "luminance-derive",
+ "luminance-front",
+ "luminance-glfw",
  "try-guard",
  "wavefront_obj",
 ]
@@ -136,21 +144,6 @@ dependencies = [
 
 [[package]]
 name = "glfw"
-version = "0.34.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4270c54da6c6035d29daf646ede04d2f10e95ad082a0e5f9f6031f6559a86dcc"
-dependencies = [
- "bitflags",
- "glfw-sys",
- "libc",
- "log",
- "objc",
- "raw-window-handle",
- "semver",
-]
-
-[[package]]
-name = "glfw"
 version = "0.39.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "88df99ca57039944669d3757663da12f732ffad2bd83bfef1ffca6d92b4b2990"
@@ -175,10 +168,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "js-sys"
+version = "0.3.41"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c4b9172132a62451e56142bff9afc91c8e4a4500aa5b847da36815b63bfda916"
+dependencies = [
+ "wasm-bindgen",
+]
+
+[[package]]
 name = "khronos_api"
 version = "3.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e2db585e1d738fc771bf08a151420d3ed193d9d895a36df7f6f8a9456b911ddc"
+
+[[package]]
+name = "lazy_static"
+version = "1.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
 
 [[package]]
 name = "lexical"
@@ -221,27 +229,7 @@ dependencies = [
 
 [[package]]
 name = "luminance"
-version = "0.39.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "367433f73e04ed455320ca7d2111aaa7594d2d5f88a924d1896120c079f70426"
-dependencies = [
- "gl",
-]
-
-[[package]]
-name = "luminance"
 version = "0.40.0"
-
-[[package]]
-name = "luminance-derive"
-version = "0.5.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bbd8bb4fe936c7c532597cdf0a1e9a2548fec9e9a77e76285e1a4d0227ddaadf"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
-]
 
 [[package]]
 name = "luminance-derive"
@@ -253,23 +241,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "luminance-front"
+version = "0.1.0"
+dependencies = [
+ "luminance",
+ "luminance-gl",
+ "luminance-webgl",
+]
+
+[[package]]
 name = "luminance-gl"
 version = "0.14.0"
 dependencies = [
  "gl",
- "luminance 0.40.0",
-]
-
-[[package]]
-name = "luminance-glfw"
-version = "0.12.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1e70c0c1f9c959c6b85cc80aed87a7644f4f7b26f28a7e3db29e20ed102d7cee"
-dependencies = [
- "gl",
- "glfw 0.34.0",
- "luminance 0.39.0",
- "luminance-windowing 0.8.2",
+ "luminance",
 ]
 
 [[package]]
@@ -277,26 +262,29 @@ name = "luminance-glfw"
 version = "0.13.0"
 dependencies = [
  "gl",
- "glfw 0.39.0",
- "luminance 0.40.0",
+ "glfw",
+ "luminance",
  "luminance-gl",
- "luminance-windowing 0.9.0",
+ "luminance-windowing",
 ]
 
 [[package]]
-name = "luminance-windowing"
-version = "0.8.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ad15bb531192e10ee9feb7d0d6fd207189ac718f182f244d2a2293c51ea2406c"
+name = "luminance-webgl"
+version = "0.1.0"
 dependencies = [
- "luminance 0.39.0",
+ "js-sys",
+ "luminance",
+ "serde",
+ "serde_derive",
+ "wasm-bindgen",
+ "web-sys",
 ]
 
 [[package]]
 name = "luminance-windowing"
 version = "0.9.0"
 dependencies = [
- "luminance 0.40.0",
+ "luminance",
 ]
 
 [[package]]
@@ -505,6 +493,23 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "388a1df253eca08550bef6c72392cfe7c30914bf41df5269b68cbd6ff8f570a3"
 
 [[package]]
+name = "serde"
+version = "1.0.114"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5317f7588f0a5078ee60ef675ef96735a1442132dc645eb1d12c018620ed8cd3"
+
+[[package]]
+name = "serde_derive"
+version = "1.0.114"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2a0be94b04690fbaed37cddffc5c134bf537c8e3329d53e982fe04c374978f8e"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "static_assertions"
 version = "0.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -534,12 +539,76 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f7fe0bb3479651439c9112f72b6c505038574c9fbb575ed1bf3b797fa39dd564"
 
 [[package]]
+name = "wasm-bindgen"
+version = "0.2.64"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6a634620115e4a229108b71bde263bb4220c483b3f07f5ba514ee8d15064c4c2"
+dependencies = [
+ "cfg-if",
+ "wasm-bindgen-macro",
+]
+
+[[package]]
+name = "wasm-bindgen-backend"
+version = "0.2.64"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3e53963b583d18a5aa3aaae4b4c1cb535218246131ba22a71f05b518098571df"
+dependencies = [
+ "bumpalo",
+ "lazy_static",
+ "log",
+ "proc-macro2",
+ "quote",
+ "syn",
+ "wasm-bindgen-shared",
+]
+
+[[package]]
+name = "wasm-bindgen-macro"
+version = "0.2.64"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3fcfd5ef6eec85623b4c6e844293d4516470d8f19cd72d0d12246017eb9060b8"
+dependencies = [
+ "quote",
+ "wasm-bindgen-macro-support",
+]
+
+[[package]]
+name = "wasm-bindgen-macro-support"
+version = "0.2.64"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9adff9ee0e94b926ca81b57f57f86d5545cdcb1d259e21ec9bdd95b901754c75"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+ "wasm-bindgen-backend",
+ "wasm-bindgen-shared",
+]
+
+[[package]]
+name = "wasm-bindgen-shared"
+version = "0.2.64"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7f7b90ea6c632dd06fd765d44542e234d5e63d9bb917ecd64d79778a13bd79ae"
+
+[[package]]
 name = "wavefront_obj"
 version = "7.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6c1f83af1f50044d5ea2c0a7aef6976566f22e2b8002fc66c512a3a2f57e9d94"
 dependencies = [
  "lexical",
+]
+
+[[package]]
+name = "web-sys"
+version = "0.3.41"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "863539788676619aac1a23e2df3655e96b32b0e05eb72ca34ba045ad573c625d"
+dependencies = [
+ "js-sys",
+ "wasm-bindgen",
 ]
 
 [[package]]
