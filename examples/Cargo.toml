@@ -8,8 +8,8 @@ members = [
 
 # TODO: remove once luminance crates are on crates.io
 [patch.crates-io]
-luminance = { path = "../../luminance-rs/luminance" }
-luminance-derive = { path = "../../luminance-rs/luminance-derive" }
-luminance-gl = { path = "../../luminance-rs/luminance-gl" }
-luminance-glfw = { path = "../../luminance-rs/luminance-glfw" }
-luminance-windowing = { path = "../../luminance-rs/luminance-windowing" }
+luminance = { path = "../../luminance/luminance" }
+luminance-derive = { path = "../../luminance/luminance-derive" }
+luminance-gl = { path = "../../luminance/luminance-gl" }
+luminance-glfw = { path = "../../luminance/luminance-glfw" }
+luminance-windowing = { path = "../../luminance/luminance-windowing" }

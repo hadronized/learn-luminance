@@ -1,10 +1,10 @@
+use glfw::Context as _;
 use luminance::context::GraphicsContext as _;
 use luminance::pipeline::PipelineState;
 use luminance::render_state::RenderState;
-use luminance::shader::program::Program;
-use luminance::tess::{Mode, TessBuilder, TessSliceIndex as _};
+use luminance::tess::Mode;
 use luminance_derive::{Semantics, Vertex};
-use luminance_glfw::{Action, GlfwSurface, Key, Surface as _, WindowDim, WindowEvent, WindowOpt};
+use luminance_glfw::{Action, GlfwSurface, Key, WindowDim, WindowEvent, WindowOpt};
 use std::process::exit;
 use std::time::Instant;
 
@@ -16,7 +16,7 @@ pub enum VertexSemantics {
   Color,
 }
 
-#[derive(Vertex)]
+#[derive(Clone, Copy, Debug, Vertex)]
 #[vertex(sem = "VertexSemantics")]
 pub struct Vertex {
   #[allow(dead_code)]
@@ -45,11 +45,11 @@ const VS_STR: &str = include_str!("vs.glsl");
 const FS_STR: &str = include_str!("fs.glsl");
 
 fn main() {
-  let surface = GlfwSurface::new(
-    WindowDim::Windowed(960, 540),
-    "Hello, world!",
-    WindowOpt::default(),
-  );
+  let dim = WindowDim::Windowed {
+    width: 960,
+    height: 540,
+  };
+  let surface = GlfwSurface::new_gl33("Hello, world!", WindowOpt::default().set_dim(dim));
 
   match surface {
     Ok(surface) => {
@@ -67,45 +67,54 @@ fn main() {
 fn main_loop(mut surface: GlfwSurface) {
   let start_t = Instant::now();
 
-  let back_buffer = surface.back_buffer().unwrap();
-
-  let triangle = TessBuilder::new(&mut surface)
-    .add_vertices(VERTICES)
+  let triangle = surface
+    .new_tess()
+    .set_vertices(&VERTICES[..])
     .set_mode(Mode::Triangle)
     .build()
     .unwrap();
 
-  let program: Program<VertexSemantics, (), ()> = Program::from_strings(None, VS_STR, None, FS_STR)
+  let mut program = surface
+    .new_shader_program::<VertexSemantics, (), ()>()
+    .from_strings(VS_STR, None, None, FS_STR)
     .unwrap()
     .ignore_warnings();
 
   'app: loop {
     // handle events
-    for event in surface.poll_events() {
+    surface.window.glfw.poll_events();
+    for (_, event) in surface.events_rx.try_iter() {
       match event {
         WindowEvent::Close | WindowEvent::Key(Key::Escape, _, Action::Release, _) => break 'app,
+
         _ => (),
       }
     }
+
+    let back_buffer = surface.back_buffer().unwrap();
 
     // rendering code goes here
     // get the current time and create a color based on the time
     let t = start_t.elapsed().as_millis() as f32 * 1e-3;
     let color = [t.cos(), t.sin(), 0.5, 1.];
 
-    surface.pipeline_builder().pipeline(
+    let render = surface.new_pipeline_gate().pipeline(
       &back_buffer,
       &PipelineState::default().set_clear_color(color),
       |_, mut shd_gate| {
-        shd_gate.shade(&program, |_, mut rdr_gate| {
+        shd_gate.shade(&mut program, |_, _, mut rdr_gate| {
           rdr_gate.render(&RenderState::default(), |mut tess_gate| {
-            tess_gate.render(triangle.slice(..));
+            tess_gate.render(&triangle);
           });
         });
       },
     );
 
     // swap buffer chains
-    surface.swap_buffers();
+    if render.is_ok() {
+      surface.window.swap_buffers();
+    } else {
+      break 'app;
+    }
   }
 }

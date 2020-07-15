@@ -72,9 +72,10 @@ dependencies = [
 name = "chapter-2"
 version = "0.1.0"
 dependencies = [
- "luminance 0.39.0",
- "luminance-derive",
- "luminance-glfw 0.12.2",
+ "glfw 0.39.0",
+ "luminance 0.40.0",
+ "luminance-derive 0.6.0",
+ "luminance-glfw 0.13.0",
 ]
 
 [[package]]
@@ -83,7 +84,7 @@ version = "0.1.0"
 dependencies = [
  "cgmath",
  "luminance 0.39.0",
- "luminance-derive",
+ "luminance-derive 0.5.3",
  "luminance-glfw 0.12.2",
  "try-guard",
  "wavefront_obj",
@@ -236,6 +237,15 @@ name = "luminance-derive"
 version = "0.5.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bbd8bb4fe936c7c532597cdf0a1e9a2548fec9e9a77e76285e1a4d0227ddaadf"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
+name = "luminance-derive"
+version = "0.6.0"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -559,7 +569,3 @@ name = "xml-rs"
 version = "0.8.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b07db065a5cf61a7e4ba64f29e67db906fb1787316516c4e6e5ff0fea1efcd8a"
-
-[[patch.unused]]
-name = "luminance-derive"
-version = "0.6.0"
