@@ -72,6 +72,7 @@ dependencies = [
  "glfw",
  "luminance",
  "luminance-glfw",
+ "luminance-windowing",
 ]
 
 [[package]]

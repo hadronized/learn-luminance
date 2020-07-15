@@ -1,7 +1,8 @@
 use glfw::{Action, Context as _, Key, WindowEvent};
 use luminance::context::GraphicsContext as _;
 use luminance::pipeline::PipelineState;
-use luminance_glfw::{GlfwSurface, WindowDim, WindowOpt};
+use luminance_glfw::GlfwSurface;
+use luminance_windowing::{WindowDim, WindowOpt};
 use std::process::exit;
 use std::time::Instant;
 

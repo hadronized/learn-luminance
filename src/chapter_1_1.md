@@ -23,6 +23,7 @@ change the `[dependencies]` section according to the following:
 [dependencies]
 luminance = "0.40"
 luminance-glfw = "0.13"
+luminance-windowing = "0.9"
 glfw = "0.39"
 ```
 
@@ -35,8 +36,11 @@ Some explanations here:
   lot of platforms so you should be good to start (plus it’s pretty easy). Windowing code allows
   to ask your system to create a window, handle inputs such as keypresses, mouse movements, touch,
   etc. etc.
+- [luminance-windowing] is a small crate providing common types _platform crates_ should use to
+  uniformize as much as possible how windows and contexts get created. This is not mandatory but
+  highly recommended. [luminance-glfw] uses [luminance-windowing].
 
-> Note: since version `0.9`, [luminance-windowing] has lost most of its “implemente” symbols.
+> Note: since version `0.9`, [luminance-windowing] has lost most of its “implementation” symbols.
 > Platform crates such as [luminance-glfw] then don’t re-export the underyling crate’s symbols.
 > For that reason, you will have to depend on them explicitely, as we do with [glfw] in this case.
 

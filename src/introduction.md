@@ -11,11 +11,12 @@ Feel free to consult the code if you would like to build each chapters on your o
 to write the code.
 
 You can compile all chapters by cloning the repository and building them all at once, or build and
-a specific one:
+run a specific one:
 
 ```sh
 git clone --depth 1 https://github.com/rust-tutorials/learn-luminance
 cd learn-luminance/examples
+
 # build everything…
 cargo build --release
 
@@ -41,7 +42,7 @@ recommended to read the great article about the ecosystem by [@icefoxen],
 However, **luminance** is a bit different from what it was initially imagined for. People are
 looking for an easy-to-use crate, with good abstractions and safe-guards against all the _bad_ and
 _dangerous_ graphics API caveats. **luminance** has always been about providing a safe, type-safe
-and elegant API (being Haskell-based makes it heavily use type systems, for instance) but it has
+and elegant API (being Haskell-rooted makes it use type systems extensively, for instance) but it has
 now a more accurate place in the ecosystem. Where [gfx-hal] provides you with an experience focused
 on down-to-metal performances and an API very similar to [Vulkan]’s, **luminance** provides an API
 that is, for sure, a bit less low-level — and hence, yes, it’s likely you will not have the same

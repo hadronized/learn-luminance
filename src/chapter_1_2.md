@@ -27,7 +27,8 @@ for instance.
 
 ```rust
 use glfw::{Action, Context as _, Key, WindowEvent};
-use luminance_glfw::{GlfwSurface, WindowDim, WindowOpt};
+use luminance_glfw::GlfwSurface;
+use luminance_windowing::{WindowDim, WindowOpt};
 use std::process::exit;
 
 fn main() {
