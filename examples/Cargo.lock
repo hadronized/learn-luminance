@@ -83,6 +83,7 @@ dependencies = [
  "luminance",
  "luminance-derive",
  "luminance-glfw",
+ "luminance-windowing",
 ]
 
 [[package]]
@@ -95,6 +96,7 @@ dependencies = [
  "luminance-derive",
  "luminance-front",
  "luminance-glfw",
+ "luminance-windowing",
  "try-guard",
  "wavefront_obj",
 ]
