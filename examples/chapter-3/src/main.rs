@@ -1,10 +1,10 @@
 use cgmath::{perspective, EuclideanSpace, Matrix4, Point3, Rad, Vector3};
 use glfw::{Action, Context as _, Key, WindowEvent};
-use luminance::context::GraphicsContext;
-use luminance::pipeline::PipelineState;
-use luminance::render_state::RenderState;
-use luminance::shader::Uniform;
 use luminance_derive::{Semantics, UniformInterface, Vertex};
+use luminance_front::context::GraphicsContext;
+use luminance_front::pipeline::PipelineState;
+use luminance_front::render_state::RenderState;
+use luminance_front::shader::Uniform;
 use luminance_front::tess::{Interleaved, Mode, Tess, TessError};
 use luminance_front::Backend;
 use luminance_glfw::{GlfwSurface, WindowDim, WindowOpt};
@@ -21,7 +21,7 @@ use wavefront_obj::obj;
 const VS_STR: &str = include_str!("vs.glsl");
 const FS_STR: &str = include_str!("fs.glsl");
 
-const FOVY: Rad<f32> = Rad(std::f32::consts::PI / 2.);
+const FOVY: Rad<f32> = Rad(std::f32::consts::FRAC_PI_2);
 const Z_NEAR: f32 = 0.1;
 const Z_FAR: f32 = 10.;
 

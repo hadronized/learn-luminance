@@ -5,6 +5,7 @@ First thing first: this book is written against this following luminance crate s
 ```toml
 luminance = "0.40"
 luminance-derive = "0.6"
+luminance-front = "0.1"
 luminance-glfw = "0.13"
 luminance-windowing = "0.9"
 ```

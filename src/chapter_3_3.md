@@ -5,18 +5,81 @@ So here it is. Refer to the [wavefront_obj] crate for further details. The idea 
 own `Obj` type with our own representation of what an object is. We then use [wavefront_obj] to
 load one object and convert it to our representation. Simple.
 
-All the code you read so far introduced new concepts from [wavefront_obj] that will not be explained
-because this is not the right place in this current book. Nevertheless, no new concept was introduced
-regarding [luminance].
+> Note: we also use the [try-guard] crate to convert boolean expressions to _try_ values.
 
-> Note: we also use the [try-guard] crate to convert boolean expression to _try_ values.
+However, before going any further, we are going to need to introduce a new crate: [luminance-front].
+
+## luminance-front
+
+The examples you saw so far are simple enough they don’t require you to explicitly put type
+ascriptions about the scarce resources you use. However, as soon as you need to pass them around,
+you are going to hit a problem.
+
+[luminance] — the crate — is a backend agnostic graphics API. It means that it doesn’t know which
+backend it will be executed with. That information is selected by a _platform_ crate — in our case,
+[luminance-glfw], which in its turn depends on a _backend crate_ — [luminance-gl] here. A type
+such as [`Tess`] gets its first type variable, `B`, replaced by the backend type. You didn’t notice
+that because the examples from the previous chapters didn’t require passing such types around, but
+now we are going to need to annotate functions’ signatures with [luminance] types, and then, with
+backend types.
+
+You have three options:
+
+1. You can decide to bring in [luminance-gl] in your `Cargo.toml` and use the backend type that is
+  exported from there — a.k.a. `GL33` in our case. This will allow you to use it where backend
+  types are expected, but this will prevent you from using anything else but OpenGL 3.3. It ties
+  your code to a backend implementation.
+2. You could continue declaring and passing the `B` type variable. That is a sane option if you are
+  writing a luminance crate or a middleware library, but it’s going to lead to not very comfortable
+  types to read. For instance, if you want to be able to call the `TessBuilder::set_vertices`
+  method, the list of constaints, types and bounds you need to add (from
+  `luminance::backend::tess`) is likely to discourage you.
+3. You could use [luminance-front]. The goal of this crate is to select a backend type at
+  compile-time and provide type aliases to remove the need to annotate functions and types with
+  backend types. This is a much more comfortable situation and it scales / adapts to the
+  compilation targets and feature gates you set in your `Cargo.toml`.
+
+We are going to use [luminance-front] to demonstrate how easy the crate is. Basically, it will
+re-export all the types from [luminance], replacing the `B` type variables (where it appears) by
+the right backend type. The backend type, found at `luminance_front::Backend`, can be used if you
+still need to constrain some code (typical with `C: GraphicsContext`).
+
+Also, in order to make things more coherent and convenient, [luminance-front] re-exports symbols
+which don’t have the `B` type variables (it simply forwards them), so that you can remove
+`luminance` from your `use` statements and make them more uniform.
+
+> Note: keep in mind that if you use [luminance-derive], as it depends on [luminance], you will
+> still need to have to include [luminance] in your `Cargo.toml`.
+
+Add this to your `Cargo.toml`:
+
+```toml
+luminance-front = "0.1"
+```
+
+## Loading Wavefront objects
+
+Loading a .obj is not really part of this book, but we’ll provide the code so that you don’t have
+to struggle too much. With [luminance-front], you will notice that the platform crate is still up
+to us to decide. So if we want to be able to work for any platform crates, we need to constrain
+the platform with the backend type [luminance-front] would have selected for us. We can do that
+with `luminance_front::Backend`. If `C` is the type of the platform (in our case it’s `GlfwSurface`
+but it’s a good practice to be able to adapt to any), then the following is required to perform
+[luminance] operations:
 
 ```rust
+where C: GraphicsContext<Backend = Backend>
+```
+
+Then, loading is just a matter of following [wavefront_obj]’s API:
+
+```rust
+use luminance_front::context::GraphicsContext;
+use luminance_front::tess::{Tess, TessError};
+use luminance_front::Backend;
 use std::fs::File;
 use std::io::Read as _;
 use std::path::Path;
-use luminance::tess::{Tess, TessBuilder, TessError};
-use luminance::context::GraphicsContext;
 use try_guard::verify;
 use wavefront_obj::obj;
 
@@ -29,13 +92,17 @@ struct Obj {
 }
 
 impl Obj {
-  fn to_tess<C>(self, ctx: &mut C) -> Result<Tess, TessError>
+  fn to_tess<C>(
+    self,
+    surface: &mut C,
+  ) -> Result<Tess<Vertex, VertexIndex, (), Interleaved>, TessError>
   where
-    C: GraphicsContext,
+    C: GraphicsContext<Backend = Backend>,
   {
-    TessBuilder::new(ctx)
+    surface
+      .new_tess()
       .set_mode(Mode::Triangle)
-      .add_vertices(self.vertices)
+      .set_vertices(self.vertices)
       .set_indices(self.indices)
       .build()
   }
@@ -101,33 +168,9 @@ Basically, calling `Obj::load(path)` here will get us a `Result<Obj, String>`. W
 convert it to a [`Tess`] for [luminance] to process.
 
 [luminance]: https://crates.io/crates/luminance
-[luminance-derive]: https://crates.io/crates/luminance-derive
-[`Vertex`]: https://docs.rs/luminance/latest/luminance/vertex/trait.Vertex.html
-[`Semantics`]: https://docs.rs/luminance/latest/luminance/vertex/trait.Semantics.html
+[luminance-front]: https://crates.io/crates/luminance-front
+[luminance-gl]: https://crates.io/crates/luminance-gl
+[luminance-glfw]: https://crates.io/crates/luminance-glfw
 [`Tess`]: https://docs.rs/luminance/latest/luminance/tess/struct.Tess.html
-[`TessBuilder`]: https://docs.rs/luminance/latest/luminance/tess/struct.TessBuilder.html
-[`Mode`]: https://docs.rs/luminance/latest/luminance/tess/enum.Mode.html
-[`Pipeline`]: https://docs.rs/luminance/latest/luminance/pipeline/struct.Pipeline.html
-[`ShadingGate`]: https://docs.rs/luminance/latest/luminance/pipeline/struct.ShadingGate.html
-[`ShadingGate::shade`]: https://docs.rs/luminance/latest/luminance/pipeline/struct.ShadingGate.html#method.shade
-[`VertexShader`]: https://docs.rs/luminance/latest/luminance/shader/stage/enum.Type.html#variant.VertexShader
-[`FragmentShader`]: https://docs.rs/luminance/latest/luminance/shader/stage/enum.Type.html#variant.FragmentShader
-[`Program`]: https://docs.rs/luminance/latest/luminance/shader/program/struct.Program.html
-[`RenderGate`]: https://docs.rs/luminance/latest/luminance/pipeline/struct.RenderGate.html
-[`TessGate`]: https://docs.rs/luminance/latest/luminance/pipeline/struct.TessGate.html
-[Wavefront .obj]: https://en.wikipedia.org/wiki/Wavefront_.obj_file
 [wavefront_obj]: https://crates.io/crates/wavefront_obj
-[cgmath]: https://crates.io/crates/cgmath
-[linear algebra]: https://en.wikipedia.org/wiki/Linear_algebra
-[shearing]: https://en.wikipedia.org/wiki/Shear_matrix
-[normalized]: http://mathworld.wolfram.com/NormalizedVector.html
-[right-handed system]: https://en.wikipedia.org/wiki/Right-hand_rule
-[uniform interfaces]: https://docs.rs/luminance/latest/luminance/shader/program/trait.UniformInterface.html
-[`Uniform`]: https://docs.rs/luminance/latest/luminance/shader/program/struct.Uniform.html
-[`Uniform::update`]: https://docs.rs/luminance/latest/luminance/shader/program/struct.Uniform.html#method.update
-[`UniformInterface`]: https://docs.rs/luminance/latest/luminance/shader/program/trait.UniformInterface.html
-[contravariant]: https://en.wikipedia.org/wiki/Functor#Covariance_and_contravariance
-[`ProgramInterface`]: https://docs.rs/luminance/latest/luminance/shader/program/struct.ProgramInterface.html
-[`M44`]: https://docs.rs/luminance/latest/luminance/linear/type.M44.html
-[Phong]: https://en.wikipedia.org/wiki/Phong_shading
 [try-guard]: https://crates.io/crates/try-guard
