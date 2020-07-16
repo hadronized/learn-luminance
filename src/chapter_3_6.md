@@ -1,7 +1,7 @@
 # Adding light
 
-You might be used to it now: if we need vertex normals, we need to change our vertex type
-definition.
+Light requires [normals] to be able to compute the shading on surfaces. You might be used to it now:
+if we need vertex normals, we need to change our vertex type definition.
 
 ## Rethinking our vertex type
 
@@ -166,18 +166,79 @@ And here’s the result:
 
 ![](imgs/suzanne_lit.png)
 
+# Let’s talk about aspect ratio
+
+If you try to resize your window, you will notice some strange distorsions. This is due to the fact
+that we are using describing objects in a space defined via an [orthonormal basis]. What it means is
+that, roughly, your screen / framebuffer is 2 units wide and 2 units tall: a point lying on the
+left-most part of your screen has `x=-1`; on the right, `x=1`. Same thing happens on the vertical:
+top has `y=1` and bottom has `y=-1`.
+
+Now if you think about it, it shouldn’t be a problem… but actually, it is. Our monitors typically
+have weird aspect ratio, such as 16:10. It means that 1 unit on the X axis doesn’t map to 1 unit
+on the Y axis on your screen. You can do the math by yourself: 16:10 means that 16 units on X
+corresponds to 10 units on Y, and then 1 unit on X corresponds to 10/16 = 0.625 units on Y.
+
+What we want to do is to restore the aspect ratio of the projected scene to 1:1, while still
+using a 16:10 ratio, for instance. That will remove the distorsion. Doing so is very easy:
+because 1 unit on X equals to 0.625 unit on Y, we just have to multiply every Y coordinates of
+our transformed points by this ratio (0.625 for a 16:10 framebuffer). Obviously, we are not going
+to hardcode that value. It might change if you resize the window, and we all have different setups.
+
+First, we need to add a new uniform to our shader interface:
+
+```rust
+  #[uniform(unbound)]
+  aspect_ratio: Uniform<f32>,
+```
+
+Then, simply update it in your loop:
+
+```rust
+    let [width, height] = back_buffer.size();
+    // … in the shading gate
+          iface.set(&uni.aspect_ratio, width as f32 / height as f32);
+```
+
+> Exercise: try to prevent doing that division at every frame by caching the aspect ratio and
+> updating it only when the framebuffer size change. You will need to inspect a bit the API of
+> [glfw].
+
+Then, one last step: update the vertex shader to perform the multiplication on the GPU:
+
+```glsl
+in vec3 position;
+in vec3 normal;
+
+out vec3 v_normal;
+
+uniform mat4 projection;
+uniform mat4 view;
+uniform float aspect_ratio;
+
+void main() {
+  v_normal = normal;
+  gl_Position = projection * view * vec4(position, 1.);
+  gl_Position.y *= aspect_ratio;
+}
+```
+
+Recompile, run: try to resize the window with your mouse or going fullscreen. No more distorsions!
+
 Complete code:
 
 ```rust
 use cgmath::{perspective, EuclideanSpace, Matrix4, Point3, Rad, Vector3};
-use luminance::context::GraphicsContext;
-use luminance::linear::M44;
-use luminance::pipeline::PipelineState;
-use luminance::render_state::RenderState;
-use luminance::shader::program::{Program, Uniform};
-use luminance::tess::{Mode, Tess, TessBuilder, TessError, TessSliceIndex};
+use glfw::{Action, Context as _, Key, WindowEvent};
 use luminance_derive::{Semantics, UniformInterface, Vertex};
-use luminance_glfw::{Action, GlfwSurface, Key, Surface as _, WindowDim, WindowEvent, WindowOpt};
+use luminance_front::context::GraphicsContext;
+use luminance_front::pipeline::PipelineState;
+use luminance_front::render_state::RenderState;
+use luminance_front::shader::Uniform;
+use luminance_front::tess::{Interleaved, Mode, Tess, TessError};
+use luminance_front::Backend;
+use luminance_glfw::GlfwSurface;
+use luminance_windowing::{WindowDim, WindowOpt};
 use std::collections::HashMap;
 use std::env;
 use std::fs::File;
@@ -191,16 +252,18 @@ use wavefront_obj::obj;
 const VS_STR: &str = include_str!("vs.glsl");
 const FS_STR: &str = include_str!("fs.glsl");
 
-const FOVY: Rad<f32> = Rad(std::f32::consts::PI / 2.);
+const FOVY: Rad<f32> = Rad(std::f32::consts::FRAC_PI_2);
 const Z_NEAR: f32 = 0.1;
 const Z_FAR: f32 = 10.;
 
 #[derive(Debug, UniformInterface)]
 struct ShaderInterface {
   #[uniform(unbound)]
-  projection: Uniform<M44>,
+  projection: Uniform<[[f32; 4]; 4]>,
   #[uniform(unbound)]
-  view: Uniform<M44>,
+  view: Uniform<[[f32; 4]; 4]>,
+  #[uniform(unbound)]
+  aspect_ratio: Uniform<f32>,
 }
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, Semantics)]
@@ -226,13 +289,17 @@ struct Obj {
 }
 
 impl Obj {
-  fn to_tess<C>(self, ctx: &mut C) -> Result<Tess, TessError>
+  fn to_tess<C>(
+    self,
+    surface: &mut C,
+  ) -> Result<Tess<Vertex, VertexIndex, (), Interleaved>, TessError>
   where
-    C: GraphicsContext,
+    C: GraphicsContext<Backend = Backend>,
   {
-    TessBuilder::new(ctx)
+    surface
+      .new_tess()
       .set_mode(Mode::Triangle)
-      .add_vertices(self.vertices)
+      .set_vertices(self.vertices)
       .set_indices(self.indices)
       .build()
   }
@@ -296,11 +363,11 @@ impl Obj {
 }
 
 fn main() {
-  let surface = GlfwSurface::new(
-    WindowDim::Windowed(960, 540),
-    "Hello, world!",
-    WindowOpt::default(),
-  );
+  let dim = WindowDim::Windowed {
+    width: 960,
+    height: 540,
+  };
+  let surface = GlfwSurface::new_gl33("Hello, world!", WindowOpt::default().set_dim(dim));
 
   match surface {
     Ok(surface) => {
@@ -325,25 +392,23 @@ fn main_loop(mut surface: GlfwSurface) {
   let mesh = Obj::load(path).unwrap().to_tess(&mut surface).unwrap();
 
   let start_t = Instant::now();
+
+  let mut program = surface
+    .new_shader_program::<VertexSemantics, (), ShaderInterface>()
+    .from_strings(VS_STR, None, None, FS_STR)
+    .unwrap()
+    .ignore_warnings();
+
   let back_buffer = surface.back_buffer().unwrap();
-
-  let program: Program<VertexSemantics, (), ShaderInterface> =
-    Program::from_strings(None, VS_STR, None, FS_STR)
-      .unwrap()
-      .ignore_warnings();
-
-  let projection = perspective(
-    FOVY,
-    surface.width() as f32 / surface.height() as f32,
-    Z_NEAR,
-    Z_FAR,
-  );
+  let [width, height] = back_buffer.size();
+  let projection = perspective(FOVY, width as f32 / height as f32, Z_NEAR, Z_FAR);
 
   let view = Matrix4::<f32>::look_at(Point3::new(2., 2., 2.), Point3::origin(), Vector3::unit_y());
 
   'app: loop {
     // handle events
-    for event in surface.poll_events() {
+    surface.window.glfw.poll_events();
+    for (_, event) in surface.events_rx.try_iter() {
       match event {
         WindowEvent::Close | WindowEvent::Key(Key::Escape, _, Action::Release, _) => break 'app,
         _ => (),
@@ -355,55 +420,36 @@ fn main_loop(mut surface: GlfwSurface) {
     let t = start_t.elapsed().as_millis() as f32 * 1e-3;
     let color = [t.cos(), t.sin(), 0.5, 1.];
 
-    surface.pipeline_builder().pipeline(
+    let back_buffer = surface.back_buffer().unwrap();
+    let [width, height] = back_buffer.size();
+    let render = surface.new_pipeline_gate().pipeline(
       &back_buffer,
       &PipelineState::default().set_clear_color(color),
       |_, mut shd_gate| {
-        shd_gate.shade(&program, |iface, mut rdr_gate| {
-          iface.projection.update(projection.into());
-          iface.view.update(view.into());
+        shd_gate.shade(&mut program, |mut iface, uni, mut rdr_gate| {
+          iface.set(&uni.projection, projection.into());
+          iface.set(&uni.view, view.into());
+          iface.set(&uni.aspect_ratio, width as f32 / height as f32);
 
           rdr_gate.render(&RenderState::default(), |mut tess_gate| {
-            tess_gate.render(mesh.slice(..));
+            tess_gate.render(&mesh);
           });
         });
       },
     );
 
     // swap buffer chains
-    surface.swap_buffers();
+    if render.is_ok() {
+      surface.window.swap_buffers();
+    } else {
+      break 'app;
+    }
   }
 }
 ```
 
+[normals]: https://en.wikipedia.org/wiki/Normal_(geometry)
+[orthonormal basis]: https://en.wikipedia.org/wiki/Orthonormal_basis
 [luminance]: https://crates.io/crates/luminance
-[luminance-derive]: https://crates.io/crates/luminance-derive
-[`Vertex`]: https://docs.rs/luminance/latest/luminance/vertex/trait.Vertex.html
-[`Semantics`]: https://docs.rs/luminance/latest/luminance/vertex/trait.Semantics.html
-[`Tess`]: https://docs.rs/luminance/latest/luminance/tess/struct.Tess.html
-[`TessBuilder`]: https://docs.rs/luminance/latest/luminance/tess/struct.TessBuilder.html
-[`Mode`]: https://docs.rs/luminance/latest/luminance/tess/enum.Mode.html
-[`Pipeline`]: https://docs.rs/luminance/latest/luminance/pipeline/struct.Pipeline.html
-[`ShadingGate`]: https://docs.rs/luminance/latest/luminance/pipeline/struct.ShadingGate.html
-[`ShadingGate::shade`]: https://docs.rs/luminance/latest/luminance/pipeline/struct.ShadingGate.html#method.shade
-[`VertexShader`]: https://docs.rs/luminance/latest/luminance/shader/stage/enum.Type.html#variant.VertexShader
-[`FragmentShader`]: https://docs.rs/luminance/latest/luminance/shader/stage/enum.Type.html#variant.FragmentShader
-[`Program`]: https://docs.rs/luminance/latest/luminance/shader/program/struct.Program.html
-[`RenderGate`]: https://docs.rs/luminance/latest/luminance/pipeline/struct.RenderGate.html
-[`TessGate`]: https://docs.rs/luminance/latest/luminance/pipeline/struct.TessGate.html
-[Wavefront .obj]: https://en.wikipedia.org/wiki/Wavefront_.obj_file
-[wavefront_obj]: https://crates.io/crates/wavefront_obj
-[cgmath]: https://crates.io/crates/cgmath
-[linear algebra]: https://en.wikipedia.org/wiki/Linear_algebra
-[shearing]: https://en.wikipedia.org/wiki/Shear_matrix
-[normalized]: http://mathworld.wolfram.com/NormalizedVector.html
-[right-handed system]: https://en.wikipedia.org/wiki/Right-hand_rule
-[uniform interfaces]: https://docs.rs/luminance/latest/luminance/shader/program/trait.UniformInterface.html
-[`Uniform`]: https://docs.rs/luminance/latest/luminance/shader/program/struct.Uniform.html
-[`Uniform::update`]: https://docs.rs/luminance/latest/luminance/shader/program/struct.Uniform.html#method.update
-[`UniformInterface`]: https://docs.rs/luminance/latest/luminance/shader/program/trait.UniformInterface.html
-[contravariant]: https://en.wikipedia.org/wiki/Functor#Covariance_and_contravariance
-[`ProgramInterface`]: https://docs.rs/luminance/latest/luminance/shader/program/struct.ProgramInterface.html
-[`M44`]: https://docs.rs/luminance/latest/luminance/linear/type.M44.html
+[glfw]: https://crates.io/crates/glfw
 [Phong]: https://en.wikipedia.org/wiki/Phong_shading
-[try-guard]: https://crates.io/crates/try-guard

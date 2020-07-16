@@ -1,12 +1,14 @@
 use cgmath::{perspective, EuclideanSpace, Matrix4, Point3, Rad, Vector3};
-use luminance::context::GraphicsContext;
-use luminance::linear::M44;
-use luminance::pipeline::PipelineState;
-use luminance::render_state::RenderState;
-use luminance::shader::program::{Program, Uniform};
-use luminance::tess::{Mode, Tess, TessBuilder, TessError, TessSliceIndex};
+use glfw::{Action, Context as _, Key, WindowEvent};
 use luminance_derive::{Semantics, UniformInterface, Vertex};
-use luminance_glfw::{Action, GlfwSurface, Key, Surface as _, WindowDim, WindowEvent, WindowOpt};
+use luminance_front::context::GraphicsContext;
+use luminance_front::pipeline::PipelineState;
+use luminance_front::render_state::RenderState;
+use luminance_front::shader::Uniform;
+use luminance_front::tess::{Interleaved, Mode, Tess, TessError};
+use luminance_front::Backend;
+use luminance_glfw::GlfwSurface;
+use luminance_windowing::{WindowDim, WindowOpt};
 use std::collections::HashMap;
 use std::env;
 use std::fs::File;
@@ -20,16 +22,18 @@ use wavefront_obj::obj;
 const VS_STR: &str = include_str!("vs.glsl");
 const FS_STR: &str = include_str!("fs.glsl");
 
-const FOVY: Rad<f32> = Rad(std::f32::consts::PI / 2.);
+const FOVY: Rad<f32> = Rad(std::f32::consts::FRAC_PI_2);
 const Z_NEAR: f32 = 0.1;
 const Z_FAR: f32 = 10.;
 
 #[derive(Debug, UniformInterface)]
 struct ShaderInterface {
   #[uniform(unbound)]
-  projection: Uniform<M44>,
+  projection: Uniform<[[f32; 4]; 4]>,
   #[uniform(unbound)]
-  view: Uniform<M44>,
+  view: Uniform<[[f32; 4]; 4]>,
+  #[uniform(unbound)]
+  aspect_ratio: Uniform<f32>,
 }
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, Semantics)]
@@ -55,13 +59,17 @@ struct Obj {
 }
 
 impl Obj {
-  fn to_tess<C>(self, ctx: &mut C) -> Result<Tess, TessError>
+  fn to_tess<C>(
+    self,
+    surface: &mut C,
+  ) -> Result<Tess<Vertex, VertexIndex, (), Interleaved>, TessError>
   where
-    C: GraphicsContext,
+    C: GraphicsContext<Backend = Backend>,
   {
-    TessBuilder::new(ctx)
+    surface
+      .new_tess()
       .set_mode(Mode::Triangle)
-      .add_vertices(self.vertices)
+      .set_vertices(self.vertices)
       .set_indices(self.indices)
       .build()
   }
@@ -125,11 +133,11 @@ impl Obj {
 }
 
 fn main() {
-  let surface = GlfwSurface::new(
-    WindowDim::Windowed(960, 540),
-    "Hello, world!",
-    WindowOpt::default(),
-  );
+  let dim = WindowDim::Windowed {
+    width: 960,
+    height: 540,
+  };
+  let surface = GlfwSurface::new_gl33("Hello, world!", WindowOpt::default().set_dim(dim));
 
   match surface {
     Ok(surface) => {
@@ -154,25 +162,23 @@ fn main_loop(mut surface: GlfwSurface) {
   let mesh = Obj::load(path).unwrap().to_tess(&mut surface).unwrap();
 
   let start_t = Instant::now();
+
+  let mut program = surface
+    .new_shader_program::<VertexSemantics, (), ShaderInterface>()
+    .from_strings(VS_STR, None, None, FS_STR)
+    .unwrap()
+    .ignore_warnings();
+
   let back_buffer = surface.back_buffer().unwrap();
-
-  let program: Program<VertexSemantics, (), ShaderInterface> =
-    Program::from_strings(None, VS_STR, None, FS_STR)
-      .unwrap()
-      .ignore_warnings();
-
-  let projection = perspective(
-    FOVY,
-    surface.width() as f32 / surface.height() as f32,
-    Z_NEAR,
-    Z_FAR,
-  );
+  let [width, height] = back_buffer.size();
+  let projection = perspective(FOVY, width as f32 / height as f32, Z_NEAR, Z_FAR);
 
   let view = Matrix4::<f32>::look_at(Point3::new(2., 2., 2.), Point3::origin(), Vector3::unit_y());
 
   'app: loop {
     // handle events
-    for event in surface.poll_events() {
+    surface.window.glfw.poll_events();
+    for (_, event) in surface.events_rx.try_iter() {
       match event {
         WindowEvent::Close | WindowEvent::Key(Key::Escape, _, Action::Release, _) => break 'app,
         _ => (),
@@ -184,22 +190,29 @@ fn main_loop(mut surface: GlfwSurface) {
     let t = start_t.elapsed().as_millis() as f32 * 1e-3;
     let color = [t.cos(), t.sin(), 0.5, 1.];
 
-    surface.pipeline_builder().pipeline(
+    let back_buffer = surface.back_buffer().unwrap();
+    let [width, height] = back_buffer.size();
+    let render = surface.new_pipeline_gate().pipeline(
       &back_buffer,
       &PipelineState::default().set_clear_color(color),
       |_, mut shd_gate| {
-        shd_gate.shade(&program, |iface, mut rdr_gate| {
-          iface.projection.update(projection.into());
-          iface.view.update(view.into());
+        shd_gate.shade(&mut program, |mut iface, uni, mut rdr_gate| {
+          iface.set(&uni.projection, projection.into());
+          iface.set(&uni.view, view.into());
+          iface.set(&uni.aspect_ratio, width as f32 / height as f32);
 
           rdr_gate.render(&RenderState::default(), |mut tess_gate| {
-            tess_gate.render(mesh.slice(..));
+            tess_gate.render(&mesh);
           });
         });
       },
     );
 
     // swap buffer chains
-    surface.swap_buffers();
+    if render.is_ok() {
+      surface.window.swap_buffers();
+    } else {
+      break 'app;
+    }
   }
 }
