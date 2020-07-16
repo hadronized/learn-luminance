@@ -4,12 +4,12 @@
 Hence, there is nothing _per se_ that provides _materials_ or that kind of concept. You will have
 to craft them yourself and that is what we are going to do in this section.
 
-Remember our pipeline creation from the chapter? We needed to provide a closure taking two
+Remember our pipeline creation from the first chapter? We needed to provide a closure taking two
 arguments. It’s time to explain you what those arguments are for. Let’s take the pipeline
 definition again:
 
 ```rust
-surface.pipeline_builder().pipeline(
+surface.new_pipeline_gate().pipeline(
   &back_buffer,
   &PipelineState::default().set_clear_color(color),
   |_, _| (),
@@ -19,7 +19,7 @@ surface.pipeline_builder().pipeline(
 And rewrite it by using the arguments:
 
 ```rust
-surface.pipeline_builder().pipeline(
+surface.new_pipeline_gate().pipeline(
   &back_buffer,
   &PipelineState::default().set_clear_color(color),
   |pipeline, mut shd_gate| (),
@@ -33,7 +33,8 @@ The `pipeline` argument here represents a [`Pipeline`] and `shd_gate` a [`Shadin
 
 The [`Pipeline`] object you’re given represents a _graphics pipeline_. It allows you to notify
 the GPU about scarce resources you’re about to use or perform specific tasks related to such
-resources. That is pretty advanced so we will just ignore that object and will leave it to `_`.
+resources. That is pretty advanced so we will just ignore that object and will leave it to `_`
+for now.
 
 More on [`Pipeline`] in a future chapter.
 
@@ -52,7 +53,7 @@ called heavily depend on its kind. The following table gives a better understand
 
 | Shader stage type                | Mandatory? | What it’s for                                                    | Inputs                | Running frequency                                                                                                              |
 | -------------------------------- | ---------- | ---------------------------------------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| [`VertexShader`]                 | Yes.       | Transforming vertices at the beginning of the pipeline.          | Vertex attributes.    | Once for every vertices that define our [`Tess`].                                                                              |
+| [`VertexShader`]                 | Yes.       | Transforming vertices at the beginning of the pipeline.          | Vertex attributes.    | Once for every vertices comprised in our [`Tess`].                                                                             |
 | [`TessellationControlShader`]    | No.        | Determines how much a _primitive patch_ must be tessellated.     | Abstract patches.     | At least once for every _abstract patches_ flowing from the [`VertexShader`].                                                  |
 | [`TessellationEvaluationShader`] | No.        | Transform tessellated patches.                                   | Abstract patches.     | At least once for every _abstract patches_ flowing from the _tessellator_ that has followed the [`TessellationControlShader`]. |
 | [`GeometryShader`]               | No.        | Map, filter, add and transform _primitives_.                     | Primitive attributes. | Once for each primitive patch flowing out from either the [`VertexShader`] or [`TessellationEvaluationShader`].                |
@@ -67,10 +68,10 @@ Assembling _shader stages_ yields a _shader program_, which type is [`Program`].
 can then be used with our [`ShadingGate`] to shade our triangle! What we need to do here is to
 write:
 
-  - A [`VertexShader`] in [GLSL] that will simply forward the vertex attributes to the next stage
-    so that this information is available later.
-  - A [`FragmentShader`] that will read this information and output a single color for each pixel
-    of the ~screen~ frame buffer.
+- A [`VertexShader`] in [GLSL] that will simply forward the vertex attributes to the next stage
+  so that this information is available later.
+- A [`FragmentShader`] that will read this information and output a single color for each pixel
+  of the ~screen~ frame buffer.
 
 ### The vertex shader
 
@@ -146,15 +147,17 @@ idea of what a GPU shader program is and should be. That opinion will be explain
 chapter. Let’s focus on the simple stuff first.
 
 ```rust
-use luminance::shader::program::Program;
+use luminance::shader::Program;
 ```
 
 Then, right before your loop:
 
 ```rust
-let program: Program<VertexSemantics, (), ()> = Program::from_strings(None, VS_STR, None, FS_STR)
-  .unwrap()
-  .ignore_warnings();
+  let mut program = surface
+    .new_shader_program::<VertexSemantics, (), ()>()
+    .from_strings(VS_STR, None, None, FS_STR)
+    .unwrap()
+    .ignore_warnings();
 ```
 
 As you can see, you need to provide the _vertex semantics type_ you defined earlier. That enables
@@ -162,7 +165,8 @@ As you can see, you need to provide the _vertex semantics type_ you defined earl
 it with… at compile-time. Ignore the two `()`, we’ll discuss that later. However, notice the use
 of the [`BuiltProgram::ignore_warnings`] method: it gives you the actual [`Program`] by ignoring any
 _warnings_ that might have happened while creating the shader program. You can inspect them if you
-want to but for the purpose of this example, you will not need to.
+want to but for the purpose of this example, you will not need to. Also, keep in mind that those
+are only warnings that wouldn’t cause your program to behave in a weird way.
 
 > On a general note, [luminance] is heavily type-driven. Familiarize yourself with how you can
 > drive behavior with types (the [turbofish syntax], for instance, will be useful).
@@ -173,31 +177,22 @@ The next step is to create a new _shading node_ in your graphics pipeline. This 
 [`ShadingGate`].
 
 ```rust
-surface.pipeline_builder().pipeline(
-  &back_buffer,
-  &PipelineState::default().set_clear_color(color),
-  |_, mut shd_gate| {
-    shd_gate.shade(&program, |_, mut rdr_gate| {
-      // …
-    });
-});
+    let render = surface.new_pipeline_gate().pipeline(
+      &back_buffer,
+      &PipelineState::default().set_clear_color(color),
+      |_, mut shd_gate| {
+        shd_gate.shade(&mut program, |_, _, mut rdr_gate| {
+          // …
+        });
+      },
+    );
 ```
 
 You can see we are getting access to a new type of _gate_ here: a [`RenderGate`].
 
 [luminance]: https://crates.io/crates/luminance
 [luminance-derive]: https://crates.io/crates/luminance-derive
-[`Vertex`]: https://docs.rs/luminance/latest/luminance/vertex/trait.Vertex.html
-[`Semantics`]: https://docs.rs/luminance/latest/luminance/vertex/trait.Semantics.html
-[`Copy`]: https://doc.rust-lang.org/std/marker/trait.Copy.html
-[`Clone`]: https://doc.rust-lang.org/std/clone/trait.Clone.html
-[`Debug`]: https://doc.rust-lang.org/std/fmt/trait.Debug.html
-[`VertexAttrib`]: https://docs.rs/luminance/latest/luminance/vertex/trait.VertexAttrib.html
-[`HasSemantics`]: https://docs.rs/luminance/latest/luminance/vertex/trait.HasSemantics.html
 [`Tess`]: https://docs.rs/luminance/latest/luminance/tess/struct.Tess.html
-[`TessBuilder`]: https://docs.rs/luminance/latest/luminance/tess/struct.TessBuilder.html
-[`Mode`]: https://docs.rs/luminance/latest/luminance/tess/enum.Mode.html
-[`Mode::Point`]: https://docs.rs/luminance/latest/luminance/tess/enum.Mode.html#variant.Point
 [`Pipeline`]: https://docs.rs/luminance/latest/luminance/pipeline/struct.Pipeline.html
 [`ShadingGate`]: https://docs.rs/luminance/latest/luminance/pipeline/struct.ShadingGate.html
 [GLSL]: https://www.khronos.org/opengl/wiki/Core_Language_(GLSL)
@@ -210,7 +205,3 @@ You can see we are getting access to a new type of _gate_ here: a [`RenderGate`]
 [`BuiltProgram::ignore_warnings`]: https://docs.rs/luminance/latest/luminance/shader/program/struct.BuiltProgram.html#method.ignore_warnings
 [turbofish syntax]: https://doc.rust-lang.org/1.30.0/book/first-edition/generics.html
 [`RenderGate`]: https://docs.rs/luminance/latest/luminance/pipeline/struct.RenderGate.html
-[`RenderState`]: https://docs.rs/luminance/latest/luminance/render_state/struct.RenderState.html
-[`TessGate`]: https://docs.rs/luminance/latest/luminance/pipeline/struct.TessGate.html
-[`TessSlice`]: https://docs.rs/luminance/latest/luminance/tess/struct.TessSlice.html
-[`TessSliceIndex`]: https://docs.rs/luminance/latest/luminance/tess/struct.TessSliceIndex.html

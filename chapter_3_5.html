@@ -5,12 +5,19 @@
         <meta charset="UTF-8">
         <title>Altering the graphics pipeline - Learn luminance</title>
         
+        
+
+
+        <!-- Custom HTML head -->
+        
+
 
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff" />
 
+        <link rel="icon" href="favicon.svg">
         <link rel="shortcut icon" href="favicon.png">
         <link rel="stylesheet" href="css/variables.css">
         <link rel="stylesheet" href="css/general.css">
@@ -19,8 +26,9 @@
 
         <!-- Fonts -->
         <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
-        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
-        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+        
+        <link rel="stylesheet" href="fonts/fonts.css">
+        
 
         <!-- Highlight.js Stylesheets -->
         <link rel="stylesheet" href="highlight.css">
@@ -36,7 +44,7 @@
         <!-- Provide site root to javascript -->
         <script type="text/javascript">
             var path_to_root = "";
-            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "light" : "light";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
         </script>
 
         <!-- Work around some values being stored in localStorage wrapped in quotes -->
@@ -151,41 +159,40 @@
 <p>Now that we have a shader program that can accept updating our two matrices, we need to actually
 pass the matrices down to the GPU so that it can use them when transforming points in the <em>vertex
 shader</em>. That is done via the <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.ShadingGate.html"><code>ShadingGate</code></a>. When you call the <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.ShadingGate.html#method.shade"><code>ShadingGate::shade</code></a> method,
-you must pass a closure that will receive two arguments:</p>
+you must pass a closure that will receive three arguments:</p>
 <ul>
+<li>A <a href="https://docs.rs/luminance/latest/luminance/shader/program/struct.ProgramInterface.html"><code>ProgramInterface</code></a>, that gives you access to an interface to update uniforms.</li>
+<li>Your uniform interface.</li>
 <li>A <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.RenderGate.html"><code>RenderGate</code></a>, as seen in previous chapters.</li>
-<li>A <a href="https://docs.rs/luminance/latest/luminance/shader/program/struct.ProgramInterface.html"><code>ProgramInterface</code></a>, that gives you access to your type (i.e. <code>ShaderInterface</code> here).</li>
 </ul>
 <p>The <a href="https://docs.rs/luminance/latest/luminance/shader/program/struct.ProgramInterface.html"><code>ProgramInterface</code></a> argument allows you to directly manipulate the fields in your
-<code>ShaderInterface</code> — here, <code>projection</code> and <code>view</code>. It also allows other operations on the
-<a href="https://docs.rs/luminance/latest/luminance/shader/program/struct.Program.html"><code>Program</code></a>’s <em>uniforms</em> but it’s currently off topic — feel free to read its documentation if
-you’re interested, though.</p>
-<p><a href="https://docs.rs/luminance/latest/luminance/shader/program/struct.ProgramInterface.html"><code>ProgramInterface</code></a> implements <code>Deref&lt;Target = ShaderInterface&gt;</code>, so you can directly select your
-fields. You update a uniform by using the <a href="https://docs.rs/luminance/latest/luminance/shader/program/struct.Uniform.html#method.update"><code>Uniform::update</code></a> method.</p>
-<pre><pre class="playpen"><code class="language-rust">
-<span class="boring">#![allow(unused_variables)]
+<code>ShaderInterface</code> — here, <code>projection</code> and <code>view</code> that you get as second argument. It also allows
+other operations on the <a href="https://docs.rs/luminance/latest/luminance/shader/program/struct.Program.html"><code>Program</code></a>’s <em>uniforms</em> but it’s currently off topic — feel free to read
+its documentation if you’re interested, though.</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>surface.pipeline_builder().pipeline(
-  &amp;back_buffer,
-  &amp;PipelineState::default().set_clear_color(color),
-  |_, mut shd_gate| {
-    shd_gate.shade(&amp;program, |iface, mut rdr_gate| {
-      iface.projection.update(projection.into());
-      iface.view.update(view.into());
+</span>    let render = surface.new_pipeline_gate().pipeline(
+      &amp;back_buffer,
+      &amp;PipelineState::default().set_clear_color(color),
+      |_, mut shd_gate| {
+        shd_gate.shade(&amp;mut program, |mut iface, uni, mut rdr_gate| {
+          iface.set(&amp;uni.projection, projection.into());
+          iface.set(&amp;uni.view, view.into());
 
-      rdr_gate.render(&amp;RenderState::default(), |mut tess_gate| {
-        tess_gate.render(mesh.slice(..));
-      });
-    });
-  },
-);
+          rdr_gate.render(&amp;RenderState::default(), |mut tess_gate| {
+            tess_gate.render(&amp;mesh);
+          });
+        });
+      },
+    );
 <span class="boring">}
 </span></code></pre></pre>
 <p>It’s as simple as that.</p>
 <blockquote>
 <p><em>Why the <code>.into()</code> call</em>?</p>
 </blockquote>
-<p>Because of <a href="https://crates.io/crates/cgmath">cgmath</a>’s type that must be converted to <a href="https://docs.rs/luminance/latest/luminance/linear/type.M44.html"><code>M44</code></a>.</p>
+<p>Because of <a href="https://crates.io/crates/cgmath">cgmath</a>’s type that must be converted to [<code>M44</code>].</p>
 <p>If you compile and run with the following
 <a href="https://phaazon.net/media/uploads/suzanne.obj">suzanne.obj</a> file, you should see this:</p>
 <p><img src="imgs/suzanne_flat.png" alt="" /></p>
@@ -239,10 +246,10 @@ compute angles to determine illumination.</li>
         
 
         
-        
+
         
         <script type="text/javascript">
-            window.playpen_copyable = true;
+            window.playground_copyable = true;
         </script>
         
 

@@ -5,12 +5,19 @@
         <meta charset="UTF-8">
         <title>The shaders - Learn luminance</title>
         
+        
+
+
+        <!-- Custom HTML head -->
+        
+
 
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff" />
 
+        <link rel="icon" href="favicon.svg">
         <link rel="shortcut icon" href="favicon.png">
         <link rel="stylesheet" href="css/variables.css">
         <link rel="stylesheet" href="css/general.css">
@@ -19,8 +26,9 @@
 
         <!-- Fonts -->
         <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
-        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
-        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+        
+        <link rel="stylesheet" href="fonts/fonts.css">
+        
 
         <!-- Highlight.js Stylesheets -->
         <link rel="stylesheet" href="highlight.css">
@@ -36,7 +44,7 @@
         <!-- Provide site root to javascript -->
         <script type="text/javascript">
             var path_to_root = "";
-            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "light" : "light";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
         </script>
 
         <!-- Work around some values being stored in localStorage wrapped in quotes -->
@@ -177,8 +185,8 @@ and raw speed of <a href="https://crates.io/crates/cgmath">cgmath</a>.</p>
 <pre><code class="language-toml">cgmath = &quot;0.17&quot;
 </code></pre>
 <p>We will be using several symbols from it:</p>
-<pre><pre class="playpen"><code class="language-rust">
-<span class="boring">#![allow(unused_variables)]
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>use cgmath::{perspective, EuclideanSpace, Matrix4, Point3, Rad, Vector3};
 <span class="boring">}
@@ -187,7 +195,7 @@ and raw speed of <a href="https://crates.io/crates/cgmath">cgmath</a>.</p>
 <ul>
 <li>In graphics applications, we use <a href="https://en.wikipedia.org/wiki/Linear_algebra">linear algebra</a> <em>a lot</em>. You don’t have to know everything by
 heart, obviously, but having a linear algebra background will highly help for sure.</li>
-<li>From linear algebra, we’re mostly interested into several concepts:
+<li>From linear algebra, we’re mostly interested into these concepts:
 <ul>
 <li>Vector spaces. The most important one. You should know how you are supposed to add vectors and
 how to scale them by a given scalar number and how to compute the sine of the angle between two
@@ -198,17 +206,17 @@ use them for combining translations, scaling, rotations, <a href="https://en.wik
 <li>Quaternions. Scary name for a cute structure. Quaternions are 4-components numbers that can
 represent a lot of things. In our case, we like to use them to represent arbitrary rotations of
 φ angle (often expressed in radians) around a given unit axis (a unit axis is a 3D vector that
-has been <a href="http://mathworld.wolfram.com/NormalizedVector.html">normalized</a>).</li>
+has been <a href="http://mathworld.wolfram.com/NormalizedVector.html">normalized</a> — i.e. its length is 1).</li>
 </ul>
 </li>
 </ul>
 <p>I know, I know, that’s a lot of new concepts completely unrelated to <a href="https://crates.io/crates/luminance">luminance</a>. But you need them
 and, trust me, it’s not that hard.</p>
 <p>Back to our code now.</p>
-<pre><pre class="playpen"><code class="language-rust">
-<span class="boring">#![allow(unused_variables)]
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>const FOVY: Rad&lt;f32&gt; = Rad(std::f32::consts::PI / 2.);
+</span>const FOVY: Rad&lt;f32&gt; = Rad(std::f32::consts::FRAC_PI_2);
 const Z_NEAR: f32 = 0.1;
 const Z_FAR: f32 = 10.;
 
@@ -216,12 +224,7 @@ const Z_FAR: f32 = 10.;
 
 // in the main_loop function, before the actual loop
 
-let projection = perspective(
-  FOVY,
-  surface.width() as f32 / surface.height() as f32,
-  Z_NEAR,
-  Z_FAR,
-);
+let projection = perspective(FOVY, width as f32 / height as f32, Z_NEAR, Z_FAR);
 <span class="boring">}
 </span></code></pre></pre>
 <p>This defines a projection matrix with a <em>field of view</em> set to <em>π ÷ 2</em> (wich represents a field of
@@ -244,8 +247,8 @@ the <em>Y</em> unit axis goes from down to up your screen and the <em>Z</em> axi
 <p>Because we will just place the loaded object at the origin, we will want to slightly offset our
 position and view direction so that we can actually see the object. Again, <a href="https://crates.io/crates/cgmath">cgmath</a> provides us with
 the right <em>transformation matrix</em> for this.</p>
-<pre><pre class="playpen"><code class="language-rust">
-<span class="boring">#![allow(unused_variables)]
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>let view = Matrix4::&lt;f32&gt;::look_at(Point3::new(2., 2., 2.), Point3::origin(), Vector3::unit_y());
 <span class="boring">}
@@ -324,7 +327,7 @@ having gone through two basis change:</p>
 declare them and change the way the shader <a href="https://docs.rs/luminance/latest/luminance/shader/program/struct.Program.html"><code>Program</code></a> works. A special concept must be used here:
 <a href="https://docs.rs/luminance/latest/luminance/shader/program/trait.UniformInterface.html">uniform interfaces</a>.</p>
 <p>A uniform interface is a typed contract between the GLSL code compiled and linked in a shader
-<a href="https://docs.rs/luminance/latest/luminance/shader/program/struct.Program.html"><code>Program</code></a> and what you are supposed to with it. This powerful abstraction allows you to specify,
+<a href="https://docs.rs/luminance/latest/luminance/shader/program/struct.Program.html"><code>Program</code></a> and what you are supposed to do with it. This powerful abstraction allows you to specify,
 via a type, a set of <em>variables</em> that are available in the GLSL code and that you can get access to
 as soon as your <a href="https://docs.rs/luminance/latest/luminance/shader/program/struct.Program.html"><code>Program</code></a> gets shading things. The way you do this is a multi-step yet simple
 process:</p>
@@ -342,26 +345,26 @@ can then update GPU variables there.</li>
 <em>must</em> be <a href="https://en.wikipedia.org/wiki/Functor#Covariance_and_contravariance">contravariant</a>, because allowing you to handle such objects around while they depend on
 the current GPU context and state would be highly unsafe.</p>
 <p>Let’s create such a type.</p>
-<pre><pre class="playpen"><code class="language-rust">
-<span class="boring">#![allow(unused_variables)]
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>#[derive(Debug, UniformInterface)]
 struct ShaderInterface {
   #[uniform(unbound)]
-  projection: Uniform&lt;M44&gt;,
+  projection: Uniform&lt;[[f32; 4]; 4]&gt;,
   #[uniform(unbound)]
-  view: Uniform&lt;M44&gt;,
+  view: Uniform&lt;[[f32; 4]; 4]&gt;,
 }
 <span class="boring">}
 </span></code></pre></pre>
-<p>Sooo… as you can see, we define a regular <code>struct</code> but <em>derive</em> <code>UniformInterface</code>. Deriving the
+<p>Sooo… as you can see, we define a regular <code>struct</code> but <em>derive</em> <a href="https://docs.rs/luminance/latest/luminance/shader/program/trait.UniformInterface.html"><code>UniformInterface</code></a>. Deriving the
 trait unlocks several annotations you can use via the <code>#[uniform(..)]</code> syntax. Here, we’ll talk
 about two:</p>
 <ul>
 <li><code>#[uniform(unbound)]</code>: that annotation tells luminance that <strong>if</strong> the GPU variable this uniform
 variable refers to is <em>inactive</em> or <em>inexistent</em>, no error will be generated. Instead, a special
-<em>unbound</em> uniform variable will be emitted. So an <em>unbound</em> <code>Uniform&lt;M44&gt;</code> means that if the GPU
-variable named after that uniform is <em>inactive</em> or <em>inexistent</em>, the resulting <code>Uniform&lt;M44&gt;</code> will
+<em>unbound</em> uniform variable will be emitted. So an <em>unbound</em> <code>Uniform&lt;[[f32; 4]; 4]&gt;</code> means that if the GPU
+variable named after that uniform is <em>inactive</em> or <em>inexistent</em>, the resulting <code>Uniform&lt;[[f32; 4]; 4]&gt;</code> will
 silently do nothing when you will try to update it. This is a feature you want when you’re
 developing or debugging but you should disable that on an end-user application or if you don’t
 care about errors for a given variable.</li>
@@ -372,11 +375,12 @@ variable mapped to a <code>uniform float t</code> in the GLSL code.</li>
 </ul>
 <p>All we have to do now is to change the type of our <a href="https://docs.rs/luminance/latest/luminance/shader/program/struct.Program.html"><code>Program</code></a> to use the uniform interface and
 we’re done.</p>
-<pre><pre class="playpen"><code class="language-rust">
-<span class="boring">#![allow(unused_variables)]
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>let program: Program&lt;VertexSemantics, (), ShaderInterface&gt; =
-  Program::from_strings(None, VS_STR, None, FS_STR)
+</span>  let program = surface
+    .new_shader_program::&lt;VertexSemantics, (), ShaderInterface&gt;()
+    .from_strings(VS_STR, None, None, FS_STR)
     .unwrap()
     .ignore_warnings();
 <span class="boring">}
@@ -424,10 +428,10 @@ we’re done.</p>
         
 
         
-        
+
         
         <script type="text/javascript">
-            window.playpen_copyable = true;
+            window.playground_copyable = true;
         </script>
         
 

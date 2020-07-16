@@ -5,12 +5,19 @@
         <meta charset="UTF-8">
         <title>Rendering our triangle - Learn luminance</title>
         
+        
+
+
+        <!-- Custom HTML head -->
+        
+
 
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff" />
 
+        <link rel="icon" href="favicon.svg">
         <link rel="shortcut icon" href="favicon.png">
         <link rel="stylesheet" href="css/variables.css">
         <link rel="stylesheet" href="css/general.css">
@@ -19,8 +26,9 @@
 
         <!-- Fonts -->
         <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
-        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
-        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+        
+        <link rel="stylesheet" href="fonts/fonts.css">
+        
 
         <!-- Highlight.js Stylesheets -->
         <link rel="stylesheet" href="highlight.css">
@@ -36,7 +44,7 @@
         <!-- Provide site root to javascript -->
         <script type="text/javascript">
             var path_to_root = "";
-            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "light" : "light";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
         </script>
 
         <!-- Work around some values being stored in localStorage wrapped in quotes -->
@@ -151,53 +159,47 @@
 <p>A <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.RenderGate.html"><code>RenderGate</code></a> allows to create <em>render nodes</em>. Such nodes will share <a href="https://docs.rs/luminance/latest/luminance/render_state/struct.RenderState.html"><code>RenderState</code></a>s for all
 lower nodes in the graphics pipeline. We will see what we can do with <a href="https://docs.rs/luminance/latest/luminance/render_state/struct.RenderState.html"><code>RenderState</code></a> in a future
 chapter. Currently, we will just use the default one.</p>
-<pre><pre class="playpen"><code class="language-rust">
-<span class="boring">#![allow(unused_variables)]
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>use luminance::render_state::RenderState;
 <span class="boring">}
 </span></code></pre></pre>
 <p>And alter your pipeline:</p>
-<pre><pre class="playpen"><code class="language-rust">
-<span class="boring">#![allow(unused_variables)]
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>surface.pipeline_builder().pipeline(
-  &amp;back_buffer,
-  &amp;PipelineState::default().set_clear_color(color),
-  |_, mut shd_gate| {
-    shd_gate.shade(&amp;program, |_, mut rdr_gate| {
-      rdr_gate.render(&amp;RenderState::default(), |mut tess_gate| {
-        // …
-      });
-    });
-  },
-);
+</span>    let render = surface.new_pipeline_gate().pipeline(
+      &amp;back_buffer,
+      &amp;PipelineState::default().set_clear_color(color),
+      |_, mut shd_gate| {
+        shd_gate.shade(&amp;mut program, |_, _, mut rdr_gate| {
+          rdr_gate.render(&amp;RenderState::default(), |mut tess_gate| {
+            // …
+          });
+        });
+      },
+    );
 <span class="boring">}
 </span></code></pre></pre>
 <p>We’re almost there. We’re getting a <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.TessGate.html"><code>TessGate</code></a>, allowing us to render actual tessellations. In
-order to do so, we will need to create a <a href="https://docs.rs/luminance/latest/luminance/tess/struct.TessSlice.html"><code>TessSlice</code></a> out of our <a href="https://docs.rs/luminance/latest/luminance/tess/struct.Tess.html"><code>Tess</code></a>. That enables to slice
-GPU tessellation on the fly for free. In our case, we want the whole thing (the whole triangle),
-so we will use the [<code>..</code>] operator.</p>
+order to do so, we will need to create a [<code>TessView</code>] out of our <a href="https://docs.rs/luminance/latest/luminance/tess/struct.Tess.html"><code>Tess</code></a>. That enables to slice
+GPU tessellation on the fly for free. In our case, we want the whole thing (the whole triangle).
+Some convenient implementors exist, and there’s one allowing to get a <code>TessView</code> from a <code>&amp;Tess</code>.</p>
 <blockquote>
-<p>You will need the <a href="https://docs.rs/luminance/latest/luminance/tess/struct.TessSliceIndex.html"><code>TessSliceIndex</code></a> trait to do such a thing.</p>
+<p>You can also use the [<code>View</code>] trait to do such a thing.</p>
 </blockquote>
-<pre><pre class="playpen"><code class="language-rust">
-<span class="boring">#![allow(unused_variables)]
-</span><span class="boring">fn main() {
-</span>use luminance::tess::{Mode, TessBuilder, TessSliceIndex as _};
-<span class="boring">}
-</span></code></pre></pre>
 <p>Let’s go and finish it.</p>
-<pre><pre class="playpen"><code class="language-rust">
-<span class="boring">#![allow(unused_variables)]
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>surface.pipeline_builder().pipeline(
+</span>let render = surface.new_pipeline_gate().pipeline(
   &amp;back_buffer,
   &amp;PipelineState::default().set_clear_color(color),
   |_, mut shd_gate| {
-    shd_gate.shade(&amp;program, |_, mut rdr_gate| {
+    shd_gate.shade(&amp;mut program, |_, _, mut rdr_gate| {
       rdr_gate.render(&amp;RenderState::default(), |mut tess_gate| {
-        tess_gate.render(triangle.slice(..));
+        tess_gate.render(&amp;triangle);
       });
     });
   },
@@ -207,13 +209,14 @@ so we will use the [<code>..</code>] operator.</p>
 <p>Compile and run the code. You should see something similar to this:</p>
 <p><img src="imgs/your_first_triangle.png" alt="" /></p>
 <p>The complete code:</p>
-<pre><pre class="playpen"><code class="language-rust">use luminance::context::GraphicsContext as _;
+<pre><pre class="playground"><code class="language-rust">use glfw::{Action, Context as _, Key, WindowEvent};
+use luminance::context::GraphicsContext as _;
 use luminance::pipeline::PipelineState;
 use luminance::render_state::RenderState;
-use luminance::shader::program::Program;
-use luminance::tess::{Mode, TessBuilder, TessSliceIndex as _};
+use luminance::tess::Mode;
 use luminance_derive::{Semantics, Vertex};
-use luminance_glfw::{Action, GlfwSurface, Key, Surface as _, WindowDim, WindowEvent, WindowOpt};
+use luminance_glfw::GlfwSurface;
+use luminance_windowing::{WindowDim, WindowOpt};
 use std::process::exit;
 use std::time::Instant;
 
@@ -225,38 +228,38 @@ pub enum VertexSemantics {
   Color,
 }
 
-#[derive(Vertex)]
+#[derive(Clone, Copy, Debug, Vertex)]
 #[vertex(sem = &quot;VertexSemantics&quot;)]
 pub struct Vertex {
+  #[allow(dead_code)]
   position: VertexPosition,
+
+  #[allow(dead_code)]
   #[vertex(normalized = &quot;true&quot;)]
   color: VertexRGB,
 }
 
 const VERTICES: [Vertex; 3] = [
-  Vertex {
-    position: VertexPosition::new([-0.5, -0.5]),
-    color: VertexRGB::new([255, 0, 0]),
-  },
-  Vertex {
-    position: VertexPosition::new([0.5, -0.5]),
-    color: VertexRGB::new([0, 255, 0]),
-  },
-  Vertex {
-    position: VertexPosition::new([0., 0.5]),
-    color: VertexRGB::new([0, 0, 255]),
-  },
+  Vertex::new(
+    VertexPosition::new([-0.5, -0.5]),
+    VertexRGB::new([255, 0, 0]),
+  ),
+  Vertex::new(
+    VertexPosition::new([0.5, -0.5]),
+    VertexRGB::new([0, 255, 0]),
+  ),
+  Vertex::new(VertexPosition::new([0., 0.5]), VertexRGB::new([0, 0, 255])),
 ];
 
 const VS_STR: &amp;str = include_str!(&quot;vs.glsl&quot;);
 const FS_STR: &amp;str = include_str!(&quot;fs.glsl&quot;);
 
 fn main() {
-  let surface = GlfwSurface::new(
-    WindowDim::Windowed(960, 540),
-    &quot;Hello, world!&quot;,
-    WindowOpt::default(),
-  );
+  let dim = WindowDim::Windowed {
+    width: 960,
+    height: 540,
+  };
+  let surface = GlfwSurface::new_gl33(&quot;Hello, world!&quot;, WindowOpt::default().set_dim(dim));
 
   match surface {
     Ok(surface) =&gt; {
@@ -274,46 +277,55 @@ fn main() {
 fn main_loop(mut surface: GlfwSurface) {
   let start_t = Instant::now();
 
-  let back_buffer = surface.back_buffer().unwrap();
-
-  let triangle = TessBuilder::new(&amp;mut surface)
-    .add_vertices(VERTICES)
+  let triangle = surface
+    .new_tess()
+    .set_vertices(&amp;VERTICES[..])
     .set_mode(Mode::Triangle)
     .build()
     .unwrap();
 
-  let program: Program&lt;VertexSemantics, (), ()&gt; = Program::from_strings(None, VS_STR, None, FS_STR)
+  let mut program = surface
+    .new_shader_program::&lt;VertexSemantics, (), ()&gt;()
+    .from_strings(VS_STR, None, None, FS_STR)
     .unwrap()
     .ignore_warnings();
 
   'app: loop {
     // handle events
-    for event in surface.poll_events() {
+    surface.window.glfw.poll_events();
+    for (_, event) in surface.events_rx.try_iter() {
       match event {
         WindowEvent::Close | WindowEvent::Key(Key::Escape, _, Action::Release, _) =&gt; break 'app,
+
         _ =&gt; (),
       }
     }
+
+    let back_buffer = surface.back_buffer().unwrap();
 
     // rendering code goes here
     // get the current time and create a color based on the time
     let t = start_t.elapsed().as_millis() as f32 * 1e-3;
     let color = [t.cos(), t.sin(), 0.5, 1.];
 
-    surface.pipeline_builder().pipeline(
+    let render = surface.new_pipeline_gate().pipeline(
       &amp;back_buffer,
       &amp;PipelineState::default().set_clear_color(color),
       |_, mut shd_gate| {
-        shd_gate.shade(&amp;program, |_, mut rdr_gate| {
+        shd_gate.shade(&amp;mut program, |_, _, mut rdr_gate| {
           rdr_gate.render(&amp;RenderState::default(), |mut tess_gate| {
-            tess_gate.render(triangle.slice(..));
+            tess_gate.render(&amp;triangle);
           });
         });
       },
     );
 
     // swap buffer chains
-    surface.swap_buffers();
+    if render.is_ok() {
+      surface.window.swap_buffers();
+    } else {
+      break 'app;
+    }
   }
 }
 </code></pre></pre>
@@ -360,10 +372,10 @@ fn main_loop(mut surface: GlfwSurface) {
         
 
         
-        
+
         
         <script type="text/javascript">
-            window.playpen_copyable = true;
+            window.playground_copyable = true;
         </script>
         
 

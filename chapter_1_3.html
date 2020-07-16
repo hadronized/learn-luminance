@@ -5,12 +5,19 @@
         <meta charset="UTF-8">
         <title>Changing the background color - Learn luminance</title>
         
+        
+
+
+        <!-- Custom HTML head -->
+        
+
 
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff" />
 
+        <link rel="icon" href="favicon.svg">
         <link rel="shortcut icon" href="favicon.png">
         <link rel="stylesheet" href="css/variables.css">
         <link rel="stylesheet" href="css/general.css">
@@ -19,8 +26,9 @@
 
         <!-- Fonts -->
         <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
-        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
-        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+        
+        <link rel="stylesheet" href="fonts/fonts.css">
+        
 
         <!-- Highlight.js Stylesheets -->
         <link rel="stylesheet" href="highlight.css">
@@ -36,7 +44,7 @@
         <!-- Provide site root to javascript -->
         <script type="text/javascript">
             var path_to_root = "";
-            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "light" : "light";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
         </script>
 
         <!-- Work around some values being stored in localStorage wrapped in quotes -->
@@ -161,13 +169,13 @@ pixel storage for renders!</p>
 <p>So… is the <em>back</em> buffer you told us earlier some kind of <a href="https://docs.rs/luminance/latest/luminance/framebuffer/struct.Framebuffer.html"><code>Framebuffer</code></a>?</p>
 </blockquote>
 <p>It’s not <em>some</em> kind: it <strong>is</strong> a <a href="https://docs.rs/luminance/latest/luminance/framebuffer/struct.Framebuffer.html"><code>Framebuffer</code></a>. And guess what: you can access it via the
-<a href="https://docs.rs/luminance-windowing/latest/luminance_windowing/trait.Surface.html#method.back_buffer"><code>Surface::back_buffer</code></a> method.</p>
+<code>surface.back_buffer()</code> method.</p>
 <p>So, let’s make our first cool render and make a color-varying background! First, you will need to
 import one symbol from <a href="https://crates.io/crates/luminance">luminance</a>: <a href="https://docs.rs/luminance/latest/luminance/context/trait.GraphicsContext.html"><code>GraphicsContext</code></a>, which is a trait that allows you to run
 <a href="https://crates.io/crates/luminance">luminance</a> code and talk to the GPU. We will also use <a href="https://doc.rust-lang.org/std/time/struct.Instant.html"><code>Instant</code></a>, from the standard library, to
 handle low-precision yet sufficient time points.</p>
-<pre><pre class="playpen"><code class="language-rust">
-<span class="boring">#![allow(unused_variables)]
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>use luminance::context::GraphicsContext as _;
 use std::time::Instant;
@@ -178,7 +186,7 @@ use std::time::Instant;
 implementors.</p>
 </blockquote>
 <p>Now, let’s get our <em>back</em> buffer.</p>
-<pre><pre class="playpen"><code class="language-rust">fn main_loop(mut surface: GlfwSurface) {
+<pre><pre class="playground"><code class="language-rust">fn main_loop(mut surface: GlfwSurface) {
   let start_t = Instant::now();
   let back_buffer = surface.back_buffer().unwrap();
 
@@ -186,37 +194,38 @@ implementors.</p>
     // …
 </code></pre></pre>
 <p>As you can see, getting the <em>back</em> buffer is piece of cake. Now let’s handle that color.</p>
-<pre><pre class="playpen"><code class="language-rust">
-<span class="boring">#![allow(unused_variables)]
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>    // rendering code goes here
     // get the current time and create a color based on the time
     let t = start_t.elapsed().as_millis() as f32 * 1e-3;
     let color = [t.cos(), t.sin(), 0.5, 1.];
 
-    surface.pipeline_builder().pipeline(
+    let render = surface.new_pipeline_gate().pipeline(
       &amp;back_buffer,
       &amp;PipelineState::default().set_clear_color(color),
       |_, _| (),
     );
 
     // swap buffer chains
-    surface.swap_buffers();
+    if render.is_ok() {
+      surface.window.swap_buffers();
+    } else {
+      break 'app;
+    }
 <span class="boring">}
 </span></code></pre></pre>
-<p>That’s already a lot of code to discuss. <code>surface.pipeline_builder()</code> gets a lightweight object
-that you can use to create <em>graphics pipelines</em> — its type is <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.Builder.html"><code>Builder</code></a>. You can get that type
+<p>That’s already a lot of code to discuss. <code>surface.new_pipeline_gate()</code> gets a lightweight object
+that you can use to create <em>graphics pipelines</em> — its type is <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.PipelineGate.html"><code>PipelineGate</code></a>. You can get that type
 once and for all and keep it around if you want to but in our case, since we’re only going to create
 a single pipeline, we’ll just chain everything.</p>
-<p>Then, the <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.Builder.html#method.pipeline"><code>Builder::pipeline</code></a> function, applied to the <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.Builder.html"><code>Builder</code></a> object, creates a graphics
+<p>Then, the <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.PipelineGate.html#method.pipeline"><code>PipelineGate::pipeline</code></a> function, applied to the <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.PipelineGate.html"><code>PipelineGate</code></a> object, creates a graphics
 pipeline. A graphics pipeline is just a strongly typed description of what a GPU should do in order
 to render <em>things</em> into a <a href="https://docs.rs/luminance/latest/luminance/framebuffer/struct.Framebuffer.html"><code>Framebuffer</code></a>. You can picture pipelines as <a href="https://en.wikipedia.org/wiki/Abstract_syntax_tree">AST</a>s in which each node
 represents a given resource sharing and leaves are actual renders.</p>
-<blockquote>
-<p>More on <a href="https://docs.rs/luminance/latest/luminance/index.html#understanding-the-pipeline-architecture">pipelines here</a>.</p>
-</blockquote>
 <p>In our case, we don’t want to render anything, we just want to modify the <em>back</em> buffer background
-color. That is done with the arguments you pass to <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.Builder.html#method.pipeline"><code>Builder::pipeline</code></a>. The first one is the
+color. That is done with the arguments you pass to <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.PipelineGate.html#method.pipeline"><code>PipelineGate::pipeline</code></a>. The first one is the
 frame buffer to render to. In our case, it’s our <em>back</em> buffer.</p>
 <p>The second argument is the <em>pipeline state</em> to use when running our pipeline. Everytime you perform a
 render into a frame buffer, you <em>need</em> to provide such an object, which contains the color to use when
@@ -229,18 +238,20 @@ we just pass a closure that does nothing. More on its two arguments later.</p>
 <p>You should obtain a window with a varying color, such as the following screenshot.</p>
 <p><img src="./imgs/hello-world.png" alt="" /></p>
 <p>The complete code is:</p>
-<pre><pre class="playpen"><code class="language-rust">use luminance::context::GraphicsContext as _;
+<pre><pre class="playground"><code class="language-rust">use glfw::{Action, Context as _, Key, WindowEvent};
+use luminance::context::GraphicsContext as _;
 use luminance::pipeline::PipelineState;
-use luminance_glfw::{Action, GlfwSurface, Key, Surface as _, WindowDim, WindowEvent, WindowOpt};
+use luminance_glfw::GlfwSurface;
+use luminance_windowing::{WindowDim, WindowOpt};
 use std::process::exit;
 use std::time::Instant;
 
 fn main() {
-  let surface = GlfwSurface::new(
-    WindowDim::Windowed(960, 540),
-    &quot;Hello, world!&quot;,
-    WindowOpt::default(),
-  );
+  let dim = WindowDim::Windowed {
+    width: 960,
+    height: 540,
+  };
+  let surface = GlfwSurface::new_gl33(&quot;Hello, world!&quot;, WindowOpt::default().set_dim(dim));
 
   match surface {
     Ok(surface) =&gt; {
@@ -261,7 +272,8 @@ fn main_loop(mut surface: GlfwSurface) {
 
   'app: loop {
     // handle events
-    for event in surface.poll_events() {
+    surface.window.glfw.poll_events();
+    for (_, event) in surface.events_rx.try_iter() {
       match event {
         WindowEvent::Close | WindowEvent::Key(Key::Escape, _, Action::Release, _) =&gt; break 'app,
         _ =&gt; (),
@@ -273,14 +285,18 @@ fn main_loop(mut surface: GlfwSurface) {
     let t = start_t.elapsed().as_millis() as f32 * 1e-3;
     let color = [t.cos(), t.sin(), 0.5, 1.];
 
-    surface.pipeline_builder().pipeline(
+    let render = surface.new_pipeline_gate().pipeline(
       &amp;back_buffer,
       &amp;PipelineState::default().set_clear_color(color),
       |_, _| (),
     );
 
     // swap buffer chains
-    surface.swap_buffers();
+    if render.is_ok() {
+      surface.window.swap_buffers();
+    } else {
+      break 'app;
+    }
   }
 }
 </code></pre></pre>
@@ -327,10 +343,10 @@ fn main_loop(mut surface: GlfwSurface) {
         
 
         
-        
+
         
         <script type="text/javascript">
-            window.playpen_copyable = true;
+            window.playground_copyable = true;
         </script>
         
 

@@ -51,7 +51,7 @@ Don’t get scared about the heavy-math symbol names. What you must know, howeve
 
 - In graphics applications, we use [linear algebra] _a lot_. You don’t have to know everything by
   heart, obviously, but having a linear algebra background will highly help for sure.
-- From linear algebra, we’re mostly interested into several concepts:
+- From linear algebra, we’re mostly interested into these concepts:
   - Vector spaces. The most important one. You should know how you are supposed to add vectors and
     how to scale them by a given scalar number and how to compute the sine of the angle between two
     vectors. More prerequisites will come but for today that’s enough about vector spaces.
@@ -61,7 +61,7 @@ Don’t get scared about the heavy-math symbol names. What you must know, howeve
   - Quaternions. Scary name for a cute structure. Quaternions are 4-components numbers that can
     represent a lot of things. In our case, we like to use them to represent arbitrary rotations of
     φ angle (often expressed in radians) around a given unit axis (a unit axis is a 3D vector that
-    has been [normalized]).
+    has been [normalized] — i.e. its length is 1).
 
 I know, I know, that’s a lot of new concepts completely unrelated to [luminance]. But you need them
 and, trust me, it’s not that hard.
@@ -69,7 +69,7 @@ and, trust me, it’s not that hard.
 Back to our code now.
 
 ```rust
-const FOVY: Rad<f32> = Rad(std::f32::consts::PI / 2.);
+const FOVY: Rad<f32> = Rad(std::f32::consts::FRAC_PI_2);
 const Z_NEAR: f32 = 0.1;
 const Z_FAR: f32 = 10.;
 
@@ -77,12 +77,7 @@ const Z_FAR: f32 = 10.;
 
 // in the main_loop function, before the actual loop
 
-let projection = perspective(
-  FOVY,
-  surface.width() as f32 / surface.height() as f32,
-  Z_NEAR,
-  Z_FAR,
-);
+let projection = perspective(FOVY, width as f32 / height as f32, Z_NEAR, Z_FAR);
 ```
 
 This defines a projection matrix with a _field of view_ set to _π ÷ 2_ (wich represents a field of
@@ -215,7 +210,7 @@ declare them and change the way the shader [`Program`] works. A special concept 
 [uniform interfaces].
 
 A uniform interface is a typed contract between the GLSL code compiled and linked in a shader
-[`Program`] and what you are supposed to with it. This powerful abstraction allows you to specify,
+[`Program`] and what you are supposed to do with it. This powerful abstraction allows you to specify,
 via a type, a set of _variables_ that are available in the GLSL code and that you can get access to
 as soon as your [`Program`] gets shading things. The way you do this is a multi-step yet simple
 process:
@@ -239,20 +234,20 @@ Let’s create such a type.
 #[derive(Debug, UniformInterface)]
 struct ShaderInterface {
   #[uniform(unbound)]
-  projection: Uniform<M44>,
+  projection: Uniform<[[f32; 4]; 4]>,
   #[uniform(unbound)]
-  view: Uniform<M44>,
+  view: Uniform<[[f32; 4]; 4]>,
 }
 ```
 
-Sooo… as you can see, we define a regular `struct` but _derive_ `UniformInterface`. Deriving the
+Sooo… as you can see, we define a regular `struct` but _derive_ [`UniformInterface`]. Deriving the
 trait unlocks several annotations you can use via the `#[uniform(..)]` syntax. Here, we’ll talk
 about two:
 
 - `#[uniform(unbound)]`: that annotation tells luminance that **if** the GPU variable this uniform
   variable refers to is _inactive_ or _inexistent_, no error will be generated. Instead, a special
-  _unbound_ uniform variable will be emitted. So an _unbound_ `Uniform<M44>` means that if the GPU
-  variable named after that uniform is _inactive_ or _inexistent_, the resulting `Uniform<M44>` will
+  _unbound_ uniform variable will be emitted. So an _unbound_ `Uniform<[[f32; 4]; 4]>` means that if the GPU
+  variable named after that uniform is _inactive_ or _inexistent_, the resulting `Uniform<[[f32; 4]; 4]>` will
   silently do nothing when you will try to update it. This is a feature you want when you’re
   developing or debugging but you should disable that on an end-user application or if you don’t
   care about errors for a given variable.
@@ -265,29 +260,17 @@ All we have to do now is to change the type of our [`Program`] to use the unifor
 we’re done.
 
 ```rust
-let program: Program<VertexSemantics, (), ShaderInterface> =
-  Program::from_strings(None, VS_STR, None, FS_STR)
+  let program = surface
+    .new_shader_program::<VertexSemantics, (), ShaderInterface>()
+    .from_strings(VS_STR, None, None, FS_STR)
     .unwrap()
     .ignore_warnings();
 ```
 
 [luminance]: https://crates.io/crates/luminance
 [luminance-derive]: https://crates.io/crates/luminance-derive
-[`Vertex`]: https://docs.rs/luminance/latest/luminance/vertex/trait.Vertex.html
-[`Semantics`]: https://docs.rs/luminance/latest/luminance/vertex/trait.Semantics.html
-[`Tess`]: https://docs.rs/luminance/latest/luminance/tess/struct.Tess.html
-[`TessBuilder`]: https://docs.rs/luminance/latest/luminance/tess/struct.TessBuilder.html
-[`Mode`]: https://docs.rs/luminance/latest/luminance/tess/enum.Mode.html
-[`Pipeline`]: https://docs.rs/luminance/latest/luminance/pipeline/struct.Pipeline.html
 [`ShadingGate`]: https://docs.rs/luminance/latest/luminance/pipeline/struct.ShadingGate.html
-[`ShadingGate::shade`]: https://docs.rs/luminance/latest/luminance/pipeline/struct.ShadingGate.html#method.shade
-[`VertexShader`]: https://docs.rs/luminance/latest/luminance/shader/stage/enum.Type.html#variant.VertexShader
-[`FragmentShader`]: https://docs.rs/luminance/latest/luminance/shader/stage/enum.Type.html#variant.FragmentShader
 [`Program`]: https://docs.rs/luminance/latest/luminance/shader/program/struct.Program.html
-[`RenderGate`]: https://docs.rs/luminance/latest/luminance/pipeline/struct.RenderGate.html
-[`TessGate`]: https://docs.rs/luminance/latest/luminance/pipeline/struct.TessGate.html
-[Wavefront .obj]: https://en.wikipedia.org/wiki/Wavefront_.obj_file
-[wavefront_obj]: https://crates.io/crates/wavefront_obj
 [cgmath]: https://crates.io/crates/cgmath
 [linear algebra]: https://en.wikipedia.org/wiki/Linear_algebra
 [shearing]: https://en.wikipedia.org/wiki/Shear_matrix
@@ -295,10 +278,5 @@ let program: Program<VertexSemantics, (), ShaderInterface> =
 [right-handed system]: https://en.wikipedia.org/wiki/Right-hand_rule
 [uniform interfaces]: https://docs.rs/luminance/latest/luminance/shader/program/trait.UniformInterface.html
 [`Uniform`]: https://docs.rs/luminance/latest/luminance/shader/program/struct.Uniform.html
-[`Uniform::update`]: https://docs.rs/luminance/latest/luminance/shader/program/struct.Uniform.html#method.update
 [`UniformInterface`]: https://docs.rs/luminance/latest/luminance/shader/program/trait.UniformInterface.html
 [contravariant]: https://en.wikipedia.org/wiki/Functor#Covariance_and_contravariance
-[`ProgramInterface`]: https://docs.rs/luminance/latest/luminance/shader/program/struct.ProgramInterface.html
-[`M44`]: https://docs.rs/luminance/latest/luminance/linear/type.M44.html
-[Phong]: https://en.wikipedia.org/wiki/Phong_shading
-[try-guard]: https://crates.io/crates/try-guard

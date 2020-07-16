@@ -5,12 +5,19 @@
         <meta charset="UTF-8">
         <title>Shady triangle - Learn luminance</title>
         
+        
+
+
+        <!-- Custom HTML head -->
+        
+
 
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff" />
 
+        <link rel="icon" href="favicon.svg">
         <link rel="shortcut icon" href="favicon.png">
         <link rel="stylesheet" href="css/variables.css">
         <link rel="stylesheet" href="css/general.css">
@@ -19,8 +26,9 @@
 
         <!-- Fonts -->
         <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
-        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
-        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+        
+        <link rel="stylesheet" href="fonts/fonts.css">
+        
 
         <!-- Highlight.js Stylesheets -->
         <link rel="stylesheet" href="highlight.css">
@@ -36,7 +44,7 @@
         <!-- Provide site root to javascript -->
         <script type="text/javascript">
             var path_to_root = "";
-            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "light" : "light";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
         </script>
 
         <!-- Work around some values being stored in localStorage wrapped in quotes -->
@@ -151,13 +159,13 @@
 <p><a href="https://crates.io/crates/luminance">luminance</a> is not a framework nor a video game engine. By default, it comes with zero data set.
 Hence, there is nothing <em>per se</em> that provides <em>materials</em> or that kind of concept. You will have
 to craft them yourself and that is what we are going to do in this section.</p>
-<p>Remember our pipeline creation from the chapter? We needed to provide a closure taking two
+<p>Remember our pipeline creation from the first chapter? We needed to provide a closure taking two
 arguments. It’s time to explain you what those arguments are for. Let’s take the pipeline
 definition again:</p>
-<pre><pre class="playpen"><code class="language-rust">
-<span class="boring">#![allow(unused_variables)]
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>surface.pipeline_builder().pipeline(
+</span>surface.new_pipeline_gate().pipeline(
   &amp;back_buffer,
   &amp;PipelineState::default().set_clear_color(color),
   |_, _| (),
@@ -165,10 +173,10 @@ definition again:</p>
 <span class="boring">}
 </span></code></pre></pre>
 <p>And rewrite it by using the arguments:</p>
-<pre><pre class="playpen"><code class="language-rust">
-<span class="boring">#![allow(unused_variables)]
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>surface.pipeline_builder().pipeline(
+</span>surface.new_pipeline_gate().pipeline(
   &amp;back_buffer,
   &amp;PipelineState::default().set_clear_color(color),
   |pipeline, mut shd_gate| (),
@@ -180,7 +188,8 @@ definition again:</p>
 <h3><a class="header" href="#the-graphics-pipeline" id="the-graphics-pipeline">The graphics pipeline</a></h3>
 <p>The <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.Pipeline.html"><code>Pipeline</code></a> object you’re given represents a <em>graphics pipeline</em>. It allows you to notify
 the GPU about scarce resources you’re about to use or perform specific tasks related to such
-resources. That is pretty advanced so we will just ignore that object and will leave it to <code>_</code>.</p>
+resources. That is pretty advanced so we will just ignore that object and will leave it to <code>_</code>
+for now.</p>
 <p>More on <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.Pipeline.html"><code>Pipeline</code></a> in a future chapter.</p>
 <h3><a class="header" href="#the-shading-gate" id="the-shading-gate">The shading gate</a></h3>
 <p><a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.ShadingGate.html"><code>ShadingGate</code></a> represents a way to <em>shade</em> things. Shading means, like if you had a paper and color
@@ -194,7 +203,7 @@ called heavily depend on its kind. The following table gives a better understand
 get what it means below.</p>
 </blockquote>
 <table><thead><tr><th>Shader stage type</th><th>Mandatory?</th><th>What it’s for</th><th>Inputs</th><th>Running frequency</th></tr></thead><tbody>
-<tr><td><a href="https://docs.rs/luminance/latest/luminance/shader/stage/enum.Type.html#variant.VertexShader"><code>VertexShader</code></a></td><td>Yes.</td><td>Transforming vertices at the beginning of the pipeline.</td><td>Vertex attributes.</td><td>Once for every vertices that define our <a href="https://docs.rs/luminance/latest/luminance/tess/struct.Tess.html"><code>Tess</code></a>.</td></tr>
+<tr><td><a href="https://docs.rs/luminance/latest/luminance/shader/stage/enum.Type.html#variant.VertexShader"><code>VertexShader</code></a></td><td>Yes.</td><td>Transforming vertices at the beginning of the pipeline.</td><td>Vertex attributes.</td><td>Once for every vertices comprised in our <a href="https://docs.rs/luminance/latest/luminance/tess/struct.Tess.html"><code>Tess</code></a>.</td></tr>
 <tr><td><a href="https://docs.rs/luminance/latest/luminance/shader/stage/enum.Type.html#variant.TessellationControlShader"><code>TessellationControlShader</code></a></td><td>No.</td><td>Determines how much a <em>primitive patch</em> must be tessellated.</td><td>Abstract patches.</td><td>At least once for every <em>abstract patches</em> flowing from the <a href="https://docs.rs/luminance/latest/luminance/shader/stage/enum.Type.html#variant.VertexShader"><code>VertexShader</code></a>.</td></tr>
 <tr><td><a href="https://docs.rs/luminance/latest/luminance/shader/stage/enum.Type.html#variant.TessellationEvaluationShader"><code>TessellationEvaluationShader</code></a></td><td>No.</td><td>Transform tessellated patches.</td><td>Abstract patches.</td><td>At least once for every <em>abstract patches</em> flowing from the <em>tessellator</em> that has followed the <a href="https://docs.rs/luminance/latest/luminance/shader/stage/enum.Type.html#variant.TessellationControlShader"><code>TessellationControlShader</code></a>.</td></tr>
 <tr><td><a href="https://docs.rs/luminance/latest/luminance/shader/stage/enum.Type.html#variant.GeometryShader"><code>GeometryShader</code></a></td><td>No.</td><td>Map, filter, add and transform <em>primitives</em>.</td><td>Primitive attributes.</td><td>Once for each primitive patch flowing out from either the <a href="https://docs.rs/luminance/latest/luminance/shader/stage/enum.Type.html#variant.VertexShader"><code>VertexShader</code></a> or <a href="https://docs.rs/luminance/latest/luminance/shader/stage/enum.Type.html#variant.TessellationEvaluationShader"><code>TessellationEvaluationShader</code></a>.</td></tr>
@@ -262,8 +271,8 @@ void main() {
 }
 </code></pre>
 <p>In your <code>src/main.rs</code>, add the following lines:</p>
-<pre><pre class="playpen"><code class="language-rust">
-<span class="boring">#![allow(unused_variables)]
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>const VS_STR: &amp;str = include_str!(&quot;vs.glsl&quot;);
 const FS_STR: &amp;str = include_str!(&quot;fs.glsl&quot;);
@@ -275,19 +284,21 @@ const FS_STR: &amp;str = include_str!(&quot;fs.glsl&quot;);
 building an actual program by gluing functions to each other. <a href="https://crates.io/crates/luminance">luminance</a> has a very opinionated
 idea of what a GPU shader program is and should be. That opinion will be explained in a future
 chapter. Let’s focus on the simple stuff first.</p>
-<pre><pre class="playpen"><code class="language-rust">
-<span class="boring">#![allow(unused_variables)]
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>use luminance::shader::program::Program;
+</span>use luminance::shader::Program;
 <span class="boring">}
 </span></code></pre></pre>
 <p>Then, right before your loop:</p>
-<pre><pre class="playpen"><code class="language-rust">
-<span class="boring">#![allow(unused_variables)]
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>let program: Program&lt;VertexSemantics, (), ()&gt; = Program::from_strings(None, VS_STR, None, FS_STR)
-  .unwrap()
-  .ignore_warnings();
+</span>  let mut program = surface
+    .new_shader_program::&lt;VertexSemantics, (), ()&gt;()
+    .from_strings(VS_STR, None, None, FS_STR)
+    .unwrap()
+    .ignore_warnings();
 <span class="boring">}
 </span></code></pre></pre>
 <p>As you can see, you need to provide the <em>vertex semantics type</em> you defined earlier. That enables
@@ -295,7 +306,8 @@ chapter. Let’s focus on the simple stuff first.</p>
 it with… at compile-time. Ignore the two <code>()</code>, we’ll discuss that later. However, notice the use
 of the <a href="https://docs.rs/luminance/latest/luminance/shader/program/struct.BuiltProgram.html#method.ignore_warnings"><code>BuiltProgram::ignore_warnings</code></a> method: it gives you the actual <a href="https://docs.rs/luminance/latest/luminance/shader/program/struct.Program.html"><code>Program</code></a> by ignoring any
 <em>warnings</em> that might have happened while creating the shader program. You can inspect them if you
-want to but for the purpose of this example, you will not need to.</p>
+want to but for the purpose of this example, you will not need to. Also, keep in mind that those
+are only warnings that wouldn’t cause your program to behave in a weird way.</p>
 <blockquote>
 <p>On a general note, <a href="https://crates.io/crates/luminance">luminance</a> is heavily type-driven. Familiarize yourself with how you can
 drive behavior with types (the <a href="https://doc.rust-lang.org/1.30.0/book/first-edition/generics.html">turbofish syntax</a>, for instance, will be useful).</p>
@@ -303,17 +315,18 @@ drive behavior with types (the <a href="https://doc.rust-lang.org/1.30.0/book/fi
 <h3><a class="header" href="#the-shading-node" id="the-shading-node">The shading node</a></h3>
 <p>The next step is to create a new <em>shading node</em> in your graphics pipeline. This is done via the
 <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.ShadingGate.html"><code>ShadingGate</code></a>.</p>
-<pre><pre class="playpen"><code class="language-rust">
-<span class="boring">#![allow(unused_variables)]
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>surface.pipeline_builder().pipeline(
-  &amp;back_buffer,
-  &amp;PipelineState::default().set_clear_color(color),
-  |_, mut shd_gate| {
-    shd_gate.shade(&amp;program, |_, mut rdr_gate| {
-      // …
-    });
-});
+</span>    let render = surface.new_pipeline_gate().pipeline(
+      &amp;back_buffer,
+      &amp;PipelineState::default().set_clear_color(color),
+      |_, mut shd_gate| {
+        shd_gate.shade(&amp;mut program, |_, _, mut rdr_gate| {
+          // …
+        });
+      },
+    );
 <span class="boring">}
 </span></code></pre></pre>
 <p>You can see we are getting access to a new type of <em>gate</em> here: a <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.RenderGate.html"><code>RenderGate</code></a>.</p>
@@ -360,10 +373,10 @@ drive behavior with types (the <a href="https://doc.rust-lang.org/1.30.0/book/fi
         
 
         
-        
+
         
         <script type="text/javascript">
-            window.playpen_copyable = true;
+            window.playground_copyable = true;
         </script>
         
 

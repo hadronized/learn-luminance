@@ -5,12 +5,19 @@
         <meta charset="UTF-8">
         <title>Getting started - Learn luminance</title>
         
+        
+
+
+        <!-- Custom HTML head -->
+        
+
 
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff" />
 
+        <link rel="icon" href="favicon.svg">
         <link rel="shortcut icon" href="favicon.png">
         <link rel="stylesheet" href="css/variables.css">
         <link rel="stylesheet" href="css/general.css">
@@ -19,8 +26,9 @@
 
         <!-- Fonts -->
         <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
-        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
-        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+        
+        <link rel="stylesheet" href="fonts/fonts.css">
+        
 
         <!-- Highlight.js Stylesheets -->
         <link rel="stylesheet" href="highlight.css">
@@ -36,7 +44,7 @@
         <!-- Provide site root to javascript -->
         <script type="text/javascript">
             var path_to_root = "";
-            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "light" : "light";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
         </script>
 
         <!-- Work around some values being stored in localStorage wrapped in quotes -->
@@ -162,19 +170,29 @@ cargo new --bin luminance-first-steps
 <p>Then we need to add <a href="https://crates.io/crates/luminance">luminance</a> as a dependency to our project. Edit your <code>Cargo.toml</code> file and
 change the <code>[dependencies]</code> section according to the following:</p>
 <pre><code class="language-toml">[dependencies]
-luminance = &quot;0.39&quot;
-luminance-glfw = &quot;0.12&quot;
+luminance = &quot;0.40&quot;
+luminance-glfw = &quot;0.13&quot;
+luminance-windowing = &quot;0.9&quot;
+glfw = &quot;0.39&quot;
 </code></pre>
 <p>Some explanations here:</p>
 <ul>
 <li><a href="https://crates.io/crates/luminance">luminance</a> is the core crate and contains everything that abstracts over GPU graphics
 capabilities. You will mostly use that crate to write graphics code.</li>
-<li><a href="https://crates.io/crates/luminance-glfw">luminance-glfw</a> is a <em>windowing</em> implementation crate for <a href="https://crates.io/crates/luminance">luminance</a>. There are several crates
+<li><a href="https://crates.io/crates/luminance-glfw">luminance-glfw</a> is a <em>platform</em> implementation crate for <a href="https://crates.io/crates/luminance">luminance</a>. There are several crates
 available for that, depending on the platform you expect to run on. <a href="https://crates.io/crates/luminance-glfw">luminance-glfw</a> supports a
 lot of platforms so you should be good to start (plus it’s pretty easy). Windowing code allows
-to ask your system create a window, handle inputs such as keypresses, mouse movements, touch,
+to ask your system to create a window, handle inputs such as keypresses, mouse movements, touch,
 etc. etc.</li>
+<li><a href="https://crates.io/crates/luminance-glfw">luminance-windowing</a> is a small crate providing common types <em>platform crates</em> should use to
+uniformize as much as possible how windows and contexts get created. This is not mandatory but
+highly recommended. <a href="https://crates.io/crates/luminance-glfw">luminance-glfw</a> uses <a href="https://crates.io/crates/luminance-glfw">luminance-windowing</a>.</li>
 </ul>
+<blockquote>
+<p>Note: since version <code>0.9</code>, <a href="https://crates.io/crates/luminance-glfw">luminance-windowing</a> has lost most of its “implementation” symbols.
+Platform crates such as <a href="https://crates.io/crates/luminance-glfw">luminance-glfw</a> then don’t re-export the underyling crate’s symbols.
+For that reason, you will have to depend on them explicitely, as we do with <a href="https://crates.io/crates/glfw">glfw</a> in this case.</p>
+</blockquote>
 <p>Optional but highly recommended: install <a href="https://crates.io/crates/cargo-watch">cargo-watch</a>. That tool allows you to have a <code>cargo</code>
 loop updating every time a code file in your project changes. You can set it up to re-compile,
 re-check, re-test, re-run or even re-doc… Very handy.</p>
@@ -224,10 +242,10 @@ re-check, re-test, re-run or even re-doc… Very handy.</p>
         
 
         
-        
+
         
         <script type="text/javascript">
-            window.playpen_copyable = true;
+            window.playground_copyable = true;
         </script>
         
 

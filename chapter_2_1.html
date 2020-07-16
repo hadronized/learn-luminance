@@ -5,12 +5,19 @@
         <meta charset="UTF-8">
         <title>What is a triangle? - Learn luminance</title>
         
+        
+
+
+        <!-- Custom HTML head -->
+        
+
 
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff" />
 
+        <link rel="icon" href="favicon.svg">
         <link rel="shortcut icon" href="favicon.png">
         <link rel="stylesheet" href="css/variables.css">
         <link rel="stylesheet" href="css/general.css">
@@ -19,8 +26,9 @@
 
         <!-- Fonts -->
         <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
-        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
-        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+        
+        <link rel="stylesheet" href="fonts/fonts.css">
+        
 
         <!-- Highlight.js Stylesheets -->
         <link rel="stylesheet" href="highlight.css">
@@ -36,7 +44,7 @@
         <!-- Provide site root to javascript -->
         <script type="text/javascript">
             var path_to_root = "";
-            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "light" : "light";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
         </script>
 
         <!-- Work around some values being stored in localStorage wrapped in quotes -->
@@ -152,14 +160,15 @@
 can be <em>represented</em> in lots of ways. In our case:</p>
 <ul>
 <li>A triangle has three vertices.</li>
-<li>Each vertex has a position in 2D, represented by two floating point values on 32-bit.</li>
+<li>We decide that each vertex has a position in <strong>2D</strong>, represented by two floating point values on
+32-bit.</li>
 <li>Each vertex has a color, represented as RGB on 8-bit unsigned integers.</li>
 </ul>
 <p>The first thing to do is to create… types. You will see throughout this book that <a href="https://crates.io/crates/luminance">luminance</a> is
 heavily type-oriented. Don’t freak out. <a href="https://crates.io/crates/luminance">luminance</a> requires you to define your type in a way it can
 acknowledge how vertices’ data are formed. The following, for instance, will not work:</p>
-<pre><pre class="playpen"><code class="language-rust">
-<span class="boring">#![allow(unused_variables)]
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>type Position = (f32, f32);
 type RGB = (u8, u8, u8);
@@ -169,27 +178,28 @@ type Vertex = (Position, RGB);
 <p>But the real vertex definition is very, very similar. Hang on.</p>
 <h2><a class="header" href="#defining-your-vertex-type" id="defining-your-vertex-type">Defining your vertex type</a></h2>
 <p>In order to define our vertex type, we need to create a <code>struct</code> that will implement the <a href="https://docs.rs/luminance/latest/luminance/vertex/trait.Vertex.html"><code>Vertex</code></a>
-trait. That trait requires various information to be provided by the implementor and you don’t even
-have to worry about those because a crate exists to automatically implement such a trait:
+trait. That trait requires various information to be provided by the implementor. You don’t have
+to worry about those, because a crate exists to automatically implement such a trait:
 <a href="https://crates.io/crates/luminance-derive">luminance-derive</a>.</p>
 <p>First thing first: add <a href="https://crates.io/crates/luminance-derive">luminance-derive</a> to your project’s <code>[dependencies]</code> section:</p>
-<pre><code class="language-toml">luminance-derive = &quot;0.5&quot;
+<pre><code class="language-toml">luminance-derive = &quot;0.6&quot;
 </code></pre>
 <p>Simple. One last thing: when you will use the <code>Vertex</code> derive annotation, you will have to provide
 a <em>vertex semantics</em> type, implementing the <a href="https://docs.rs/luminance/latest/luminance/vertex/trait.Semantics.html"><code>Semantics</code></a> trait. Again, you don’t have to implement
 such a trait by hand: <a href="https://crates.io/crates/luminance-derive">luminance-derive</a> will handle all that for you.</p>
 <p>Vertex semantics are a way to tell <a href="https://crates.io/crates/luminance">luminance</a> what the relationship between <em>all</em> objects you
 intend to create and the way they will be rendered is. In our case, we just only need two
-semantics: <em>vertex positions</em> and <em>vertex colors</em>. Let’s create our semantics type:</p>
-<pre><pre class="playpen"><code class="language-rust">
-<span class="boring">#![allow(unused_variables)]
+semantics: <em>vertex positions</em> and <em>vertex colors</em>. Let’s create our semantics type by using a
+proc-macro derive from <a href="https://crates.io/crates/luminance-derive">luminance-derive</a>:</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>use luminance_derive::Semantics;
 <span class="boring">}
 </span></code></pre></pre>
 <p>Our proc-macro derive, yay. Let’s use it:</p>
-<pre><pre class="playpen"><code class="language-rust">
-<span class="boring">#![allow(unused_variables)]
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>#[derive(Copy, Clone, Debug, Semantics)]
 pub enum VertexSemantics {
@@ -221,7 +231,8 @@ of <a href="https://docs.rs/luminance/latest/luminance/vertex/trait.VertexAttrib
 <li>The <code>wrapper = &quot;VertexPosition&quot;</code> annotation generates a new type called <code>VertexPosition</code> and
 in scope in the module you declared the <code>enum</code>. That type is one of the only ones which are
 recognized as being usable with the <code>Semantics</code> <code>enum</code> you just declared — it implements the
-<a href="https://docs.rs/luminance/latest/luminance/vertex/trait.HasSemantics.html"><code>HasSemantics</code></a> trait for which <code>HasSemantics::Sem = VertexSemantics</code>.</li>
+<a href="https://docs.rs/luminance/latest/luminance/vertex/trait.HasSemantics.html"><code>HasSemantics</code></a> trait for which <code>HasSemantics::Sem = VertexSemantics</code>. This type is also
+equipped with some functions and implementors, such as <code>new</code>, <code>From / Into</code>, etc.</li>
 </ul>
 </li>
 </ul>
@@ -231,22 +242,25 @@ implement <a href="https://docs.rs/luminance/latest/luminance/vertex/trait.Seman
 represent <em>vertex attributes</em> types you will be able to use to construct types that will correctly
 implement the <a href="https://docs.rs/luminance/latest/luminance/vertex/trait.Vertex.html"><code>Vertex</code></a> trait.</p>
 <p>Talking about <a href="https://docs.rs/luminance/latest/luminance/vertex/trait.Vertex.html"><code>Vertex</code></a>, let’s go and define our vertex type. The <code>Vertex</code> derive annotation works
-on both <code>struct</code>s and tuple-<code>struct</code>. Import the <code>Vertex</code> proc-macro first:</p>
-<pre><pre class="playpen"><code class="language-rust">
-<span class="boring">#![allow(unused_variables)]
+on both <code>struct</code>s and tuple-<code>struct</code>. Import the <code>Vertex</code> proc-macro derive first:</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>use luminance_derive::{Semantics, Vertex};
 <span class="boring">}
 </span></code></pre></pre>
 <p>And then define your <code>Vertex</code> type (it’s possible to use the same typename because proc-macro won’t
 clash with types):</p>
-<pre><pre class="playpen"><code class="language-rust">
-<span class="boring">#![allow(unused_variables)]
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>#[derive(Vertex)]
 #[vertex(sem = &quot;VertexSemantics&quot;)]
 pub struct Vertex {
+  #[allow(dead_code)]
   position: VertexPosition,
+
+  #[allow(dead_code)]
   #[vertex(normalized = &quot;true&quot;)]
   color: VertexRGB,
 }
@@ -263,8 +277,8 @@ Don’t forget about the <code>wrapper</code> types that got generated with the 
 types are valid as fields’ types here.</li>
 <li>The special <code>#[vertex(normalized = &quot;true&quot;)]</code> annotation marks a field as being <em>normalized</em>.
 Normalized fields make sense when the field is of an integral type, such as <code>[u8; 3]</code>, which is
-<em>unsigned integral</em>. When trying to fetch normalized vertex attribute, a <em>shader stage</em> will get
-normalized floating point numbers (lying in <code>[0; 1]</code>) instead of the typical e.g. <code>[0; 255]</code>.</li>
+<em>unsigned integral</em>. When trying to fetch normalized vertex attributes, a <em>vertex stage</em> will get
+normalized floating point numbers (lying in <code>[0.; 1.]</code>) instead of the typical e.g. <code>[0; 255]</code>.</li>
 </ul>
 <p>And we are good to go as our vertex type is now live!</p>
 <blockquote>
@@ -273,30 +287,26 @@ get a list by running <code>cargo doc --open</code>.</p>
 </blockquote>
 <h2><a class="header" href="#defining-a-triangle" id="defining-a-triangle">Defining a triangle</a></h2>
 <p>A triangle is just three points — three vertices. Let’s define them.</p>
-<pre><pre class="playpen"><code class="language-rust">
-<span class="boring">#![allow(unused_variables)]
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>const VERTICES: [Vertex; 3] = [
-  Vertex {
-    position: VertexPosition::new([-0.5, -0.5]),
-    color: VertexRGB::new([255, 0, 0]),
-  },
-  Vertex {
-    position: VertexPosition::new([0.5, -0.5]),
-    color: VertexRGB::new([0, 255, 0]),
-  },
-  Vertex {
-    position: VertexPosition::new([0., 0.5]),
-    color: VertexRGB::new([0, 0, 255]),
-  },
+  Vertex::new(
+    VertexPosition::new([-0.5, -0.5]),
+    VertexRGB::new([255, 0, 0]),
+  ),
+  Vertex::new(
+    VertexPosition::new([0.5, -0.5]),
+    VertexRGB::new([0, 255, 0]),
+  ),
+  Vertex::new(
+    VertexPosition::new([0., 0.5]),
+    VertexRGB::new([0, 0, 255])
+  ),
 ];
 <span class="boring">}
 </span></code></pre></pre>
 <p>It’s that simple.</p>
-<blockquote>
-<p>Disclaimer: an on-going patch will soon allow to build vertices with <code>const fn</code> at the vertex type
-level too; not only the vertex attributes.</p>
-</blockquote>
 <h2><a class="header" href="#the-final-part-of-the-recipe-gpu-tessellations" id="the-final-part-of-the-recipe-gpu-tessellations">The final part of the recipe: GPU tessellations</a></h2>
 <blockquote>
 <p>Tessellations?</p>
@@ -317,22 +327,23 @@ manipulate and render our triangle. However, one does not simply create a <a hre
 <a href="https://docs.rs/luminance/latest/luminance/tess/struct.TessBuilder.html"><code>TessBuilder</code></a>, which follows the [builder pattern].</p>
 <p><img src="./imgs/one-does-not-simply-create-tess-without-builder.jpg" alt="" /></p>
 <p>Let’s see the code to create our <a href="https://docs.rs/luminance/latest/luminance/tess/struct.Tess.html"><code>Tess</code></a> via <a href="https://docs.rs/luminance/latest/luminance/tess/struct.TessBuilder.html"><code>TessBuilder</code></a>.</p>
-<pre><pre class="playpen"><code class="language-rust">
-<span class="boring">#![allow(unused_variables)]
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>use luminance::tess::{Mode, TessBuilder};
+</span>use luminance::tess::Mode;
 <span class="boring">}
 </span></code></pre></pre>
-<p>You really thought you wouldn’t need to import those?</p>
-<pre><pre class="playpen"><code class="language-rust">
-<span class="boring">#![allow(unused_variables)]
+<p>Then:</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>// at the beginning of main_loop
-let triangle = TessBuilder::new(&amp;mut surface)
-  .add_vertices(VERTICES)
-  .set_mode(Mode::Triangle)
-  .build()
-  .unwrap();
+</span>  // at the beginning of main_loop
+  let triangle = surface
+    .new_tess()
+    .set_vertices(&amp;VERTICES[..])
+    .set_mode(Mode::Triangle)
+    .build()
+    .unwrap();
 <span class="boring">}
 </span></code></pre></pre>
 <p>If you don’t specify the <a href="https://docs.rs/luminance/latest/luminance/tess/enum.Mode.html"><code>Mode</code></a>, the <a href="https://docs.rs/luminance/latest/luminance/tess/struct.TessBuilder.html"><code>TessBuilder</code></a> defaults to <a href="https://docs.rs/luminance/latest/luminance/tess/enum.Mode.html#variant.Point"><code>Mode::Point</code></a>, which will not
@@ -384,10 +395,10 @@ how we can render it into our frame buffer.</p>
         
 
         
-        
+
         
         <script type="text/javascript">
-            window.playpen_copyable = true;
+            window.playground_copyable = true;
         </script>
         
 

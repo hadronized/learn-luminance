@@ -5,12 +5,19 @@
         <meta charset="UTF-8">
         <title>Creating a window and preparing graphics code - Learn luminance</title>
         
+        
+
+
+        <!-- Custom HTML head -->
+        
+
 
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff" />
 
+        <link rel="icon" href="favicon.svg">
         <link rel="shortcut icon" href="favicon.png">
         <link rel="stylesheet" href="css/variables.css">
         <link rel="stylesheet" href="css/general.css">
@@ -19,8 +26,9 @@
 
         <!-- Fonts -->
         <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
-        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
-        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+        
+        <link rel="stylesheet" href="fonts/fonts.css">
+        
 
         <!-- Highlight.js Stylesheets -->
         <link rel="stylesheet" href="highlight.css">
@@ -36,7 +44,7 @@
         <!-- Provide site root to javascript -->
         <script type="text/javascript">
             var path_to_root = "";
-            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "light" : "light";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
         </script>
 
         <!-- Work around some values being stored in localStorage wrapped in quotes -->
@@ -150,13 +158,12 @@
                         <h2><a class="header" href="#creating-a-window-and-preparing-graphics-code" id="creating-a-window-and-preparing-graphics-code">Creating a window and preparing graphics code</a></h2>
 <p>The first thing you want to do is to create a window. This is done via a type you can find in
 <a href="https://crates.io/crates/luminance-glfw">luminance-glfw</a>: <code>GlfwSurface</code>. A <em>graphics surface</em> is a common term yet a bit opaque describing
-a region of memory that accepts getting rendered to. In <a href="https://crates.io/crates/luminance">luminance</a>, it’s also responsible for
-handling all the events related to that surface.</p>
+a region of memory that accepts getting rendered to.</p>
 <p>Creating a new <em>graphics surface</em> relies on several objects you need to decide values for:</p>
 <ul>
 <li>The dimensions of the surface. In our case, we will use a screen resolution of <em>960×540</em> just
 for the sake of the introduction. You create such dimensions with the <code>WindowDim::Windowed</code>
-variant.</li>
+variant. Others are available, like restricted fullscreen or fullscreen.</li>
 <li>The title of the window. Whether it will get displayed depends on your compositor and window
 manager but pretty much all of them display the title in the top-level location of your window
 as a <em>window decoration property</em>. Titles are encoded as simple <code>&amp;str</code>.</li>
@@ -170,16 +177,18 @@ you want to write. For a video game, a simulation, a demo or an animation progra
 and dequeue them all. Once you’re done, you render a frame, and you loop back.</p>
 <p>You quit the application if the window gets closed by the user or if they enter the <em>escape</em> key,
 for instance.</p>
-<pre><pre class="playpen"><code class="language-rust">use luminance_glfw::{Action, GlfwSurface, Key, Surface as _, WindowDim, WindowEvent, WindowOpt};
+<pre><pre class="playground"><code class="language-rust">use glfw::{Action, Context as _, Key, WindowEvent};
+use luminance_glfw::GlfwSurface;
+use luminance_windowing::{WindowDim, WindowOpt};
 use std::process::exit;
 
 fn main() {
   // our graphics surface
-  let surface = GlfwSurface::new(
-    WindowDim::Windowed(960, 540),
-    &quot;Hello, world!&quot;,
-    WindowOpt::default()
-  );
+  let dim = WindowDim::Windowed {
+    width: 960,
+    height: 540,
+  };
+  let surface = GlfwSurface::new_gl33(&quot;Hello, world!&quot;, WindowOpt::default().set_dim(dim));
 
   match surface {
     Ok(surface) =&gt; {
@@ -197,7 +206,8 @@ fn main() {
 fn main_loop(mut surface: GlfwSurface) {
   'app: loop {
     // handle events
-    for event in surface.poll_events() {
+    surface.window.glfw.poll_events();
+    for (_, event) in surface.events_rx.try_iter() {
       match event {
         WindowEvent::Close | WindowEvent::Key(Key::Escape, _, Action::Release, _) =&gt; break 'app,
         _ =&gt; ()
@@ -205,21 +215,22 @@ fn main_loop(mut surface: GlfwSurface) {
     }
 
     // rendering code goes here
+    // …
 
     // swap buffer chains
-    surface.swap_buffers();
+    surface.window.swap_buffers();
   }
 }
 </code></pre></pre>
-<p><a href="https://docs.rs/luminance-windowing/latest/luminance_windowing/trait.Surface.html#tymethod.poll_events"><code>Surface::poll_events</code></a> allows you to have a look whether you need to dequeue events. If no event
-is present in the event queue, that function exits immediately instead of blocking for an event.
-That allows you to keep maintaining a constant frame rate.</p>
-<p><a href="https://docs.rs/luminance-windowing/latest/luminance_windowing/trait.Surface.html#tymethod.swap_buffers"><code>Surface::swap_buffers</code></a> takes the graphics <em>back</em> buffer linked to your application and swaps it
-with the <em>front</em> buffer, which is the one exposed on your screen. That technique is commonly
-referred to as <a href="https://en.wikipedia.org/wiki/Multiple_buffering">double buffering</a>. With <a href="https://crates.io/crates/luminance">luminance</a>, all the renders must eventually end up in the
-<em>back</em> buffer so that they get swapped at the end of the main loop. It’s important to notice — and
-you will see in future tutorials — that you don’t necessarily have to make your renders <em>directly</em>
-into the back buffer. More on that later… ;)</p>
+<p><code>surface.window.glfw.poll_events()</code> allows you to have a look whether you need to dequeue events.
+If no event is present in the event queue, that function exits immediately instead of blocking for
+an event. That allows you to keep maintaining a constant frame rate.</p>
+<p><code>surface.window.swap_buffers()</code> takes the graphics <em>back</em> buffer linked to your application and
+swaps it with the <em>front</em> buffer, which is the one exposed on your screen. That technique is
+commonly referred to as <a href="https://en.wikipedia.org/wiki/Multiple_buffering">double buffering</a>. With <a href="https://crates.io/crates/luminance">luminance</a>, all the renders must eventually end
+up in the <em>back</em> buffer so that they get swapped at the end of the main loop. It’s important to
+notice — and you will see in future tutorials — that you don’t necessarily have to make your
+renders <em>directly</em> into the back buffer. More on that later… ;)</p>
 
                     </main>
 
@@ -263,10 +274,10 @@ into the back buffer. More on that later… ;)</p>
         
 
         
-        
+
         
         <script type="text/javascript">
-            window.playpen_copyable = true;
+            window.playground_copyable = true;
         </script>
         
 
