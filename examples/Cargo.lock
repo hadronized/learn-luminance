@@ -233,10 +233,14 @@ dependencies = [
 [[package]]
 name = "luminance"
 version = "0.40.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2470d5250320d9a2042c0de4bb86159050854899d480fbbfad412c27715b28cf"
 
 [[package]]
 name = "luminance-derive"
 version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "da4aaf49b9a3b469dd8123f7e41e3f09e6f4254482362fad9581e002f26cda66"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -246,6 +250,8 @@ dependencies = [
 [[package]]
 name = "luminance-front"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "087bd26a6b9a5a8c444440eb1f49d4ebdf0adb077e68a6908602db86f9fd9782"
 dependencies = [
  "luminance",
  "luminance-gl",
@@ -255,6 +261,8 @@ dependencies = [
 [[package]]
 name = "luminance-gl"
 version = "0.14.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "00314e061d19178394dd2167a6215ed5d86fc6feb7fa3b5217abc1f03f2760c7"
 dependencies = [
  "gl",
  "luminance",
@@ -263,6 +271,8 @@ dependencies = [
 [[package]]
 name = "luminance-glfw"
 version = "0.13.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d09d339fd9b701942c438667dfe19ee85d4ae6fad93e21ba64870264c5086bb0"
 dependencies = [
  "gl",
  "glfw",
@@ -274,6 +284,8 @@ dependencies = [
 [[package]]
 name = "luminance-webgl"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b4ab792852f178804236c46e137fcd414ec39533229d704df2841a0e382e435f"
 dependencies = [
  "js-sys",
  "luminance",
@@ -286,6 +298,8 @@ dependencies = [
 [[package]]
 name = "luminance-windowing"
 version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7998bb672a0ebfebce55379e5e9d8ac27fca0f7cbc4379bb260b2f8c12f29a98"
 dependencies = [
  "luminance",
 ]
