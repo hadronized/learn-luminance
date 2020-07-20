@@ -166,65 +166,6 @@ And here’s the result:
 
 ![](imgs/suzanne_lit.png)
 
-# Let’s talk about aspect ratio
-
-If you try to resize your window, you will notice some strange distorsions. This is due to the fact
-that we are using describing objects in a space defined via an [orthonormal basis]. What it means is
-that, roughly, your screen / framebuffer is 2 units wide and 2 units tall: a point lying on the
-left-most part of your screen has `x=-1`; on the right, `x=1`. Same thing happens on the vertical:
-top has `y=1` and bottom has `y=-1`.
-
-Now if you think about it, it shouldn’t be a problem… but actually, it is. Our monitors typically
-have weird aspect ratio, such as 16:10. It means that 1 unit on the X axis doesn’t map to 1 unit
-on the Y axis on your screen. You can do the math by yourself: 16:10 means that 16 units on X
-corresponds to 10 units on Y, and then 1 unit on X corresponds to 10/16 = 0.625 units on Y.
-
-What we want to do is to restore the aspect ratio of the projected scene to 1:1, while still
-using a 16:10 ratio, for instance. That will remove the distorsion. Doing so is very easy:
-because 1 unit on X equals to 0.625 unit on Y, we just have to multiply every Y coordinates of
-our transformed points by this ratio (0.625 for a 16:10 framebuffer). Obviously, we are not going
-to hardcode that value. It might change if you resize the window, and we all have different setups.
-
-First, we need to add a new uniform to our shader interface:
-
-```rust
-  #[uniform(unbound)]
-  aspect_ratio: Uniform<f32>,
-```
-
-Then, simply update it in your loop:
-
-```rust
-    let [width, height] = back_buffer.size();
-    // … in the shading gate
-          iface.set(&uni.aspect_ratio, width as f32 / height as f32);
-```
-
-> Exercise: try to prevent doing that division at every frame by caching the aspect ratio and
-> updating it only when the framebuffer size change. You will need to inspect a bit the API of
-> [glfw].
-
-Then, one last step: update the vertex shader to perform the multiplication on the GPU:
-
-```glsl
-in vec3 position;
-in vec3 normal;
-
-out vec3 v_normal;
-
-uniform mat4 projection;
-uniform mat4 view;
-uniform float aspect_ratio;
-
-void main() {
-  v_normal = normal;
-  gl_Position = projection * view * vec4(position, 1.);
-  gl_Position.y *= aspect_ratio;
-}
-```
-
-Recompile, run: try to resize the window with your mouse or going fullscreen. No more distorsions!
-
 Complete code:
 
 ```rust
@@ -262,8 +203,6 @@ struct ShaderInterface {
   projection: Uniform<[[f32; 4]; 4]>,
   #[uniform(unbound)]
   view: Uniform<[[f32; 4]; 4]>,
-  #[uniform(unbound)]
-  aspect_ratio: Uniform<f32>,
 }
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, Semantics)]
@@ -421,7 +360,6 @@ fn main_loop(mut surface: GlfwSurface) {
     let color = [t.cos(), t.sin(), 0.5, 1.];
 
     let back_buffer = surface.back_buffer().unwrap();
-    let [width, height] = back_buffer.size();
     let render = surface.new_pipeline_gate().pipeline(
       &back_buffer,
       &PipelineState::default().set_clear_color(color),
@@ -429,7 +367,6 @@ fn main_loop(mut surface: GlfwSurface) {
         shd_gate.shade(&mut program, |mut iface, uni, mut rdr_gate| {
           iface.set(&uni.projection, projection.into());
           iface.set(&uni.view, view.into());
-          iface.set(&uni.aspect_ratio, width as f32 / height as f32);
 
           rdr_gate.render(&RenderState::default(), |mut tess_gate| {
             tess_gate.render(&mesh);
