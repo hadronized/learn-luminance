@@ -32,8 +32,6 @@ struct ShaderInterface {
   projection: Uniform<[[f32; 4]; 4]>,
   #[uniform(unbound)]
   view: Uniform<[[f32; 4]; 4]>,
-  #[uniform(unbound)]
-  aspect_ratio: Uniform<f32>,
 }
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, Semantics)]
@@ -191,7 +189,6 @@ fn main_loop(mut surface: GlfwSurface) {
     let color = [t.cos(), t.sin(), 0.5, 1.];
 
     let back_buffer = surface.back_buffer().unwrap();
-    let [width, height] = back_buffer.size();
     let render = surface.new_pipeline_gate().pipeline(
       &back_buffer,
       &PipelineState::default().set_clear_color(color),
@@ -199,7 +196,6 @@ fn main_loop(mut surface: GlfwSurface) {
         shd_gate.shade(&mut program, |mut iface, uni, mut rdr_gate| {
           iface.set(&uni.projection, projection.into());
           iface.set(&uni.view, view.into());
-          iface.set(&uni.aspect_ratio, width as f32 / height as f32);
 
           rdr_gate.render(&RenderState::default(), |mut tess_gate| {
             tess_gate.render(&mesh);
