@@ -70,7 +70,7 @@ name = "chapter-1"
 version = "0.1.0"
 dependencies = [
  "glfw",
- "luminance 0.41.0",
+ "luminance",
  "luminance-glfw",
  "luminance-windowing",
 ]
@@ -80,7 +80,7 @@ name = "chapter-2"
 version = "0.1.0"
 dependencies = [
  "glfw",
- "luminance 0.41.0",
+ "luminance",
  "luminance-derive",
  "luminance-glfw",
  "luminance-windowing",
@@ -92,7 +92,7 @@ version = "0.1.0"
 dependencies = [
  "cgmath",
  "glfw",
- "luminance 0.40.0",
+ "luminance",
  "luminance-derive",
  "luminance-front",
  "luminance-glfw",
@@ -232,12 +232,6 @@ dependencies = [
 
 [[package]]
 name = "luminance"
-version = "0.40.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2470d5250320d9a2042c0de4bb86159050854899d480fbbfad412c27715b28cf"
-
-[[package]]
-name = "luminance"
 version = "0.41.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fdde9a32c24a02e8b10a34787f24c42bcf1516e0be53556c3d7545297fb38f01"
@@ -255,11 +249,11 @@ dependencies = [
 
 [[package]]
 name = "luminance-front"
-version = "0.1.0"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "087bd26a6b9a5a8c444440eb1f49d4ebdf0adb077e68a6908602db86f9fd9782"
+checksum = "b9e51314b876a348a475dd3f054c2ab06babf9e578ef9859206d7e3f631d0245"
 dependencies = [
- "luminance 0.40.0",
+ "luminance",
  "luminance-gl",
  "luminance-webgl",
 ]
@@ -271,7 +265,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "44c8439470a3af537d7f8c399be6743e8a4db4f9df23eb8cd0915d9bb8070427"
 dependencies = [
  "gl",
- "luminance 0.41.0",
+ "luminance",
 ]
 
 [[package]]
@@ -282,7 +276,7 @@ checksum = "38f015a35ce92994ca09d22d512b173ecb98f64798f46b971be69d7c2deac4aa"
 dependencies = [
  "gl",
  "glfw",
- "luminance 0.41.0",
+ "luminance",
  "luminance-gl",
  "luminance-windowing",
 ]
@@ -294,7 +288,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dad55eaa3dbb0f49939ebe966cfb654880725d4ed05b39c906d94b1618709737"
 dependencies = [
  "js-sys",
- "luminance 0.41.0",
+ "luminance",
  "serde",
  "serde_derive",
  "wasm-bindgen",
@@ -307,7 +301,7 @@ version = "0.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "be09d5acc243f3a5a0e9d8561c2c40ef3ac86ce77f24e358c1c18d52a7ab9062"
 dependencies = [
- "luminance 0.41.0",
+ "luminance",
 ]
 
 [[package]]
