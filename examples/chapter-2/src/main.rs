@@ -97,17 +97,20 @@ fn main_loop(mut surface: GlfwSurface) {
     let t = start_t.elapsed().as_millis() as f32 * 1e-3;
     let color = [t.cos(), t.sin(), 0.5, 1.];
 
-    let render = surface.new_pipeline_gate().pipeline(
-      &back_buffer,
-      &PipelineState::default().set_clear_color(color),
-      |_, mut shd_gate| {
-        shd_gate.shade(&mut program, |_, _, mut rdr_gate| {
-          rdr_gate.render(&RenderState::default(), |mut tess_gate| {
-            tess_gate.render(&triangle);
-          });
-        });
-      },
-    );
+    let render = surface
+      .new_pipeline_gate()
+      .pipeline(
+        &back_buffer,
+        &PipelineState::default().set_clear_color(color),
+        |_, mut shd_gate| {
+          shd_gate.shade(&mut program, |_, _, mut rdr_gate| {
+            rdr_gate.render(&RenderState::default(), |mut tess_gate| {
+              tess_gate.render(&triangle)
+            })
+          })
+        },
+      )
+      .assume();
 
     // swap buffer chains
     if render.is_ok() {
