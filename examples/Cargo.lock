@@ -80,7 +80,7 @@ name = "chapter-2"
 version = "0.1.0"
 dependencies = [
  "glfw",
- "luminance 0.40.0",
+ "luminance 0.41.0",
  "luminance-derive",
  "luminance-glfw",
  "luminance-windowing",
