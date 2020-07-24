@@ -15,20 +15,23 @@ other operations on the [`Program`]’s _uniforms_ but it’s currently off topi
 its documentation if you’re interested, though.
 
 ```rust
-    let render = surface.new_pipeline_gate().pipeline(
-      &back_buffer,
-      &PipelineState::default().set_clear_color(color),
-      |_, mut shd_gate| {
-        shd_gate.shade(&mut program, |mut iface, uni, mut rdr_gate| {
-          iface.set(&uni.projection, projection.into());
-          iface.set(&uni.view, view.into());
+    let render = surface
+      .new_pipeline_gate()
+      .pipeline(
+        &back_buffer,
+        &PipelineState::default().set_clear_color(color),
+        |_, mut shd_gate| {
+          shd_gate.shade(&mut program, |mut iface, uni, mut rdr_gate| {
+            iface.set(&uni.projection, projection.into());
+            iface.set(&uni.view, view.into());
 
-          rdr_gate.render(&RenderState::default(), |mut tess_gate| {
-            tess_gate.render(&mesh);
-          });
-        });
-      },
-    );
+            rdr_gate.render(&RenderState::default(), |mut tess_gate| {
+              tess_gate.render(&mesh)
+            })
+          })
+        },
+      )
+      .assume();
 ```
 
 It’s as simple as that.

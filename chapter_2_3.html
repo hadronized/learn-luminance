@@ -169,17 +169,20 @@ chapter. Currently, we will just use the default one.</p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>    let render = surface.new_pipeline_gate().pipeline(
-      &amp;back_buffer,
-      &amp;PipelineState::default().set_clear_color(color),
-      |_, mut shd_gate| {
-        shd_gate.shade(&amp;mut program, |_, _, mut rdr_gate| {
-          rdr_gate.render(&amp;RenderState::default(), |mut tess_gate| {
-            // …
-          });
-        });
-      },
-    );
+</span>    let render = surface
+      .new_pipeline_gate()
+      .pipeline(
+        &amp;back_buffer,
+        &amp;PipelineState::default().set_clear_color(color),
+        |_, mut shd_gate| {
+          shd_gate.shade(&amp;mut program, |_, _, mut rdr_gate| {
+            rdr_gate.render(&amp;RenderState::default(), |mut tess_gate| {
+              // …
+            })
+          })
+        },
+      )
+      .assume();
 <span class="boring">}
 </span></code></pre></pre>
 <p>We’re almost there. We’re getting a <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.TessGate.html"><code>TessGate</code></a>, allowing us to render actual tessellations. In
@@ -193,17 +196,20 @@ Some convenient implementors exist, and there’s one allowing to get a <code>Te
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>let render = surface.new_pipeline_gate().pipeline(
-  &amp;back_buffer,
-  &amp;PipelineState::default().set_clear_color(color),
-  |_, mut shd_gate| {
-    shd_gate.shade(&amp;mut program, |_, _, mut rdr_gate| {
-      rdr_gate.render(&amp;RenderState::default(), |mut tess_gate| {
-        tess_gate.render(&amp;triangle);
-      });
-    });
-  },
-);
+</span>    let render = surface
+      .new_pipeline_gate()
+      .pipeline(
+        &amp;back_buffer,
+        &amp;PipelineState::default().set_clear_color(color),
+        |_, mut shd_gate| {
+          shd_gate.shade(&amp;mut program, |_, _, mut rdr_gate| {
+            rdr_gate.render(&amp;RenderState::default(), |mut tess_gate| {
+              tess_gate.render(&amp;triangle)
+            })
+          })
+        },
+      )
+      .assume();
 <span class="boring">}
 </span></code></pre></pre>
 <p>Compile and run the code. You should see something similar to this:</p>
@@ -308,17 +314,21 @@ fn main_loop(mut surface: GlfwSurface) {
     let t = start_t.elapsed().as_millis() as f32 * 1e-3;
     let color = [t.cos(), t.sin(), 0.5, 1.];
 
-    let render = surface.new_pipeline_gate().pipeline(
-      &amp;back_buffer,
-      &amp;PipelineState::default().set_clear_color(color),
-      |_, mut shd_gate| {
-        shd_gate.shade(&amp;mut program, |_, _, mut rdr_gate| {
-          rdr_gate.render(&amp;RenderState::default(), |mut tess_gate| {
-            tess_gate.render(&amp;triangle);
-          });
-        });
-      },
-    );
+
+    let render = surface
+      .new_pipeline_gate()
+      .pipeline(
+        &amp;back_buffer,
+        &amp;PipelineState::default().set_clear_color(color),
+        |_, mut shd_gate| {
+          shd_gate.shade(&amp;mut program, |_, _, mut rdr_gate| {
+            rdr_gate.render(&amp;RenderState::default(), |mut tess_gate| {
+              tess_gate.render(&amp;triangle)
+            })
+          })
+        },
+      )
+      .assume();
 
     // swap buffer chains
     if render.is_ok() {

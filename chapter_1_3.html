@@ -205,8 +205,9 @@ implementors.</p>
     let render = surface.new_pipeline_gate().pipeline(
       &amp;back_buffer,
       &amp;PipelineState::default().set_clear_color(color),
-      |_, _| (),
-    );
+      |_, _| Ok(()),
+    )
+    .assume();
 
     // swap buffer chains
     if render.is_ok() {
@@ -234,7 +235,13 @@ but this is off topic.</p>
 <p>The third and last argument is a <em>closure</em> you need to pass. That closure will be called as soon as
 the frame buffer is ready to receive a render. All this code is fully <em>synchronous</em> though, so
 lifetimes are enforced. In our case, since we’re not interested into making any actual render,
-we just pass a closure that does nothing. More on its two arguments later.</p>
+we just pass a closure that does nothing – it simply returns <code>Ok(())</code>. More on its two arguments later.</p>
+<p>The <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.Render.html#method.assume"><code>assume()</code></a> method, defined on <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.Render.html"><code>Render</code></a>, is an <em>identity function</em> (i.e. it simply forwards
+its argument). It doesn’t seem very useful, but there’s a small trick: it explicitely states that
+its argument has a type which error types are <a href="https://docs.rs/luminance/latest/luminance/pipeline/enum.PipelineError.html"><code>PipelineError</code></a>. It’s indeed possible to use a
+different error type in the graphics pipeline, but in our case, we will just use the default one
+and <em>assume</em> the pipeline is typed with it. It gives hint to the type system to use this error type
+and remove any ambiguity, then.</p>
 <p>You should obtain a window with a varying color, such as the following screenshot.</p>
 <p><img src="./imgs/hello-world.png" alt="" /></p>
 <p>The complete code is:</p>
@@ -288,8 +295,9 @@ fn main_loop(mut surface: GlfwSurface) {
     let render = surface.new_pipeline_gate().pipeline(
       &amp;back_buffer,
       &amp;PipelineState::default().set_clear_color(color),
-      |_, _| (),
-    );
+      |_, _| Ok(()),
+    )
+    .assume();
 
     // swap buffer chains
     if render.is_ok() {

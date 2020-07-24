@@ -369,11 +369,11 @@ fn main_loop(mut surface: GlfwSurface) {
           iface.set(&uni.view, view.into());
 
           rdr_gate.render(&RenderState::default(), |mut tess_gate| {
-            tess_gate.render(&mesh);
-          });
-        });
+            tess_gate.render(&mesh)
+          })
+        })
       },
-    );
+    ).assume();
 
     // swap buffer chains
     if render.is_ok() {

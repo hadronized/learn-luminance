@@ -12,8 +12,8 @@ definition again:
 surface.new_pipeline_gate().pipeline(
   &back_buffer,
   &PipelineState::default().set_clear_color(color),
-  |_, _| (),
-);
+  |_, _| Ok(()),
+).assume();
 ```
 
 And rewrite it by using the arguments:
@@ -22,9 +22,9 @@ And rewrite it by using the arguments:
 surface.new_pipeline_gate().pipeline(
   &back_buffer,
   &PipelineState::default().set_clear_color(color),
-  |pipeline, mut shd_gate| (),
+  |pipeline, mut shd_gate| Ok(()),
   // …
-});
+}).assume();
 ```
 
 The `pipeline` argument here represents a [`Pipeline`] and `shd_gate` a [`ShadingGate`].
@@ -177,15 +177,18 @@ The next step is to create a new _shading node_ in your graphics pipeline. This 
 [`ShadingGate`].
 
 ```rust
-    let render = surface.new_pipeline_gate().pipeline(
-      &back_buffer,
-      &PipelineState::default().set_clear_color(color),
-      |_, mut shd_gate| {
-        shd_gate.shade(&mut program, |_, _, mut rdr_gate| {
-          // …
-        });
-      },
-    );
+    let render = surface
+      .new_pipeline_gate()
+      .pipeline(
+        &back_buffer,
+        &PipelineState::default().set_clear_color(color),
+        |_, mut shd_gate| {
+          shd_gate.shade(&mut program, |_, _, mut rdr_gate| {
+            // …
+          })
+        },
+      )
+      .assume();
 ```
 
 You can see we are getting access to a new type of _gate_ here: a [`RenderGate`].

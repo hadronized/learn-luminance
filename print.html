@@ -239,9 +239,9 @@ it with luminance, or just to have a rough idea of what’s supported.</li>
 </ul>
 <h1><a class="header" href="#crate-setup" id="crate-setup">Crate setup</a></h1>
 <p>First thing first: this book is written against this following luminance crate setup:</p>
-<pre><code class="language-toml">luminance = &quot;0.40&quot;
+<pre><code class="language-toml">luminance = &quot;0.41&quot;
 luminance-derive = &quot;0.6&quot;
-luminance-front = &quot;0.1&quot;
+luminance-front = &quot;0.2&quot;
 luminance-glfw = &quot;0.13&quot;
 luminance-windowing = &quot;0.9&quot;
 </code></pre>
@@ -285,7 +285,7 @@ cargo new --bin luminance-first-steps
 <p>Then we need to add <a href="https://crates.io/crates/luminance">luminance</a> as a dependency to our project. Edit your <code>Cargo.toml</code> file and
 change the <code>[dependencies]</code> section according to the following:</p>
 <pre><code class="language-toml">[dependencies]
-luminance = &quot;0.40&quot;
+luminance = &quot;0.41&quot;
 luminance-glfw = &quot;0.13&quot;
 luminance-windowing = &quot;0.9&quot;
 glfw = &quot;0.39&quot;
@@ -440,8 +440,9 @@ implementors.</p>
     let render = surface.new_pipeline_gate().pipeline(
       &amp;back_buffer,
       &amp;PipelineState::default().set_clear_color(color),
-      |_, _| (),
-    );
+      |_, _| Ok(()),
+    )
+    .assume();
 
     // swap buffer chains
     if render.is_ok() {
@@ -469,7 +470,13 @@ but this is off topic.</p>
 <p>The third and last argument is a <em>closure</em> you need to pass. That closure will be called as soon as
 the frame buffer is ready to receive a render. All this code is fully <em>synchronous</em> though, so
 lifetimes are enforced. In our case, since we’re not interested into making any actual render,
-we just pass a closure that does nothing. More on its two arguments later.</p>
+we just pass a closure that does nothing – it simply returns <code>Ok(())</code>. More on its two arguments later.</p>
+<p>The <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.Render.html#method.assume"><code>assume()</code></a> method, defined on <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.Render.html"><code>Render</code></a>, is an <em>identity function</em> (i.e. it simply forwards
+its argument). It doesn’t seem very useful, but there’s a small trick: it explicitely states that
+its argument has a type which error types are <a href="https://docs.rs/luminance/latest/luminance/pipeline/enum.PipelineError.html"><code>PipelineError</code></a>. It’s indeed possible to use a
+different error type in the graphics pipeline, but in our case, we will just use the default one
+and <em>assume</em> the pipeline is typed with it. It gives hint to the type system to use this error type
+and remove any ambiguity, then.</p>
 <p>You should obtain a window with a varying color, such as the following screenshot.</p>
 <p><img src="./imgs/hello-world.png" alt="" /></p>
 <p>The complete code is:</p>
@@ -523,8 +530,9 @@ fn main_loop(mut surface: GlfwSurface) {
     let render = surface.new_pipeline_gate().pipeline(
       &amp;back_buffer,
       &amp;PipelineState::default().set_clear_color(color),
-      |_, _| (),
-    );
+      |_, _| Ok(()),
+    )
+    .assume();
 
     // swap buffer chains
     if render.is_ok() {
@@ -752,8 +760,8 @@ definition again:</p>
 </span>surface.new_pipeline_gate().pipeline(
   &amp;back_buffer,
   &amp;PipelineState::default().set_clear_color(color),
-  |_, _| (),
-);
+  |_, _| Ok(()),
+).assume();
 <span class="boring">}
 </span></code></pre></pre>
 <p>And rewrite it by using the arguments:</p>
@@ -763,9 +771,9 @@ definition again:</p>
 </span>surface.new_pipeline_gate().pipeline(
   &amp;back_buffer,
   &amp;PipelineState::default().set_clear_color(color),
-  |pipeline, mut shd_gate| (),
+  |pipeline, mut shd_gate| Ok(()),
   // …
-});
+}).assume();
 <span class="boring">}
 </span></code></pre></pre>
 <p>The <code>pipeline</code> argument here represents a <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.Pipeline.html"><code>Pipeline</code></a> and <code>shd_gate</code> a <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.ShadingGate.html"><code>ShadingGate</code></a>.</p>
@@ -902,15 +910,18 @@ drive behavior with types (the <a href="https://doc.rust-lang.org/1.30.0/book/fi
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>    let render = surface.new_pipeline_gate().pipeline(
-      &amp;back_buffer,
-      &amp;PipelineState::default().set_clear_color(color),
-      |_, mut shd_gate| {
-        shd_gate.shade(&amp;mut program, |_, _, mut rdr_gate| {
-          // …
-        });
-      },
-    );
+</span>    let render = surface
+      .new_pipeline_gate()
+      .pipeline(
+        &amp;back_buffer,
+        &amp;PipelineState::default().set_clear_color(color),
+        |_, mut shd_gate| {
+          shd_gate.shade(&amp;mut program, |_, _, mut rdr_gate| {
+            // …
+          })
+        },
+      )
+      .assume();
 <span class="boring">}
 </span></code></pre></pre>
 <p>You can see we are getting access to a new type of <em>gate</em> here: a <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.RenderGate.html"><code>RenderGate</code></a>.</p>
@@ -928,17 +939,20 @@ chapter. Currently, we will just use the default one.</p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>    let render = surface.new_pipeline_gate().pipeline(
-      &amp;back_buffer,
-      &amp;PipelineState::default().set_clear_color(color),
-      |_, mut shd_gate| {
-        shd_gate.shade(&amp;mut program, |_, _, mut rdr_gate| {
-          rdr_gate.render(&amp;RenderState::default(), |mut tess_gate| {
-            // …
-          });
-        });
-      },
-    );
+</span>    let render = surface
+      .new_pipeline_gate()
+      .pipeline(
+        &amp;back_buffer,
+        &amp;PipelineState::default().set_clear_color(color),
+        |_, mut shd_gate| {
+          shd_gate.shade(&amp;mut program, |_, _, mut rdr_gate| {
+            rdr_gate.render(&amp;RenderState::default(), |mut tess_gate| {
+              // …
+            })
+          })
+        },
+      )
+      .assume();
 <span class="boring">}
 </span></code></pre></pre>
 <p>We’re almost there. We’re getting a <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.TessGate.html"><code>TessGate</code></a>, allowing us to render actual tessellations. In
@@ -952,17 +966,20 @@ Some convenient implementors exist, and there’s one allowing to get a <code>Te
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>let render = surface.new_pipeline_gate().pipeline(
-  &amp;back_buffer,
-  &amp;PipelineState::default().set_clear_color(color),
-  |_, mut shd_gate| {
-    shd_gate.shade(&amp;mut program, |_, _, mut rdr_gate| {
-      rdr_gate.render(&amp;RenderState::default(), |mut tess_gate| {
-        tess_gate.render(&amp;triangle);
-      });
-    });
-  },
-);
+</span>    let render = surface
+      .new_pipeline_gate()
+      .pipeline(
+        &amp;back_buffer,
+        &amp;PipelineState::default().set_clear_color(color),
+        |_, mut shd_gate| {
+          shd_gate.shade(&amp;mut program, |_, _, mut rdr_gate| {
+            rdr_gate.render(&amp;RenderState::default(), |mut tess_gate| {
+              tess_gate.render(&amp;triangle)
+            })
+          })
+        },
+      )
+      .assume();
 <span class="boring">}
 </span></code></pre></pre>
 <p>Compile and run the code. You should see something similar to this:</p>
@@ -1067,17 +1084,21 @@ fn main_loop(mut surface: GlfwSurface) {
     let t = start_t.elapsed().as_millis() as f32 * 1e-3;
     let color = [t.cos(), t.sin(), 0.5, 1.];
 
-    let render = surface.new_pipeline_gate().pipeline(
-      &amp;back_buffer,
-      &amp;PipelineState::default().set_clear_color(color),
-      |_, mut shd_gate| {
-        shd_gate.shade(&amp;mut program, |_, _, mut rdr_gate| {
-          rdr_gate.render(&amp;RenderState::default(), |mut tess_gate| {
-            tess_gate.render(&amp;triangle);
-          });
-        });
-      },
-    );
+
+    let render = surface
+      .new_pipeline_gate()
+      .pipeline(
+        &amp;back_buffer,
+        &amp;PipelineState::default().set_clear_color(color),
+        |_, mut shd_gate| {
+          shd_gate.shade(&amp;mut program, |_, _, mut rdr_gate| {
+            rdr_gate.render(&amp;RenderState::default(), |mut tess_gate| {
+              tess_gate.render(&amp;triangle)
+            })
+          })
+        },
+      )
+      .assume();
 
     // swap buffer chains
     if render.is_ok() {
@@ -1214,7 +1235,7 @@ which don’t have the <code>B</code> type variables (it simply forwards them), 
 still need to have to include <a href="https://crates.io/crates/luminance">luminance</a> in your <code>Cargo.toml</code>.</p>
 </blockquote>
 <p>Add this to your <code>Cargo.toml</code>:</p>
-<pre><code class="language-toml">luminance-front = &quot;0.1&quot;
+<pre><code class="language-toml">luminance-front = &quot;0.2&quot;
 </code></pre>
 <h2><a class="header" href="#loading-wavefront-objects" id="loading-wavefront-objects">Loading Wavefront objects</a></h2>
 <p>Loading a .obj is not really part of this book, but we’ll provide the code so that you don’t have
@@ -1573,20 +1594,23 @@ its documentation if you’re interested, though.</p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>    let render = surface.new_pipeline_gate().pipeline(
-      &amp;back_buffer,
-      &amp;PipelineState::default().set_clear_color(color),
-      |_, mut shd_gate| {
-        shd_gate.shade(&amp;mut program, |mut iface, uni, mut rdr_gate| {
-          iface.set(&amp;uni.projection, projection.into());
-          iface.set(&amp;uni.view, view.into());
+</span>    let render = surface
+      .new_pipeline_gate()
+      .pipeline(
+        &amp;back_buffer,
+        &amp;PipelineState::default().set_clear_color(color),
+        |_, mut shd_gate| {
+          shd_gate.shade(&amp;mut program, |mut iface, uni, mut rdr_gate| {
+            iface.set(&amp;uni.projection, projection.into());
+            iface.set(&amp;uni.view, view.into());
 
-          rdr_gate.render(&amp;RenderState::default(), |mut tess_gate| {
-            tess_gate.render(&amp;mesh);
-          });
-        });
-      },
-    );
+            rdr_gate.render(&amp;RenderState::default(), |mut tess_gate| {
+              tess_gate.render(&amp;mesh)
+            })
+          })
+        },
+      )
+      .assume();
 <span class="boring">}
 </span></code></pre></pre>
 <p>It’s as simple as that.</p>
@@ -1950,11 +1974,11 @@ fn main_loop(mut surface: GlfwSurface) {
           iface.set(&amp;uni.view, view.into());
 
           rdr_gate.render(&amp;RenderState::default(), |mut tess_gate| {
-            tess_gate.render(&amp;mesh);
-          });
-        });
+            tess_gate.render(&amp;mesh)
+          })
+        })
       },
-    );
+    ).assume();
 
     // swap buffer chains
     if render.is_ok() {

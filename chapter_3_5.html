@@ -172,20 +172,23 @@ its documentation if you’re interested, though.</p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>    let render = surface.new_pipeline_gate().pipeline(
-      &amp;back_buffer,
-      &amp;PipelineState::default().set_clear_color(color),
-      |_, mut shd_gate| {
-        shd_gate.shade(&amp;mut program, |mut iface, uni, mut rdr_gate| {
-          iface.set(&amp;uni.projection, projection.into());
-          iface.set(&amp;uni.view, view.into());
+</span>    let render = surface
+      .new_pipeline_gate()
+      .pipeline(
+        &amp;back_buffer,
+        &amp;PipelineState::default().set_clear_color(color),
+        |_, mut shd_gate| {
+          shd_gate.shade(&amp;mut program, |mut iface, uni, mut rdr_gate| {
+            iface.set(&amp;uni.projection, projection.into());
+            iface.set(&amp;uni.view, view.into());
 
-          rdr_gate.render(&amp;RenderState::default(), |mut tess_gate| {
-            tess_gate.render(&amp;mesh);
-          });
-        });
-      },
-    );
+            rdr_gate.render(&amp;RenderState::default(), |mut tess_gate| {
+              tess_gate.render(&amp;mesh)
+            })
+          })
+        },
+      )
+      .assume();
 <span class="boring">}
 </span></code></pre></pre>
 <p>It’s as simple as that.</p>

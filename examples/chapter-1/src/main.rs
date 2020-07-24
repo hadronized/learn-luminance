@@ -45,11 +45,14 @@ fn main_loop(mut surface: GlfwSurface) {
     let t = start_t.elapsed().as_millis() as f32 * 1e-3;
     let color = [t.cos(), t.sin(), 0.5, 1.];
 
-    let render = surface.new_pipeline_gate().pipeline(
-      &back_buffer,
-      &PipelineState::default().set_clear_color(color),
-      |_, _| (),
-    );
+    let render = surface
+      .new_pipeline_gate()
+      .pipeline(
+        &back_buffer,
+        &PipelineState::default().set_clear_color(color),
+        |_, _| Ok(()),
+      )
+      .assume();
 
     // swap buffer chains
     if render.is_ok() {

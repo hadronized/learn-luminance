@@ -52,8 +52,9 @@ As you can see, getting the _back_ buffer is piece of cake. Now let’s handle t
     let render = surface.new_pipeline_gate().pipeline(
       &back_buffer,
       &PipelineState::default().set_clear_color(color),
-      |_, _| (),
-    );
+      |_, _| Ok(()),
+    )
+    .assume();
 
     // swap buffer chains
     if render.is_ok() {
@@ -85,7 +86,14 @@ but this is off topic.
 The third and last argument is a _closure_ you need to pass. That closure will be called as soon as
 the frame buffer is ready to receive a render. All this code is fully _synchronous_ though, so
 lifetimes are enforced. In our case, since we’re not interested into making any actual render,
-we just pass a closure that does nothing. More on its two arguments later.
+we just pass a closure that does nothing – it simply returns `Ok(())`. More on its two arguments later.
+
+The [`assume()`] method, defined on [`Render`], is an _identity function_ (i.e. it simply forwards
+its argument). It doesn’t seem very useful, but there’s a small trick: it explicitely states that
+its argument has a type which error types are [`PipelineError`]. It’s indeed possible to use a
+different error type in the graphics pipeline, but in our case, we will just use the default one
+and _assume_ the pipeline is typed with it. It gives hint to the type system to use this error type
+and remove any ambiguity, then.
 
 You should obtain a window with a varying color, such as the following screenshot.
 
@@ -144,8 +152,9 @@ fn main_loop(mut surface: GlfwSurface) {
     let render = surface.new_pipeline_gate().pipeline(
       &back_buffer,
       &PipelineState::default().set_clear_color(color),
-      |_, _| (),
-    );
+      |_, _| Ok(()),
+    )
+    .assume();
 
     // swap buffer chains
     if render.is_ok() {
@@ -170,3 +179,7 @@ fn main_loop(mut surface: GlfwSurface) {
 [`PipelineGate`]: https://docs.rs/luminance/latest/luminance/pipeline/struct.PipelineGate.html
 [`PipelineGate::pipeline`]: https://docs.rs/luminance/latest/luminance/pipeline/struct.PipelineGate.html#method.pipeline
 [AST]: https://en.wikipedia.org/wiki/Abstract_syntax_tree
+[`Render`]: https://docs.rs/luminance/latest/luminance/pipeline/struct.Render.html
+[`assume()`]: https://docs.rs/luminance/latest/luminance/pipeline/struct.Render.html#method.assume
+[`PipelineError`]: https://docs.rs/luminance/latest/luminance/pipeline/enum.PipelineError.html
+

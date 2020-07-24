@@ -168,8 +168,8 @@ definition again:</p>
 </span>surface.new_pipeline_gate().pipeline(
   &amp;back_buffer,
   &amp;PipelineState::default().set_clear_color(color),
-  |_, _| (),
-);
+  |_, _| Ok(()),
+).assume();
 <span class="boring">}
 </span></code></pre></pre>
 <p>And rewrite it by using the arguments:</p>
@@ -179,9 +179,9 @@ definition again:</p>
 </span>surface.new_pipeline_gate().pipeline(
   &amp;back_buffer,
   &amp;PipelineState::default().set_clear_color(color),
-  |pipeline, mut shd_gate| (),
+  |pipeline, mut shd_gate| Ok(()),
   // …
-});
+}).assume();
 <span class="boring">}
 </span></code></pre></pre>
 <p>The <code>pipeline</code> argument here represents a <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.Pipeline.html"><code>Pipeline</code></a> and <code>shd_gate</code> a <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.ShadingGate.html"><code>ShadingGate</code></a>.</p>
@@ -318,15 +318,18 @@ drive behavior with types (the <a href="https://doc.rust-lang.org/1.30.0/book/fi
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>    let render = surface.new_pipeline_gate().pipeline(
-      &amp;back_buffer,
-      &amp;PipelineState::default().set_clear_color(color),
-      |_, mut shd_gate| {
-        shd_gate.shade(&amp;mut program, |_, _, mut rdr_gate| {
-          // …
-        });
-      },
-    );
+</span>    let render = surface
+      .new_pipeline_gate()
+      .pipeline(
+        &amp;back_buffer,
+        &amp;PipelineState::default().set_clear_color(color),
+        |_, mut shd_gate| {
+          shd_gate.shade(&amp;mut program, |_, _, mut rdr_gate| {
+            // …
+          })
+        },
+      )
+      .assume();
 <span class="boring">}
 </span></code></pre></pre>
 <p>You can see we are getting access to a new type of <em>gate</em> here: a <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.RenderGate.html"><code>RenderGate</code></a>.</p>
