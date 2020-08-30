@@ -54,7 +54,7 @@ which don’t have the `B` type variables (it simply forwards them), so that you
 Add this to your `Cargo.toml`:
 
 ```toml
-luminance-front = "0.2"
+luminance-front = "0.3"
 ```
 
 ## Loading Wavefront objects
