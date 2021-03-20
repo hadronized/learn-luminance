@@ -122,11 +122,11 @@ In your project, add the `src/fs.glsl` file with the following content:
 in vec3 v_color;
 
 // we will output a single color
-out vec3 frag_color;
+out vec4 frag_color;
 
 void main() {
   // KISS
-  frag_color = v_color;
+  frag_color = vec4(v_color, 1.0);
 }
 ```
 

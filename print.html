@@ -28,7 +28,9 @@
         <link rel="stylesheet" href="css/variables.css">
         <link rel="stylesheet" href="css/general.css">
         <link rel="stylesheet" href="css/chrome.css">
+        
         <link rel="stylesheet" href="css/print.css" media="print">
+        
 
         <!-- Fonts -->
         <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
@@ -130,9 +132,11 @@
                     <h1 class="menu-title">Learn luminance</h1>
 
                     <div class="right-buttons">
+                        
                         <a href="print.html" title="Print this book" aria-label="Print this book">
                             <i id="print-button" class="fa fa-print"></i>
                         </a>
+                        
                         
                     </div>
                 </div>
@@ -161,9 +165,9 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#learn-luminance" id="learn-luminance">Learn luminance</a></h1>
+                        <h1 id="learn-luminance"><a class="header" href="#learn-luminance">Learn luminance</a></h1>
 <p>You’re here because you want to learn luminance. Here is the chapter summary.</p>
-<h2><a class="header" href="#plan-of-the-book" id="plan-of-the-book">Plan of the book</a></h2>
+<h2 id="plan-of-the-book"><a class="header" href="#plan-of-the-book">Plan of the book</a></h2>
 <p>The book is written in chapters. It is highly recommended to read them in order, as they will
 reference code introduced in previous chapters. Also, each chapter has a dedicated Rust project
 containing the final solution <a href="https://github.com/rust-tutorials/learn-luminance/tree/master/examples">here</a>.
@@ -180,7 +184,7 @@ cargo build --release
 # …or run the chapter 3
 cargo run --release --bin chapter-3 ~/Downloads/torus.obj
 </code></pre>
-<h2><a class="header" href="#everything-you-should-know-before-jumping-in" id="everything-you-should-know-before-jumping-in">Everything you should know before jumping in</a></h2>
+<h2 id="everything-you-should-know-before-jumping-in"><a class="header" href="#everything-you-should-know-before-jumping-in">Everything you should know before jumping in</a></h2>
 <p><strong>luminance</strong> is an effort to make graphics rendering simple and elegant. It was originally imagined,
 designed and implemented by <a href="https://github.com/phaazon">@phaazon</a> in Haskell (<a href="https://hackage.haskell.org/package/luminance">here</a>)
 and eventually ported to Rust in 2016. The core concepts remained the same and the crate has been
@@ -241,7 +245,7 @@ it with luminance, or just to have a rough idea of what’s supported.</li>
 <li>Spotted a bug? A typo? A performance issue? You need a feature that’s not already available? Shoot it
 <a href="https://github.com/phaazon/luminance-rs/issues">here</a>.</li>
 </ul>
-<h1><a class="header" href="#crate-setup" id="crate-setup">Crate setup</a></h1>
+<h1 id="crate-setup"><a class="header" href="#crate-setup">Crate setup</a></h1>
 <p>First thing first: this book is written against this following luminance crate setup:</p>
 <pre><code class="language-toml">luminance = &quot;0.42&quot;
 luminance-derive = &quot;0.6&quot;
@@ -254,7 +258,7 @@ ask via an <a href="https://github.com/phaazon/luminance-rs/issues">issue</a> to
 to keep it as updated as possible, but it might happen it lags a bit behind. Sorry about that.</p>
 <p>Even though some other crates exist (windowing, for most), we are not going to focus on them and
 will stick to the ones above.</p>
-<h2><a class="header" href="#on-version-updates--migrations" id="on-version-updates--migrations">On version updates / migrations</a></h2>
+<h2 id="on-version-updates--migrations"><a class="header" href="#on-version-updates--migrations">On version updates / migrations</a></h2>
 <p>It is possible that you have started reading some documentation / examples / the book about
 luminance at a previous version as the one described here. In that case, you will want to
 update your luminance dependencies.</p>
@@ -266,7 +270,7 @@ cryptic typing or traits errors. In such case, you need to tell <code>cargo</cod
 dependencies by taking into account the new upper bounds:</p>
 <pre><code>cargo update --aggressive
 </code></pre>
-<h1><a class="header" href="#introduction-to-luminance-for-newcomers" id="introduction-to-luminance-for-newcomers">Introduction to luminance for newcomers</a></h1>
+<h1 id="introduction-to-luminance-for-newcomers"><a class="header" href="#introduction-to-luminance-for-newcomers">Introduction to luminance for newcomers</a></h1>
 <p>Hello there. You’ve hit that page because you’re wondering how <a href="https://crates.io/crates/luminance">luminance</a> is supposed to be used.
 You’ve come to the right place. This book is an introduction to <a href="https://crates.io/crates/luminance">luminance</a>, its ways of doing
 <em>graphics programming</em> and how to write your first graphics application, the fun way! Its audience
@@ -274,7 +278,7 @@ spreads from people who know nothing about graphics programming to people who wo
 and safely build graphics programs.</p>
 <p>Let’s not waste time.</p>
 <p><img src="./imgs/hello-world.png" alt="" /></p>
-<h1><a class="header" href="#getting-started" id="getting-started">Getting started</a></h1>
+<h1 id="getting-started"><a class="header" href="#getting-started">Getting started</a></h1>
 <p>You’ll need some prerequisites:</p>
 <table><thead><tr><th>Prerequisite</th><th>How to get / resolve</th></tr></thead><tbody>
 <tr><td><code>rustup</code></td><td><a href="https://rustup.rs">https://rustup.rs</a></td></tr>
@@ -318,7 +322,7 @@ re-check, re-test, re-run or even re-doc… Very handy.</p>
 <pre><code>cargo install cargo-watch
 </code></pre>
 <p>You’re now ready to get started.</p>
-<h2><a class="header" href="#creating-a-window-and-preparing-graphics-code" id="creating-a-window-and-preparing-graphics-code">Creating a window and preparing graphics code</a></h2>
+<h2 id="creating-a-window-and-preparing-graphics-code"><a class="header" href="#creating-a-window-and-preparing-graphics-code">Creating a window and preparing graphics code</a></h2>
 <p>The first thing you want to do is to create a window. This is done via a type you can find in
 <a href="https://crates.io/crates/luminance-glfw">luminance-glfw</a>: <code>GlfwSurface</code>. A <em>graphics surface</em> is a common term yet a bit opaque describing
 a region of memory that accepts getting rendered to.</p>
@@ -394,7 +398,7 @@ commonly referred to as <a href="https://en.wikipedia.org/wiki/Multiple_bufferin
 up in the <em>back</em> buffer so that they get swapped at the end of the main loop. It’s important to
 notice — and you will see in future tutorials — that you don’t necessarily have to make your
 renders <em>directly</em> into the back buffer. More on that later… ;)</p>
-<h2><a class="header" href="#changing-the-background-color" id="changing-the-background-color">Changing the background color</a></h2>
+<h2 id="changing-the-background-color"><a class="header" href="#changing-the-background-color">Changing the background color</a></h2>
 <p>We’re getting to the interesting things. Before trying to render cool rotating cubes, we need to
 understand how graphics rendering works in <a href="https://crates.io/crates/luminance">luminance</a>.</p>
 <p><a href="https://crates.io/crates/luminance">luminance</a> has a special way of encoding renders. Instead of giving you all the GPU power right
@@ -547,14 +551,14 @@ fn main_loop(mut surface: GlfwSurface) {
   }
 }
 </code></pre></pre>
-<h1><a class="header" href="#render-your-first-triangle" id="render-your-first-triangle">Render your first triangle</a></h1>
+<h1 id="render-your-first-triangle"><a class="header" href="#render-your-first-triangle">Render your first triangle</a></h1>
 <p>Now you know how to create a <em>graphics pipeline</em> and change the <em>frame buffer</em> background color.
 Let’s get to more exciting things, shall we?</p>
 <p>We are going to render a single triangle on screen. It will have its <em>vertices</em> with a different
 color (one red, one green, one blue) and will be filled by a color gradient between the three
 colors. It’s the <em>Hello, world!</em> of graphics libraries.</p>
 <p><img src="./imgs/your_first_triangle.png" alt="" /></p>
-<h1><a class="header" href="#what-is-a-triangle" id="what-is-a-triangle">What is a triangle?</a></h1>
+<h1 id="what-is-a-triangle"><a class="header" href="#what-is-a-triangle">What is a triangle?</a></h1>
 <p>Everyone knows what a triangle is… but what is a triangle on your GPU? In <a href="https://crates.io/crates/luminance">luminance</a>, a triangle
 can be <em>represented</em> in lots of ways. In our case:</p>
 <ul>
@@ -575,7 +579,7 @@ type Vertex = (Position, RGB);
 <span class="boring">}
 </span></code></pre></pre>
 <p>But the real vertex definition is very, very similar. Hang on.</p>
-<h2><a class="header" href="#defining-your-vertex-type" id="defining-your-vertex-type">Defining your vertex type</a></h2>
+<h2 id="defining-your-vertex-type"><a class="header" href="#defining-your-vertex-type">Defining your vertex type</a></h2>
 <p>In order to define our vertex type, we need to create a <code>struct</code> that will implement the <a href="https://docs.rs/luminance/latest/luminance/vertex/trait.Vertex.html"><code>Vertex</code></a>
 trait. That trait requires various information to be provided by the implementor. You don’t have
 to worry about those, because a crate exists to automatically implement such a trait:
@@ -684,7 +688,7 @@ normalized floating point numbers (lying in <code>[0.; 1.]</code>) instead of th
 <p>Some notes: the generated wrapper types have some useful methods and implementors. You can easily
 get a list by running <code>cargo doc --open</code>.</p>
 </blockquote>
-<h2><a class="header" href="#defining-a-triangle" id="defining-a-triangle">Defining a triangle</a></h2>
+<h2 id="defining-a-triangle"><a class="header" href="#defining-a-triangle">Defining a triangle</a></h2>
 <p>A triangle is just three points — three vertices. Let’s define them.</p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
@@ -706,7 +710,7 @@ get a list by running <code>cargo doc --open</code>.</p>
 <span class="boring">}
 </span></code></pre></pre>
 <p>It’s that simple.</p>
-<h2><a class="header" href="#the-final-part-of-the-recipe-gpu-tessellations" id="the-final-part-of-the-recipe-gpu-tessellations">The final part of the recipe: GPU tessellations</a></h2>
+<h2 id="the-final-part-of-the-recipe-gpu-tessellations"><a class="header" href="#the-final-part-of-the-recipe-gpu-tessellations">The final part of the recipe: GPU tessellations</a></h2>
 <blockquote>
 <p>Tessellations?</p>
 </blockquote>
@@ -751,7 +755,7 @@ in a production application, you shouldn’t use <code>.unwrap()</code> but inst
 treat it.</p>
 <p>We have everything we need to represent our triangle on GPU with <a href="https://crates.io/crates/luminance">luminance</a>. Let’s go on and see
 how we can render it into our frame buffer.</p>
-<h1><a class="header" href="#shady-triangle" id="shady-triangle">Shady triangle</a></h1>
+<h1 id="shady-triangle"><a class="header" href="#shady-triangle">Shady triangle</a></h1>
 <p><a href="https://crates.io/crates/luminance">luminance</a> is not a framework nor a video game engine. By default, it comes with zero data set.
 Hence, there is nothing <em>per se</em> that provides <em>materials</em> or that kind of concept. You will have
 to craft them yourself and that is what we are going to do in this section.</p>
@@ -781,13 +785,13 @@ definition again:</p>
 <span class="boring">}
 </span></code></pre></pre>
 <p>The <code>pipeline</code> argument here represents a <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.Pipeline.html"><code>Pipeline</code></a> and <code>shd_gate</code> a <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.ShadingGate.html"><code>ShadingGate</code></a>.</p>
-<h3><a class="header" href="#the-graphics-pipeline" id="the-graphics-pipeline">The graphics pipeline</a></h3>
+<h3 id="the-graphics-pipeline"><a class="header" href="#the-graphics-pipeline">The graphics pipeline</a></h3>
 <p>The <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.Pipeline.html"><code>Pipeline</code></a> object you’re given represents a <em>graphics pipeline</em>. It allows you to notify
 the GPU about scarce resources you’re about to use or perform specific tasks related to such
 resources. That is pretty advanced so we will just ignore that object and will leave it to <code>_</code>
 for now.</p>
 <p>More on <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.Pipeline.html"><code>Pipeline</code></a> in a future chapter.</p>
-<h3><a class="header" href="#the-shading-gate" id="the-shading-gate">The shading gate</a></h3>
+<h3 id="the-shading-gate"><a class="header" href="#the-shading-gate">The shading gate</a></h3>
 <p><a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.ShadingGate.html"><code>ShadingGate</code></a> represents a way to <em>shade</em> things. Shading means, like if you had a paper and color
 pens, filling in shapes with colors. <a href="https://crates.io/crates/luminance">luminance</a> works the same way. However, you have no pen and no
 default algorithm to fill your triangle. You need to instruct <a href="https://crates.io/crates/luminance">luminance</a> how to. And to do that,
@@ -819,7 +823,7 @@ so that this information is available later.</li>
 <li>A <a href="https://docs.rs/luminance/latest/luminance/shader/stage/enum.Type.html#variant.FragmentShader"><code>FragmentShader</code></a> that will read this information and output a single color for each pixel
 of the ~screen~ frame buffer.</li>
 </ul>
-<h3><a class="header" href="#the-vertex-shader" id="the-vertex-shader">The vertex shader</a></h3>
+<h3 id="the-vertex-shader"><a class="header" href="#the-vertex-shader">The vertex shader</a></h3>
 <blockquote>
 <p>If you don’t know <a href="https://www.khronos.org/opengl/wiki/Core_Language_(GLSL)">GLSL</a>, you’re going to have some hard times but we will try to explain
 everything.</p>
@@ -844,7 +848,7 @@ void main() {
   gl_Position = vec4(position, 0., 1.);
 }
 </code></pre>
-<h3><a class="header" href="#the-fragment-shader" id="the-fragment-shader">The fragment shader</a></h3>
+<h3 id="the-fragment-shader"><a class="header" href="#the-fragment-shader">The fragment shader</a></h3>
 <p>A fragment shader runs for every <em>rasterized</em> fragments from the render of your <a href="https://docs.rs/luminance/latest/luminance/tess/struct.Tess.html"><code>Tess</code></a>. Basically,
 your GPU transforms the geometry, projects it, performs several complex operations we end up with
 rasterized data. Rasterized data means to discretize all the vertex attributes. The discretization
@@ -859,11 +863,11 @@ that on a screen, store in an image, etc.</p>
 in vec3 v_color;
 
 // we will output a single color
-out vec3 frag_color;
+out vec4 frag_color;
 
 void main() {
   // KISS
-  frag_color = v_color;
+  frag_color = vec4(v_color, 1.0);
 }
 </code></pre>
 <p>In your <code>src/main.rs</code>, add the following lines:</p>
@@ -875,7 +879,7 @@ const FS_STR: &amp;str = include_str!(&quot;fs.glsl&quot;);
 <span class="boring">}
 </span></code></pre></pre>
 <p>And we’re good to go. Let’s create a <a href="https://docs.rs/luminance/latest/luminance/shader/program/struct.Program.html"><code>Program</code></a>. We’ll first need to import the type.</p>
-<h3><a class="header" href="#the-shader-program" id="the-shader-program">The shader program</a></h3>
+<h3 id="the-shader-program"><a class="header" href="#the-shader-program">The shader program</a></h3>
 <p>A <em>shader program</em> is a collection of <em>shader stages</em>, connecting them to each other. It’s like
 building an actual program by gluing functions to each other. <a href="https://crates.io/crates/luminance">luminance</a> has a very opinionated
 idea of what a GPU shader program is and should be. That opinion will be explained in a future
@@ -908,7 +912,7 @@ are only warnings that wouldn’t cause your program to behave in a weird way.</
 <p>On a general note, <a href="https://crates.io/crates/luminance">luminance</a> is heavily type-driven. Familiarize yourself with how you can
 drive behavior with types (the <a href="https://doc.rust-lang.org/1.30.0/book/first-edition/generics.html">turbofish syntax</a>, for instance, will be useful).</p>
 </blockquote>
-<h3><a class="header" href="#the-shading-node" id="the-shading-node">The shading node</a></h3>
+<h3 id="the-shading-node"><a class="header" href="#the-shading-node">The shading node</a></h3>
 <p>The next step is to create a new <em>shading node</em> in your graphics pipeline. This is done via the
 <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.ShadingGate.html"><code>ShadingGate</code></a>.</p>
 <pre><pre class="playground"><code class="language-rust">
@@ -929,7 +933,7 @@ drive behavior with types (the <a href="https://doc.rust-lang.org/1.30.0/book/fi
 <span class="boring">}
 </span></code></pre></pre>
 <p>You can see we are getting access to a new type of <em>gate</em> here: a <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.RenderGate.html"><code>RenderGate</code></a>.</p>
-<h1><a class="header" href="#rendering-our-triangle" id="rendering-our-triangle">Rendering our triangle</a></h1>
+<h1 id="rendering-our-triangle"><a class="header" href="#rendering-our-triangle">Rendering our triangle</a></h1>
 <p>A <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.RenderGate.html"><code>RenderGate</code></a> allows to create <em>render nodes</em>. Such nodes will share <a href="https://docs.rs/luminance/latest/luminance/render_state/struct.RenderState.html"><code>RenderState</code></a>s for all
 lower nodes in the graphics pipeline. We will see what we can do with <a href="https://docs.rs/luminance/latest/luminance/render_state/struct.RenderState.html"><code>RenderState</code></a> in a future
 chapter. Currently, we will just use the default one.</p>
@@ -1113,7 +1117,7 @@ fn main_loop(mut surface: GlfwSurface) {
   }
 }
 </code></pre></pre>
-<h1><a class="header" href="#wavefront-obj-loader" id="wavefront-obj-loader">Wavefront .obj loader</a></h1>
+<h1 id="wavefront-obj-loader"><a class="header" href="#wavefront-obj-loader">Wavefront .obj loader</a></h1>
 <p>In the previous chapter, we saw how to render a single triangle by using several concepts:</p>
 <ul>
 <li><a href="https://docs.rs/luminance/latest/luminance/vertex/trait.Vertex.html"><code>Vertex</code></a> and <a href="https://docs.rs/luminance/latest/luminance/vertex/trait.Semantics.html"><code>Semantics</code></a> types to define what vertices can be.</li>
@@ -1123,7 +1127,7 @@ fn main_loop(mut surface: GlfwSurface) {
 </ul>
 <p>In this chapter, we will see how we can write a [Wavefront .obj] viewer.</p>
 <p><img src="./imgs/suzanne_lit.png" alt="" /></p>
-<h1><a class="header" href="#the-wavefront-obj-format" id="the-wavefront-obj-format">The Wavefront .obj format</a></h1>
+<h1 id="the-wavefront-obj-format"><a class="header" href="#the-wavefront-obj-format">The Wavefront .obj format</a></h1>
 <blockquote>
 <p><em>A what?!</em></p>
 </blockquote>
@@ -1155,7 +1159,7 @@ that so far.</li>
 </ul>
 <p>So what we will want to do here is to load a <code>.obj</code> object and actually display it with
 <a href="https://crates.io/crates/luminance">luminance</a>.</p>
-<h1><a class="header" href="#defining-our-vertex-type" id="defining-our-vertex-type">Defining our vertex type</a></h1>
+<h1 id="defining-our-vertex-type"><a class="header" href="#defining-our-vertex-type">Defining our vertex type</a></h1>
 <p>The first thing to do is to define the kind of geometry our renderer will support. In the first
 place, we are not interested into supporting texturing nor even lighting, just raw geometry. We
 will then only need the position.</p>
@@ -1191,7 +1195,7 @@ struct Vertex {
 <p><a href="https://crates.io/crates/luminance">luminance</a> supports several kinds of indices. <code>u32</code> is more than enough for our current use case
 but you never know.</p>
 </blockquote>
-<h1><a class="header" href="#loading-an-obj-object" id="loading-an-obj-object">Loading an .obj object</a></h1>
+<h1 id="loading-an-obj-object"><a class="header" href="#loading-an-obj-object">Loading an .obj object</a></h1>
 <p>This is not really the purpose of this book but you actually need the following code in order to get the rest.
 So here it is. Refer to the <a href="https://crates.io/crates/wavefront_obj">wavefront_obj</a> crate for further details. The idea here is that we define our
 own <code>Obj</code> type with our own representation of what an object is. We then use <a href="https://crates.io/crates/wavefront_obj">wavefront_obj</a> to
@@ -1200,7 +1204,7 @@ load one object and convert it to our representation. Simple.</p>
 <p>Note: we also use the <a href="https://crates.io/crates/try-guard">try-guard</a> crate to convert boolean expressions to <em>try</em> values.</p>
 </blockquote>
 <p>However, before going any further, we are going to need to introduce a new crate: <a href="https://crates.io/crates/luminance-front">luminance-front</a>.</p>
-<h2><a class="header" href="#luminance-front" id="luminance-front">luminance-front</a></h2>
+<h2 id="luminance-front"><a class="header" href="#luminance-front">luminance-front</a></h2>
 <p>The examples you saw so far are simple enough they don’t require you to explicitly put type
 ascriptions about the scarce resources you use. However, as soon as you need to pass them around,
 you are going to hit a problem.</p>
@@ -1241,7 +1245,7 @@ still need to have to include <a href="https://crates.io/crates/luminance">lumin
 <p>Add this to your <code>Cargo.toml</code>:</p>
 <pre><code class="language-toml">luminance-front = &quot;0.3&quot;
 </code></pre>
-<h2><a class="header" href="#loading-wavefront-objects" id="loading-wavefront-objects">Loading Wavefront objects</a></h2>
+<h2 id="loading-wavefront-objects"><a class="header" href="#loading-wavefront-objects">Loading Wavefront objects</a></h2>
 <p>Loading a .obj is not really part of this book, but we’ll provide the code so that you don’t have
 to struggle too much. With <a href="https://crates.io/crates/luminance-front">luminance-front</a>, you will notice that the platform crate is still up
 to us to decide. So if we want to be able to work for any platform crates, we need to constrain
@@ -1351,12 +1355,12 @@ impl Obj {
 </span></code></pre></pre>
 <p>Basically, calling <code>Obj::load(path)</code> here will get us a <code>Result&lt;Obj, String&gt;</code>. We can then just
 convert it to a <a href="https://docs.rs/luminance/latest/luminance/tess/struct.Tess.html"><code>Tess</code></a> for <a href="https://crates.io/crates/luminance">luminance</a> to process.</p>
-<h1><a class="header" href="#the-shaders" id="the-shaders">The shaders</a></h1>
+<h1 id="the-shaders"><a class="header" href="#the-shaders">The shaders</a></h1>
 <p>Again, we need to define our shaders. But in our case, we are going to need to write <em>slightly</em>
 more complicated shaders. See, a 3D viewer requires objects to be <em>projected</em> onto one’s screen. In
 the previous chapters, we just rendered a triangle in 2D. Here we are talking 3D. Going from a three
 dimensional world to a screen (i.e. 2D) requires some operations to do.</p>
-<h2><a class="header" href="#projection-matrix" id="projection-matrix">Projection matrix</a></h2>
+<h2 id="projection-matrix"><a class="header" href="#projection-matrix">Projection matrix</a></h2>
 <p>Going from a 3D space to a 2D space always implies losing information on the fly in the process.
 This is really easy to picture by taking an easier example. Imagine someone moving around Earth.
 They have a position, including an altitude. Now imagine you want to <em>project</em> their positions onto
@@ -1374,7 +1378,7 @@ a kind of projection that preserves parallels. A <em>perspective projection</em>
 implies distorting the vertices so that the <em>field of view</em> is respected. You are typically used to
 that kind of projection when playing a video game or watching a movie, for instance. Or just taking
 a picture!</p>
-<h2><a class="header" href="#the-perspective-matrix" id="the-perspective-matrix">The perspective matrix</a></h2>
+<h2 id="the-perspective-matrix"><a class="header" href="#the-perspective-matrix">The perspective matrix</a></h2>
 <p>Any way, no more theory talk. In order to use a perspective matrix and project our loaded object,
 we will be using the <a href="https://crates.io/crates/cgmath">cgmath</a> crate. Many exist that can do the job but I really like the simplicity
 and raw speed of <a href="https://crates.io/crates/cgmath">cgmath</a>.</p>
@@ -1432,7 +1436,7 @@ visible when asking to render.</p>
 <blockquote>
 <p>Image taken from <a href="http://www.lighthouse3d.com/tutorials/view-frustum-culling">here</a>.</p>
 </blockquote>
-<h2><a class="header" href="#the-view-matrix" id="the-view-matrix">The view matrix</a></h2>
+<h2 id="the-view-matrix"><a class="header" href="#the-view-matrix">The view matrix</a></h2>
 <p>A single projection matrix <em>projects</em> 3D coordinates on 2D coordinates with a given perspective but
 the 3D coordinate system is still left unchanged. What it means is that projecting only will place
 you in a situation where you’re still at the origin (i.e. <code>(0, 0, 0)</code>) looking in the <em>forward</em>
@@ -1451,13 +1455,13 @@ the right <em>transformation matrix</em> for this.</p>
 </span></code></pre></pre>
 <p>We will then be at the 3D point <code>(2, 2, 2)</code> and will look at the origin, the <em>Y</em> unit axis being
 considered the <em>up</em> axis.</p>
-<h2><a class="header" href="#declaring-the-matrices-in-the-shader" id="declaring-the-matrices-in-the-shader">Declaring the matrices in the shader</a></h2>
+<h2 id="declaring-the-matrices-in-the-shader"><a class="header" href="#declaring-the-matrices-in-the-shader">Declaring the matrices in the shader</a></h2>
 <p>Next step is to actually use those matrices. In order to do so, we need to do two things:</p>
 <ul>
 <li>Use the matrices in the shader code.</li>
 <li>Tell <a href="https://crates.io/crates/luminance">luminance</a> about the existence of those matrices in the shaders so that we can update them.</li>
 </ul>
-<h3><a class="header" href="#glsl-matrices" id="glsl-matrices">GLSL matrices</a></h3>
+<h3 id="glsl-matrices"><a class="header" href="#glsl-matrices">GLSL matrices</a></h3>
 <p>Let’s start from the <em>vertex shader</em> we used in the previous chapter.</p>
 <pre><code class="language-glsl">// those are our vertex attributes
 in vec2 position;
@@ -1518,7 +1522,7 @@ having gone through two basis change:</p>
 <li>A <em>3D -&gt; 3D</em> linear transformation to <em>move the camera around</em>.</li>
 <li>A <em>3D -&gt; 2D</em> projection to introduce perspective.</li>
 </ul>
-<h3><a class="header" href="#the-uniform-interface" id="the-uniform-interface">The uniform interface</a></h3>
+<h3 id="the-uniform-interface"><a class="header" href="#the-uniform-interface">The uniform interface</a></h3>
 <p>In order for your application to actually update and send those matrices to the GPU, you need to
 declare them and change the way the shader <a href="https://docs.rs/luminance/latest/luminance/shader/program/struct.Program.html"><code>Program</code></a> works. A special concept must be used here:
 <a href="https://docs.rs/luminance/latest/luminance/shader/program/trait.UniformInterface.html">uniform interfaces</a>.</p>
@@ -1581,7 +1585,7 @@ we’re done.</p>
     .ignore_warnings();
 <span class="boring">}
 </span></code></pre></pre>
-<h1><a class="header" href="#altering-the-graphics-pipeline" id="altering-the-graphics-pipeline">Altering the graphics pipeline</a></h1>
+<h1 id="altering-the-graphics-pipeline"><a class="header" href="#altering-the-graphics-pipeline">Altering the graphics pipeline</a></h1>
 <p>Now that we have a shader program that can accept updating our two matrices, we need to actually
 pass the matrices down to the GPU so that it can use them when transforming points in the <em>vertex
 shader</em>. That is done via the <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.ShadingGate.html"><code>ShadingGate</code></a>. When you call the <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.ShadingGate.html#method.shade"><code>ShadingGate::shade</code></a> method,
@@ -1632,10 +1636,10 @@ to fix that, we will need several things:</p>
 compute angles to determine illumination.</li>
 <li>At least one light, to actually “see” the object.</li>
 </ul>
-<h1><a class="header" href="#adding-light" id="adding-light">Adding light</a></h1>
+<h1 id="adding-light"><a class="header" href="#adding-light">Adding light</a></h1>
 <p>Light requires <a href="https://en.wikipedia.org/wiki/Normal_(geometry)">normals</a> to be able to compute the shading on surfaces. You might be used to it now:
 if we need vertex normals, we need to change our vertex type definition.</p>
-<h2><a class="header" href="#rethinking-our-vertex-type" id="rethinking-our-vertex-type">Rethinking our vertex type</a></h2>
+<h2 id="rethinking-our-vertex-type"><a class="header" href="#rethinking-our-vertex-type">Rethinking our vertex type</a></h2>
 <p>We need normals, so let’s just state it in our vertex type and semantics!</p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
@@ -1664,7 +1668,7 @@ struct Vertex {
     |                          ^^^^^^ missing `normal`
 </code></pre>
 <p>Ah, the beauty of strong-typing. :) Let’s fix our loader!</p>
-<h2><a class="header" href="#adapting-the-loading-code" id="adapting-the-loading-code">Adapting the loading code</a></h2>
+<h2 id="adapting-the-loading-code"><a class="header" href="#adapting-the-loading-code">Adapting the loading code</a></h2>
 <p>Let’s take normals into account when loading objects:</p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
@@ -1703,7 +1707,7 @@ struct Vertex {
 <p>Basically, the obj format doesn’t force to use normals, so the normal index is optional. In our
 case, we can enforce it this way or we could have a fallback normal that would point in the same
 direction for all vertices. Up to you to decide.</p>
-<h2><a class="header" href="#debugging-normals" id="debugging-normals">Debugging normals</a></h2>
+<h2 id="debugging-normals"><a class="header" href="#debugging-normals">Debugging normals</a></h2>
 <p>Let’s make a small and fun debug session to ensure our normals are okay. Modify the vertex and
 fragment shader stages to forward the normals and display them.</p>
 <pre><code class="language-glsl">// vertex shader
@@ -1750,7 +1754,7 @@ shaders. You can try it by using <code>flat out vec3 v_normal;</code> in the ver
 </ul>
 <p>Face normals here:</p>
 <p><img src="imgs/suzanne_face_normals.png" alt="" /></p>
-<h2><a class="header" href="#actually-lighting-the-mesh" id="actually-lighting-the-mesh">Actually lighting the mesh!</a></h2>
+<h2 id="actually-lighting-the-mesh"><a class="header" href="#actually-lighting-the-mesh">Actually lighting the mesh!</a></h2>
 <p>Lighting is now a simple shader concept. Let’s implement a simple lighting effect based on
 <a href="https://en.wikipedia.org/wiki/Shading#Directional_lighting">directional lighting</a>. Basically, we can
 shade an object by computing the sine of the angles between the light rays and the object normal.

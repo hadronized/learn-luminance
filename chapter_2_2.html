@@ -26,7 +26,9 @@
         <link rel="stylesheet" href="css/variables.css">
         <link rel="stylesheet" href="css/general.css">
         <link rel="stylesheet" href="css/chrome.css">
+        
         <link rel="stylesheet" href="css/print.css" media="print">
+        
 
         <!-- Fonts -->
         <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
@@ -128,9 +130,11 @@
                     <h1 class="menu-title">Learn luminance</h1>
 
                     <div class="right-buttons">
+                        
                         <a href="print.html" title="Print this book" aria-label="Print this book">
                             <i id="print-button" class="fa fa-print"></i>
                         </a>
+                        
                         
                     </div>
                 </div>
@@ -159,7 +163,7 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#shady-triangle" id="shady-triangle">Shady triangle</a></h1>
+                        <h1 id="shady-triangle"><a class="header" href="#shady-triangle">Shady triangle</a></h1>
 <p><a href="https://crates.io/crates/luminance">luminance</a> is not a framework nor a video game engine. By default, it comes with zero data set.
 Hence, there is nothing <em>per se</em> that provides <em>materials</em> or that kind of concept. You will have
 to craft them yourself and that is what we are going to do in this section.</p>
@@ -189,13 +193,13 @@ definition again:</p>
 <span class="boring">}
 </span></code></pre></pre>
 <p>The <code>pipeline</code> argument here represents a <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.Pipeline.html"><code>Pipeline</code></a> and <code>shd_gate</code> a <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.ShadingGate.html"><code>ShadingGate</code></a>.</p>
-<h3><a class="header" href="#the-graphics-pipeline" id="the-graphics-pipeline">The graphics pipeline</a></h3>
+<h3 id="the-graphics-pipeline"><a class="header" href="#the-graphics-pipeline">The graphics pipeline</a></h3>
 <p>The <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.Pipeline.html"><code>Pipeline</code></a> object you’re given represents a <em>graphics pipeline</em>. It allows you to notify
 the GPU about scarce resources you’re about to use or perform specific tasks related to such
 resources. That is pretty advanced so we will just ignore that object and will leave it to <code>_</code>
 for now.</p>
 <p>More on <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.Pipeline.html"><code>Pipeline</code></a> in a future chapter.</p>
-<h3><a class="header" href="#the-shading-gate" id="the-shading-gate">The shading gate</a></h3>
+<h3 id="the-shading-gate"><a class="header" href="#the-shading-gate">The shading gate</a></h3>
 <p><a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.ShadingGate.html"><code>ShadingGate</code></a> represents a way to <em>shade</em> things. Shading means, like if you had a paper and color
 pens, filling in shapes with colors. <a href="https://crates.io/crates/luminance">luminance</a> works the same way. However, you have no pen and no
 default algorithm to fill your triangle. You need to instruct <a href="https://crates.io/crates/luminance">luminance</a> how to. And to do that,
@@ -227,7 +231,7 @@ so that this information is available later.</li>
 <li>A <a href="https://docs.rs/luminance/latest/luminance/shader/stage/enum.Type.html#variant.FragmentShader"><code>FragmentShader</code></a> that will read this information and output a single color for each pixel
 of the ~screen~ frame buffer.</li>
 </ul>
-<h3><a class="header" href="#the-vertex-shader" id="the-vertex-shader">The vertex shader</a></h3>
+<h3 id="the-vertex-shader"><a class="header" href="#the-vertex-shader">The vertex shader</a></h3>
 <blockquote>
 <p>If you don’t know <a href="https://www.khronos.org/opengl/wiki/Core_Language_(GLSL)">GLSL</a>, you’re going to have some hard times but we will try to explain
 everything.</p>
@@ -252,7 +256,7 @@ void main() {
   gl_Position = vec4(position, 0., 1.);
 }
 </code></pre>
-<h3><a class="header" href="#the-fragment-shader" id="the-fragment-shader">The fragment shader</a></h3>
+<h3 id="the-fragment-shader"><a class="header" href="#the-fragment-shader">The fragment shader</a></h3>
 <p>A fragment shader runs for every <em>rasterized</em> fragments from the render of your <a href="https://docs.rs/luminance/latest/luminance/tess/struct.Tess.html"><code>Tess</code></a>. Basically,
 your GPU transforms the geometry, projects it, performs several complex operations we end up with
 rasterized data. Rasterized data means to discretize all the vertex attributes. The discretization
@@ -267,11 +271,11 @@ that on a screen, store in an image, etc.</p>
 in vec3 v_color;
 
 // we will output a single color
-out vec3 frag_color;
+out vec4 frag_color;
 
 void main() {
   // KISS
-  frag_color = v_color;
+  frag_color = vec4(v_color, 1.0);
 }
 </code></pre>
 <p>In your <code>src/main.rs</code>, add the following lines:</p>
@@ -283,7 +287,7 @@ const FS_STR: &amp;str = include_str!(&quot;fs.glsl&quot;);
 <span class="boring">}
 </span></code></pre></pre>
 <p>And we’re good to go. Let’s create a <a href="https://docs.rs/luminance/latest/luminance/shader/program/struct.Program.html"><code>Program</code></a>. We’ll first need to import the type.</p>
-<h3><a class="header" href="#the-shader-program" id="the-shader-program">The shader program</a></h3>
+<h3 id="the-shader-program"><a class="header" href="#the-shader-program">The shader program</a></h3>
 <p>A <em>shader program</em> is a collection of <em>shader stages</em>, connecting them to each other. It’s like
 building an actual program by gluing functions to each other. <a href="https://crates.io/crates/luminance">luminance</a> has a very opinionated
 idea of what a GPU shader program is and should be. That opinion will be explained in a future
@@ -316,7 +320,7 @@ are only warnings that wouldn’t cause your program to behave in a weird way.</
 <p>On a general note, <a href="https://crates.io/crates/luminance">luminance</a> is heavily type-driven. Familiarize yourself with how you can
 drive behavior with types (the <a href="https://doc.rust-lang.org/1.30.0/book/first-edition/generics.html">turbofish syntax</a>, for instance, will be useful).</p>
 </blockquote>
-<h3><a class="header" href="#the-shading-node" id="the-shading-node">The shading node</a></h3>
+<h3 id="the-shading-node"><a class="header" href="#the-shading-node">The shading node</a></h3>
 <p>The next step is to create a new <em>shading node</em> in your graphics pipeline. This is done via the
 <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.ShadingGate.html"><code>ShadingGate</code></a>.</p>
 <pre><pre class="playground"><code class="language-rust">

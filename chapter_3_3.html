@@ -26,7 +26,9 @@
         <link rel="stylesheet" href="css/variables.css">
         <link rel="stylesheet" href="css/general.css">
         <link rel="stylesheet" href="css/chrome.css">
+        
         <link rel="stylesheet" href="css/print.css" media="print">
+        
 
         <!-- Fonts -->
         <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
@@ -128,9 +130,11 @@
                     <h1 class="menu-title">Learn luminance</h1>
 
                     <div class="right-buttons">
+                        
                         <a href="print.html" title="Print this book" aria-label="Print this book">
                             <i id="print-button" class="fa fa-print"></i>
                         </a>
+                        
                         
                     </div>
                 </div>
@@ -159,7 +163,7 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#loading-an-obj-object" id="loading-an-obj-object">Loading an .obj object</a></h1>
+                        <h1 id="loading-an-obj-object"><a class="header" href="#loading-an-obj-object">Loading an .obj object</a></h1>
 <p>This is not really the purpose of this book but you actually need the following code in order to get the rest.
 So here it is. Refer to the <a href="https://crates.io/crates/wavefront_obj">wavefront_obj</a> crate for further details. The idea here is that we define our
 own <code>Obj</code> type with our own representation of what an object is. We then use <a href="https://crates.io/crates/wavefront_obj">wavefront_obj</a> to
@@ -168,7 +172,7 @@ load one object and convert it to our representation. Simple.</p>
 <p>Note: we also use the <a href="https://crates.io/crates/try-guard">try-guard</a> crate to convert boolean expressions to <em>try</em> values.</p>
 </blockquote>
 <p>However, before going any further, we are going to need to introduce a new crate: <a href="https://crates.io/crates/luminance-front">luminance-front</a>.</p>
-<h2><a class="header" href="#luminance-front" id="luminance-front">luminance-front</a></h2>
+<h2 id="luminance-front"><a class="header" href="#luminance-front">luminance-front</a></h2>
 <p>The examples you saw so far are simple enough they don’t require you to explicitly put type
 ascriptions about the scarce resources you use. However, as soon as you need to pass them around,
 you are going to hit a problem.</p>
@@ -209,7 +213,7 @@ still need to have to include <a href="https://crates.io/crates/luminance">lumin
 <p>Add this to your <code>Cargo.toml</code>:</p>
 <pre><code class="language-toml">luminance-front = &quot;0.3&quot;
 </code></pre>
-<h2><a class="header" href="#loading-wavefront-objects" id="loading-wavefront-objects">Loading Wavefront objects</a></h2>
+<h2 id="loading-wavefront-objects"><a class="header" href="#loading-wavefront-objects">Loading Wavefront objects</a></h2>
 <p>Loading a .obj is not really part of this book, but we’ll provide the code so that you don’t have
 to struggle too much. With <a href="https://crates.io/crates/luminance-front">luminance-front</a>, you will notice that the platform crate is still up
 to us to decide. So if we want to be able to work for any platform crates, we need to constrain

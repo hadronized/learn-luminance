@@ -26,7 +26,9 @@
         <link rel="stylesheet" href="css/variables.css">
         <link rel="stylesheet" href="css/general.css">
         <link rel="stylesheet" href="css/chrome.css">
+        
         <link rel="stylesheet" href="css/print.css" media="print">
+        
 
         <!-- Fonts -->
         <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
@@ -128,9 +130,11 @@
                     <h1 class="menu-title">Learn luminance</h1>
 
                     <div class="right-buttons">
+                        
                         <a href="print.html" title="Print this book" aria-label="Print this book">
                             <i id="print-button" class="fa fa-print"></i>
                         </a>
+                        
                         
                     </div>
                 </div>
@@ -159,7 +163,7 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#what-is-a-triangle" id="what-is-a-triangle">What is a triangle?</a></h1>
+                        <h1 id="what-is-a-triangle"><a class="header" href="#what-is-a-triangle">What is a triangle?</a></h1>
 <p>Everyone knows what a triangle is… but what is a triangle on your GPU? In <a href="https://crates.io/crates/luminance">luminance</a>, a triangle
 can be <em>represented</em> in lots of ways. In our case:</p>
 <ul>
@@ -180,7 +184,7 @@ type Vertex = (Position, RGB);
 <span class="boring">}
 </span></code></pre></pre>
 <p>But the real vertex definition is very, very similar. Hang on.</p>
-<h2><a class="header" href="#defining-your-vertex-type" id="defining-your-vertex-type">Defining your vertex type</a></h2>
+<h2 id="defining-your-vertex-type"><a class="header" href="#defining-your-vertex-type">Defining your vertex type</a></h2>
 <p>In order to define our vertex type, we need to create a <code>struct</code> that will implement the <a href="https://docs.rs/luminance/latest/luminance/vertex/trait.Vertex.html"><code>Vertex</code></a>
 trait. That trait requires various information to be provided by the implementor. You don’t have
 to worry about those, because a crate exists to automatically implement such a trait:
@@ -289,7 +293,7 @@ normalized floating point numbers (lying in <code>[0.; 1.]</code>) instead of th
 <p>Some notes: the generated wrapper types have some useful methods and implementors. You can easily
 get a list by running <code>cargo doc --open</code>.</p>
 </blockquote>
-<h2><a class="header" href="#defining-a-triangle" id="defining-a-triangle">Defining a triangle</a></h2>
+<h2 id="defining-a-triangle"><a class="header" href="#defining-a-triangle">Defining a triangle</a></h2>
 <p>A triangle is just three points — three vertices. Let’s define them.</p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
@@ -311,7 +315,7 @@ get a list by running <code>cargo doc --open</code>.</p>
 <span class="boring">}
 </span></code></pre></pre>
 <p>It’s that simple.</p>
-<h2><a class="header" href="#the-final-part-of-the-recipe-gpu-tessellations" id="the-final-part-of-the-recipe-gpu-tessellations">The final part of the recipe: GPU tessellations</a></h2>
+<h2 id="the-final-part-of-the-recipe-gpu-tessellations"><a class="header" href="#the-final-part-of-the-recipe-gpu-tessellations">The final part of the recipe: GPU tessellations</a></h2>
 <blockquote>
 <p>Tessellations?</p>
 </blockquote>

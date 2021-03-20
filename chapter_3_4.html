@@ -26,7 +26,9 @@
         <link rel="stylesheet" href="css/variables.css">
         <link rel="stylesheet" href="css/general.css">
         <link rel="stylesheet" href="css/chrome.css">
+        
         <link rel="stylesheet" href="css/print.css" media="print">
+        
 
         <!-- Fonts -->
         <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
@@ -128,9 +130,11 @@
                     <h1 class="menu-title">Learn luminance</h1>
 
                     <div class="right-buttons">
+                        
                         <a href="print.html" title="Print this book" aria-label="Print this book">
                             <i id="print-button" class="fa fa-print"></i>
                         </a>
+                        
                         
                     </div>
                 </div>
@@ -159,12 +163,12 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#the-shaders" id="the-shaders">The shaders</a></h1>
+                        <h1 id="the-shaders"><a class="header" href="#the-shaders">The shaders</a></h1>
 <p>Again, we need to define our shaders. But in our case, we are going to need to write <em>slightly</em>
 more complicated shaders. See, a 3D viewer requires objects to be <em>projected</em> onto one’s screen. In
 the previous chapters, we just rendered a triangle in 2D. Here we are talking 3D. Going from a three
 dimensional world to a screen (i.e. 2D) requires some operations to do.</p>
-<h2><a class="header" href="#projection-matrix" id="projection-matrix">Projection matrix</a></h2>
+<h2 id="projection-matrix"><a class="header" href="#projection-matrix">Projection matrix</a></h2>
 <p>Going from a 3D space to a 2D space always implies losing information on the fly in the process.
 This is really easy to picture by taking an easier example. Imagine someone moving around Earth.
 They have a position, including an altitude. Now imagine you want to <em>project</em> their positions onto
@@ -182,7 +186,7 @@ a kind of projection that preserves parallels. A <em>perspective projection</em>
 implies distorting the vertices so that the <em>field of view</em> is respected. You are typically used to
 that kind of projection when playing a video game or watching a movie, for instance. Or just taking
 a picture!</p>
-<h2><a class="header" href="#the-perspective-matrix" id="the-perspective-matrix">The perspective matrix</a></h2>
+<h2 id="the-perspective-matrix"><a class="header" href="#the-perspective-matrix">The perspective matrix</a></h2>
 <p>Any way, no more theory talk. In order to use a perspective matrix and project our loaded object,
 we will be using the <a href="https://crates.io/crates/cgmath">cgmath</a> crate. Many exist that can do the job but I really like the simplicity
 and raw speed of <a href="https://crates.io/crates/cgmath">cgmath</a>.</p>
@@ -240,7 +244,7 @@ visible when asking to render.</p>
 <blockquote>
 <p>Image taken from <a href="http://www.lighthouse3d.com/tutorials/view-frustum-culling">here</a>.</p>
 </blockquote>
-<h2><a class="header" href="#the-view-matrix" id="the-view-matrix">The view matrix</a></h2>
+<h2 id="the-view-matrix"><a class="header" href="#the-view-matrix">The view matrix</a></h2>
 <p>A single projection matrix <em>projects</em> 3D coordinates on 2D coordinates with a given perspective but
 the 3D coordinate system is still left unchanged. What it means is that projecting only will place
 you in a situation where you’re still at the origin (i.e. <code>(0, 0, 0)</code>) looking in the <em>forward</em>
@@ -259,13 +263,13 @@ the right <em>transformation matrix</em> for this.</p>
 </span></code></pre></pre>
 <p>We will then be at the 3D point <code>(2, 2, 2)</code> and will look at the origin, the <em>Y</em> unit axis being
 considered the <em>up</em> axis.</p>
-<h2><a class="header" href="#declaring-the-matrices-in-the-shader" id="declaring-the-matrices-in-the-shader">Declaring the matrices in the shader</a></h2>
+<h2 id="declaring-the-matrices-in-the-shader"><a class="header" href="#declaring-the-matrices-in-the-shader">Declaring the matrices in the shader</a></h2>
 <p>Next step is to actually use those matrices. In order to do so, we need to do two things:</p>
 <ul>
 <li>Use the matrices in the shader code.</li>
 <li>Tell <a href="https://crates.io/crates/luminance">luminance</a> about the existence of those matrices in the shaders so that we can update them.</li>
 </ul>
-<h3><a class="header" href="#glsl-matrices" id="glsl-matrices">GLSL matrices</a></h3>
+<h3 id="glsl-matrices"><a class="header" href="#glsl-matrices">GLSL matrices</a></h3>
 <p>Let’s start from the <em>vertex shader</em> we used in the previous chapter.</p>
 <pre><code class="language-glsl">// those are our vertex attributes
 in vec2 position;
@@ -326,7 +330,7 @@ having gone through two basis change:</p>
 <li>A <em>3D -&gt; 3D</em> linear transformation to <em>move the camera around</em>.</li>
 <li>A <em>3D -&gt; 2D</em> projection to introduce perspective.</li>
 </ul>
-<h3><a class="header" href="#the-uniform-interface" id="the-uniform-interface">The uniform interface</a></h3>
+<h3 id="the-uniform-interface"><a class="header" href="#the-uniform-interface">The uniform interface</a></h3>
 <p>In order for your application to actually update and send those matrices to the GPU, you need to
 declare them and change the way the shader <a href="https://docs.rs/luminance/latest/luminance/shader/program/struct.Program.html"><code>Program</code></a> works. A special concept must be used here:
 <a href="https://docs.rs/luminance/latest/luminance/shader/program/trait.UniformInterface.html">uniform interfaces</a>.</p>
