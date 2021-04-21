@@ -63,9 +63,9 @@ Loading a .obj is not really part of this book, but we’ll provide the code so 
 to struggle too much. With [luminance-front], you will notice that the platform crate is still up
 to us to decide. So if we want to be able to work for any platform crates, we need to constrain
 the platform with the backend type [luminance-front] would have selected for us. We can do that
-with `luminance_front::Backend`. If `C` is the type of the platform (in our case it’s `GlfwSurface`
-but it’s a good practice to be able to adapt to any), then the following is required to perform
-[luminance] operations:
+with `luminance_front::Backend`. If `C` is the type of the platform (in our case it’s the one from
+`GlfwSurface` but it’s a good practice to be able to adapt to any), then the following is required
+to perform [luminance] operations:
 
 ```rust
 where C: GraphicsContext<Backend = Backend>
@@ -92,14 +92,11 @@ struct Obj {
 }
 
 impl Obj {
-  fn to_tess<C>(
-    self,
-    surface: &mut C,
-  ) -> Result<Tess<Vertex, VertexIndex, (), Interleaved>, TessError>
+  fn to_tess<C>(self, ctxt: &mut C) -> Result<Tess<Vertex, VertexIndex, (), Interleaved>, TessError>
   where
     C: GraphicsContext<Backend = Backend>,
   {
-    surface
+    ctxt
       .new_tess()
       .set_mode(Mode::Triangle)
       .set_vertices(self.vertices)

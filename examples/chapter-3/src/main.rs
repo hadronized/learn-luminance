@@ -57,14 +57,11 @@ struct Obj {
 }
 
 impl Obj {
-  fn to_tess<C>(
-    self,
-    surface: &mut C,
-  ) -> Result<Tess<Vertex, VertexIndex, (), Interleaved>, TessError>
+  fn to_tess<C>(self, ctxt: &mut C) -> Result<Tess<Vertex, VertexIndex, (), Interleaved>, TessError>
   where
     C: GraphicsContext<Backend = Backend>,
   {
-    surface
+    ctxt
       .new_tess()
       .set_mode(Mode::Triangle)
       .set_vertices(self.vertices)
@@ -150,24 +147,26 @@ fn main() {
   }
 }
 
-fn main_loop(mut surface: GlfwSurface) {
+fn main_loop(surface: GlfwSurface) {
   let path = env::args()
     .skip(1)
     .next()
     .expect("first argument must be the path of the .obj file to view");
   println!("loading {}", path);
 
-  let mesh = Obj::load(path).unwrap().to_tess(&mut surface).unwrap();
-
+  let mut ctxt = surface.context;
+  let events = surface.events_rx;
+  let back_buffer = ctxt.back_buffer().expect("back buffer");
   let start_t = Instant::now();
 
-  let mut program = surface
+  let mesh = Obj::load(path).unwrap().to_tess(&mut ctxt).unwrap();
+
+  let mut program = ctxt
     .new_shader_program::<VertexSemantics, (), ShaderInterface>()
     .from_strings(VS_STR, None, None, FS_STR)
     .unwrap()
     .ignore_warnings();
 
-  let back_buffer = surface.back_buffer().unwrap();
   let [width, height] = back_buffer.size();
   let projection = perspective(FOVY, width as f32 / height as f32, Z_NEAR, Z_FAR);
 
@@ -175,8 +174,8 @@ fn main_loop(mut surface: GlfwSurface) {
 
   'app: loop {
     // handle events
-    surface.window.glfw.poll_events();
-    for (_, event) in surface.events_rx.try_iter() {
+    ctxt.window.glfw.poll_events();
+    for (_, event) in glfw::flush_messages(&events) {
       match event {
         WindowEvent::Close | WindowEvent::Key(Key::Escape, _, Action::Release, _) => break 'app,
         _ => (),
@@ -188,8 +187,7 @@ fn main_loop(mut surface: GlfwSurface) {
     let t = start_t.elapsed().as_millis() as f32 * 1e-3;
     let color = [t.cos(), t.sin(), 0.5, 1.];
 
-    let back_buffer = surface.back_buffer().unwrap();
-    let render = surface
+    let render = ctxt
       .new_pipeline_gate()
       .pipeline(
         &back_buffer,
@@ -209,7 +207,7 @@ fn main_loop(mut surface: GlfwSurface) {
 
     // swap buffer chains
     if render.is_ok() {
-      surface.window.swap_buffers();
+      ctxt.window.swap_buffers();
     } else {
       break 'app;
     }

@@ -9,7 +9,7 @@ arguments. It’s time to explain you what those arguments are for. Let’s take
 definition again:
 
 ```rust
-surface.new_pipeline_gate().pipeline(
+ctxt.new_pipeline_gate().pipeline(
   &back_buffer,
   &PipelineState::default().set_clear_color(color),
   |_, _| Ok(()),
@@ -19,7 +19,7 @@ surface.new_pipeline_gate().pipeline(
 And rewrite it by using the arguments:
 
 ```rust
-surface.new_pipeline_gate().pipeline(
+ctxt.new_pipeline_gate().pipeline(
   &back_buffer,
   &PipelineState::default().set_clear_color(color),
   |pipeline, mut shd_gate| Ok(()),
@@ -153,7 +153,7 @@ use luminance::shader::Program;
 Then, right before your loop:
 
 ```rust
-  let mut program = surface
+  let mut program = ctxt
     .new_shader_program::<VertexSemantics, (), ()>()
     .from_strings(VS_STR, None, None, FS_STR)
     .unwrap()
@@ -177,7 +177,7 @@ The next step is to create a new _shading node_ in your graphics pipeline. This 
 [`ShadingGate`].
 
 ```rust
-    let render = surface
+    let render = ctxt
       .new_pipeline_gate()
       .pipeline(
         &back_buffer,

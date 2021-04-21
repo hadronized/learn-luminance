@@ -15,7 +15,7 @@ pixel storage for renders!
 > So… is the _back_ buffer you told us earlier some kind of [`Framebuffer`]?
 
 It’s not _some_ kind: it **is** a [`Framebuffer`]. And guess what: you can access it via the
-`surface.back_buffer()` method.
+`ctxt.back_buffer()` method.
 
 So, let’s make our first cool render and make a color-varying background! First, you will need to
 import one symbol from [luminance]: [`GraphicsContext`], which is a trait that allows you to run
@@ -35,7 +35,9 @@ Now, let’s get our _back_ buffer.
 ```rust
 fn main_loop(mut surface: GlfwSurface) {
   let start_t = Instant::now();
-  let back_buffer = surface.back_buffer().unwrap();
+  let mut ctxt = surface.context;
+  let events = surface.events_rx;
+  let back_buffer = ctxt.back_buffer().expect("back buffer");
 
   'app: loop {
     // …
@@ -49,22 +51,24 @@ As you can see, getting the _back_ buffer is piece of cake. Now let’s handle t
     let t = start_t.elapsed().as_millis() as f32 * 1e-3;
     let color = [t.cos(), t.sin(), 0.5, 1.];
 
-    let render = surface.new_pipeline_gate().pipeline(
-      &back_buffer,
-      &PipelineState::default().set_clear_color(color),
-      |_, _| Ok(()),
-    )
-    .assume();
+    let render = ctxt
+      .new_pipeline_gate()
+      .pipeline(
+        &back_buffer,
+        &PipelineState::default().set_clear_color(color),
+        |_, _| Ok(()),
+      )
+      .assume();
 
     // swap buffer chains
     if render.is_ok() {
-      surface.window.swap_buffers();
+      ctxt.window.swap_buffers();
     } else {
       break 'app;
     }
 ```
 
-That’s already a lot of code to discuss. `surface.new_pipeline_gate()` gets a lightweight object
+That’s already a lot of code to discuss. `ctxt.new_pipeline_gate()` gets a lightweight object
 that you can use to create _graphics pipelines_ — its type is [`PipelineGate`]. You can get that type
 once and for all and keep it around if you want to but in our case, since we’re only going to create
 a single pipeline, we’ll just chain everything.
@@ -130,14 +134,16 @@ fn main() {
   }
 }
 
-fn main_loop(mut surface: GlfwSurface) {
+fn main_loop(surface: GlfwSurface) {
   let start_t = Instant::now();
-  let back_buffer = surface.back_buffer().unwrap();
+  let mut ctxt = surface.context;
+  let events = surface.events_rx;
+  let back_buffer = ctxt.back_buffer().expect("back buffer");
 
   'app: loop {
     // handle events
-    surface.window.glfw.poll_events();
-    for (_, event) in surface.events_rx.try_iter() {
+    ctxt.window.glfw.poll_events();
+    for (_, event) in glfw::flush_messages(&events) {
       match event {
         WindowEvent::Close | WindowEvent::Key(Key::Escape, _, Action::Release, _) => break 'app,
         _ => (),
@@ -149,16 +155,18 @@ fn main_loop(mut surface: GlfwSurface) {
     let t = start_t.elapsed().as_millis() as f32 * 1e-3;
     let color = [t.cos(), t.sin(), 0.5, 1.];
 
-    let render = surface.new_pipeline_gate().pipeline(
-      &back_buffer,
-      &PipelineState::default().set_clear_color(color),
-      |_, _| Ok(()),
-    )
-    .assume();
+    let render = ctxt
+      .new_pipeline_gate()
+      .pipeline(
+        &back_buffer,
+        &PipelineState::default().set_clear_color(color),
+        |_, _| Ok(()),
+      )
+      .assume();
 
     // swap buffer chains
     if render.is_ok() {
-      surface.window.swap_buffers();
+      ctxt.window.swap_buffers();
     } else {
       break 'app;
     }

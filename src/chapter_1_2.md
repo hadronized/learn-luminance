@@ -53,10 +53,14 @@ fn main() {
 }
 
 fn main_loop(mut surface: GlfwSurface) {
+  let mut ctxt = surface.context;
+  let events = surface.events_rx;
+  let back_buffer = ctxt.back_buffer().expect("back buffer");
+
   'app: loop {
     // handle events
-    surface.window.glfw.poll_events();
-    for (_, event) in surface.events_rx.try_iter() {
+    ctxt.window.glfw.poll_events();
+    for (_, event) in glfw::flush_messages(&events) {
       match event {
         WindowEvent::Close | WindowEvent::Key(Key::Escape, _, Action::Release, _) => break 'app,
         _ => ()
@@ -67,16 +71,16 @@ fn main_loop(mut surface: GlfwSurface) {
     // …
 
     // swap buffer chains
-    surface.window.swap_buffers();
+    ctxt.window.swap_buffers();
   }
 }
 ```
 
-`surface.window.glfw.poll_events()` allows you to have a look whether you need to dequeue events.
+`ctxt.window.glfw.poll_events()` allows you to have a look whether you need to dequeue events.
 If no event is present in the event queue, that function exits immediately instead of blocking for
 an event. That allows you to keep maintaining a constant frame rate.
 
-`surface.window.swap_buffers()` takes the graphics _back_ buffer linked to your application and
+`ctxt.window.swap_buffers()` takes the graphics _back_ buffer linked to your application and
 swaps it with the _front_ buffer, which is the one exposed on your screen. That technique is
 commonly referred to as [double buffering]. With [luminance], all the renders must eventually end
 up in the _back_ buffer so that they get swapped at the end of the main loop. It’s important to

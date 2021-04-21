@@ -13,7 +13,7 @@ Because we do not care about the actual format definition nor implementing a par
 [wavefront_obj] crate for that purpose:
 
 ```toml
-wavefront_obj = "7"
+wavefront_obj = "10"
 ```
 
 That format is basically divided into several parts (non-exhaustive):

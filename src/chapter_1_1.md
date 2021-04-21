@@ -21,10 +21,10 @@ change the `[dependencies]` section according to the following:
 
 ```toml
 [dependencies]
-luminance = "0.42"
-luminance-glfw = "0.14"
+glfw = "0.41"
+luminance = "0.43"
+luminance-glfw = "0.15"
 luminance-windowing = "0.9"
-glfw = "0.39"
 ```
 
 Some explanations here:
