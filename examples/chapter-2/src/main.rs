@@ -63,17 +63,20 @@ fn main() {
   }
 }
 
-fn main_loop(mut surface: GlfwSurface) {
+fn main_loop(surface: GlfwSurface) {
+  let mut ctxt = surface.context;
+  let events = surface.events_rx;
+  let back_buffer = ctxt.back_buffer().expect("back buffer");
   let start_t = Instant::now();
 
-  let triangle = surface
+  let triangle = ctxt
     .new_tess()
     .set_vertices(&VERTICES[..])
     .set_mode(Mode::Triangle)
     .build()
     .unwrap();
 
-  let mut program = surface
+  let mut program = ctxt
     .new_shader_program::<VertexSemantics, (), ()>()
     .from_strings(VS_STR, None, None, FS_STR)
     .unwrap()
@@ -81,8 +84,8 @@ fn main_loop(mut surface: GlfwSurface) {
 
   'app: loop {
     // handle events
-    surface.window.glfw.poll_events();
-    for (_, event) in surface.events_rx.try_iter() {
+    ctxt.window.glfw.poll_events();
+    for (_, event) in glfw::flush_messages(&events) {
       match event {
         WindowEvent::Close | WindowEvent::Key(Key::Escape, _, Action::Release, _) => break 'app,
 
@@ -90,14 +93,12 @@ fn main_loop(mut surface: GlfwSurface) {
       }
     }
 
-    let back_buffer = surface.back_buffer().unwrap();
-
     // rendering code goes here
     // get the current time and create a color based on the time
     let t = start_t.elapsed().as_millis() as f32 * 1e-3;
     let color = [t.cos(), t.sin(), 0.5, 1.];
 
-    let render = surface
+    let render = ctxt
       .new_pipeline_gate()
       .pipeline(
         &back_buffer,
@@ -114,7 +115,7 @@ fn main_loop(mut surface: GlfwSurface) {
 
     // swap buffer chains
     if render.is_ok() {
-      surface.window.swap_buffers();
+      ctxt.window.swap_buffers();
     } else {
       break 'app;
     }

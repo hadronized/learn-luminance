@@ -180,7 +180,7 @@ its documentation if you’re interested, though.</p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>    let render = surface
+</span>    let render = ctxt
       .new_pipeline_gate()
       .pipeline(
         &amp;back_buffer,
@@ -203,7 +203,7 @@ its documentation if you’re interested, though.</p>
 <blockquote>
 <p><em>Why the <code>.into()</code> call</em>?</p>
 </blockquote>
-<p>Because of <a href="https://crates.io/crates/cgmath">cgmath</a>’s type that must be converted to [<code>M44</code>].</p>
+<p>Because of <a href="https://crates.io/crates/cgmath">cgmath</a>’s type that must be converted to the right array type of our 4×4 matrix.</p>
 <p>If you compile and run with the following
 <a href="https://phaazon.net/media/uploads/suzanne.obj">suzanne.obj</a> file, you should see this:</p>
 <p><img src="imgs/suzanne_flat.png" alt="" /></p>

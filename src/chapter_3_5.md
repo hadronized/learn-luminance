@@ -15,7 +15,7 @@ other operations on the [`Program`]’s _uniforms_ but it’s currently off topi
 its documentation if you’re interested, though.
 
 ```rust
-    let render = surface
+    let render = ctxt
       .new_pipeline_gate()
       .pipeline(
         &back_buffer,
@@ -38,7 +38,7 @@ It’s as simple as that.
 
 > _Why the `.into()` call_?
 
-Because of [cgmath]’s type that must be converted to [`M44`].
+Because of [cgmath]’s type that must be converted to the right array type of our 4×4 matrix.
 
 If you compile and run with the following
 [suzanne.obj](https://phaazon.net/media/uploads/suzanne.obj) file, you should see this:

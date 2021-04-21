@@ -247,10 +247,10 @@ it with luminance, or just to have a rough idea of what’s supported.</li>
 </ul>
 <h1 id="crate-setup"><a class="header" href="#crate-setup">Crate setup</a></h1>
 <p>First thing first: this book is written against this following luminance crate setup:</p>
-<pre><code class="language-toml">luminance = &quot;0.42&quot;
+<pre><code class="language-toml">luminance = &quot;0.43&quot;
 luminance-derive = &quot;0.6&quot;
 luminance-front = &quot;0.3&quot;
-luminance-glfw = &quot;0.14&quot;
+luminance-glfw = &quot;0.15&quot;
 luminance-windowing = &quot;0.9&quot;
 </code></pre>
 <p>If you are using a version from crates.io that is more recent that this current book, feel free to
@@ -293,10 +293,10 @@ cargo new --bin luminance-first-steps
 <p>Then we need to add <a href="https://crates.io/crates/luminance">luminance</a> as a dependency to our project. Edit your <code>Cargo.toml</code> file and
 change the <code>[dependencies]</code> section according to the following:</p>
 <pre><code class="language-toml">[dependencies]
-luminance = &quot;0.42&quot;
-luminance-glfw = &quot;0.14&quot;
+glfw = &quot;0.41&quot;
+luminance = &quot;0.43&quot;
+luminance-glfw = &quot;0.15&quot;
 luminance-windowing = &quot;0.9&quot;
-glfw = &quot;0.39&quot;
 </code></pre>
 <p>Some explanations here:</p>
 <ul>
@@ -371,10 +371,14 @@ fn main() {
 }
 
 fn main_loop(mut surface: GlfwSurface) {
+  let mut ctxt = surface.context;
+  let events = surface.events_rx;
+  let back_buffer = ctxt.back_buffer().expect(&quot;back buffer&quot;);
+
   'app: loop {
     // handle events
-    surface.window.glfw.poll_events();
-    for (_, event) in surface.events_rx.try_iter() {
+    ctxt.window.glfw.poll_events();
+    for (_, event) in glfw::flush_messages(&amp;events) {
       match event {
         WindowEvent::Close | WindowEvent::Key(Key::Escape, _, Action::Release, _) =&gt; break 'app,
         _ =&gt; ()
@@ -385,14 +389,14 @@ fn main_loop(mut surface: GlfwSurface) {
     // …
 
     // swap buffer chains
-    surface.window.swap_buffers();
+    ctxt.window.swap_buffers();
   }
 }
 </code></pre></pre>
-<p><code>surface.window.glfw.poll_events()</code> allows you to have a look whether you need to dequeue events.
+<p><code>ctxt.window.glfw.poll_events()</code> allows you to have a look whether you need to dequeue events.
 If no event is present in the event queue, that function exits immediately instead of blocking for
 an event. That allows you to keep maintaining a constant frame rate.</p>
-<p><code>surface.window.swap_buffers()</code> takes the graphics <em>back</em> buffer linked to your application and
+<p><code>ctxt.window.swap_buffers()</code> takes the graphics <em>back</em> buffer linked to your application and
 swaps it with the <em>front</em> buffer, which is the one exposed on your screen. That technique is
 commonly referred to as <a href="https://en.wikipedia.org/wiki/Multiple_buffering">double buffering</a>. With <a href="https://crates.io/crates/luminance">luminance</a>, all the renders must eventually end
 up in the <em>back</em> buffer so that they get swapped at the end of the main loop. It’s important to
@@ -412,7 +416,7 @@ pixel storage for renders!</p>
 <p>So… is the <em>back</em> buffer you told us earlier some kind of <a href="https://docs.rs/luminance/latest/luminance/framebuffer/struct.Framebuffer.html"><code>Framebuffer</code></a>?</p>
 </blockquote>
 <p>It’s not <em>some</em> kind: it <strong>is</strong> a <a href="https://docs.rs/luminance/latest/luminance/framebuffer/struct.Framebuffer.html"><code>Framebuffer</code></a>. And guess what: you can access it via the
-<code>surface.back_buffer()</code> method.</p>
+<code>ctxt.back_buffer()</code> method.</p>
 <p>So, let’s make our first cool render and make a color-varying background! First, you will need to
 import one symbol from <a href="https://crates.io/crates/luminance">luminance</a>: <a href="https://docs.rs/luminance/latest/luminance/context/trait.GraphicsContext.html"><code>GraphicsContext</code></a>, which is a trait that allows you to run
 <a href="https://crates.io/crates/luminance">luminance</a> code and talk to the GPU. We will also use <a href="https://doc.rust-lang.org/std/time/struct.Instant.html"><code>Instant</code></a>, from the standard library, to
@@ -431,7 +435,9 @@ implementors.</p>
 <p>Now, let’s get our <em>back</em> buffer.</p>
 <pre><pre class="playground"><code class="language-rust">fn main_loop(mut surface: GlfwSurface) {
   let start_t = Instant::now();
-  let back_buffer = surface.back_buffer().unwrap();
+  let mut ctxt = surface.context;
+  let events = surface.events_rx;
+  let back_buffer = ctxt.back_buffer().expect(&quot;back buffer&quot;);
 
   'app: loop {
     // …
@@ -445,22 +451,24 @@ implementors.</p>
     let t = start_t.elapsed().as_millis() as f32 * 1e-3;
     let color = [t.cos(), t.sin(), 0.5, 1.];
 
-    let render = surface.new_pipeline_gate().pipeline(
-      &amp;back_buffer,
-      &amp;PipelineState::default().set_clear_color(color),
-      |_, _| Ok(()),
-    )
-    .assume();
+    let render = ctxt
+      .new_pipeline_gate()
+      .pipeline(
+        &amp;back_buffer,
+        &amp;PipelineState::default().set_clear_color(color),
+        |_, _| Ok(()),
+      )
+      .assume();
 
     // swap buffer chains
     if render.is_ok() {
-      surface.window.swap_buffers();
+      ctxt.window.swap_buffers();
     } else {
       break 'app;
     }
 <span class="boring">}
 </span></code></pre></pre>
-<p>That’s already a lot of code to discuss. <code>surface.new_pipeline_gate()</code> gets a lightweight object
+<p>That’s already a lot of code to discuss. <code>ctxt.new_pipeline_gate()</code> gets a lightweight object
 that you can use to create <em>graphics pipelines</em> — its type is <a href="https://docs.rs/luminance/latest/luminance/pipeline/struct.PipelineGate.html"><code>PipelineGate</code></a>. You can get that type
 once and for all and keep it around if you want to but in our case, since we’re only going to create
 a single pipeline, we’ll just chain everything.</p>
@@ -516,14 +524,16 @@ fn main() {
   }
 }
 
-fn main_loop(mut surface: GlfwSurface) {
+fn main_loop(surface: GlfwSurface) {
   let start_t = Instant::now();
-  let back_buffer = surface.back_buffer().unwrap();
+  let mut ctxt = surface.context;
+  let events = surface.events_rx;
+  let back_buffer = ctxt.back_buffer().expect(&quot;back buffer&quot;);
 
   'app: loop {
     // handle events
-    surface.window.glfw.poll_events();
-    for (_, event) in surface.events_rx.try_iter() {
+    ctxt.window.glfw.poll_events();
+    for (_, event) in glfw::flush_messages(&amp;events) {
       match event {
         WindowEvent::Close | WindowEvent::Key(Key::Escape, _, Action::Release, _) =&gt; break 'app,
         _ =&gt; (),
@@ -535,16 +545,18 @@ fn main_loop(mut surface: GlfwSurface) {
     let t = start_t.elapsed().as_millis() as f32 * 1e-3;
     let color = [t.cos(), t.sin(), 0.5, 1.];
 
-    let render = surface.new_pipeline_gate().pipeline(
-      &amp;back_buffer,
-      &amp;PipelineState::default().set_clear_color(color),
-      |_, _| Ok(()),
-    )
-    .assume();
+    let render = ctxt
+      .new_pipeline_gate()
+      .pipeline(
+        &amp;back_buffer,
+        &amp;PipelineState::default().set_clear_color(color),
+        |_, _| Ok(()),
+      )
+      .assume();
 
     // swap buffer chains
     if render.is_ok() {
-      surface.window.swap_buffers();
+      ctxt.window.swap_buffers();
     } else {
       break 'app;
     }
@@ -741,7 +753,7 @@ manipulate and render our triangle. However, one does not simply create a <a hre
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>  // at the beginning of main_loop
-  let triangle = surface
+  let triangle = ctxt
     .new_tess()
     .set_vertices(&amp;VERTICES[..])
     .set_mode(Mode::Triangle)
@@ -765,7 +777,7 @@ definition again:</p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>surface.new_pipeline_gate().pipeline(
+</span>ctxt.new_pipeline_gate().pipeline(
   &amp;back_buffer,
   &amp;PipelineState::default().set_clear_color(color),
   |_, _| Ok(()),
@@ -776,7 +788,7 @@ definition again:</p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>surface.new_pipeline_gate().pipeline(
+</span>ctxt.new_pipeline_gate().pipeline(
   &amp;back_buffer,
   &amp;PipelineState::default().set_clear_color(color),
   |pipeline, mut shd_gate| Ok(()),
@@ -894,7 +906,7 @@ chapter. Let’s focus on the simple stuff first.</p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>  let mut program = surface
+</span>  let mut program = ctxt
     .new_shader_program::&lt;VertexSemantics, (), ()&gt;()
     .from_strings(VS_STR, None, None, FS_STR)
     .unwrap()
@@ -918,7 +930,7 @@ drive behavior with types (the <a href="https://doc.rust-lang.org/1.30.0/book/fi
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>    let render = surface
+</span>    let render = ctxt
       .new_pipeline_gate()
       .pipeline(
         &amp;back_buffer,
@@ -947,7 +959,7 @@ chapter. Currently, we will just use the default one.</p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>    let render = surface
+</span>    let render = ctxt
       .new_pipeline_gate()
       .pipeline(
         &amp;back_buffer,
@@ -974,7 +986,7 @@ Some convenient implementors exist, and there’s one allowing to get a <code>Te
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>    let render = surface
+</span>    let render = ctxt
       .new_pipeline_gate()
       .pipeline(
         &amp;back_buffer,
@@ -1058,17 +1070,20 @@ fn main() {
   }
 }
 
-fn main_loop(mut surface: GlfwSurface) {
+fn main_loop(surface: GlfwSurface) {
+  let mut ctxt = surface.context;
+  let events = surface.events_rx;
+  let back_buffer = ctxt.back_buffer().expect(&quot;back buffer&quot;);
   let start_t = Instant::now();
 
-  let triangle = surface
+  let triangle = ctxt
     .new_tess()
     .set_vertices(&amp;VERTICES[..])
     .set_mode(Mode::Triangle)
     .build()
     .unwrap();
 
-  let mut program = surface
+  let mut program = ctxt
     .new_shader_program::&lt;VertexSemantics, (), ()&gt;()
     .from_strings(VS_STR, None, None, FS_STR)
     .unwrap()
@@ -1076,8 +1091,8 @@ fn main_loop(mut surface: GlfwSurface) {
 
   'app: loop {
     // handle events
-    surface.window.glfw.poll_events();
-    for (_, event) in surface.events_rx.try_iter() {
+    ctxt.window.glfw.poll_events();
+    for (_, event) in glfw::flush_messages(&amp;events) {
       match event {
         WindowEvent::Close | WindowEvent::Key(Key::Escape, _, Action::Release, _) =&gt; break 'app,
 
@@ -1085,15 +1100,12 @@ fn main_loop(mut surface: GlfwSurface) {
       }
     }
 
-    let back_buffer = surface.back_buffer().unwrap();
-
     // rendering code goes here
     // get the current time and create a color based on the time
     let t = start_t.elapsed().as_millis() as f32 * 1e-3;
     let color = [t.cos(), t.sin(), 0.5, 1.];
 
-
-    let render = surface
+    let render = ctxt
       .new_pipeline_gate()
       .pipeline(
         &amp;back_buffer,
@@ -1110,7 +1122,7 @@ fn main_loop(mut surface: GlfwSurface) {
 
     // swap buffer chains
     if render.is_ok() {
-      surface.window.swap_buffers();
+      ctxt.window.swap_buffers();
     } else {
       break 'app;
     }
@@ -1139,7 +1151,7 @@ of applications. Applications such as Z-Brush, Blender or 3Ds Max have full supp
 format so it’s a perfect match for our community concerns.</p>
 <p>Because we do not care about the actual format definition nor implementing a parser, we will use the
 <a href="https://crates.io/crates/wavefront_obj">wavefront_obj</a> crate for that purpose:</p>
-<pre><code class="language-toml">wavefront_obj = &quot;7&quot;
+<pre><code class="language-toml">wavefront_obj = &quot;10&quot;
 </code></pre>
 <p>That format is basically divided into several parts (non-exhaustive):</p>
 <ul>
@@ -1250,9 +1262,9 @@ still need to have to include <a href="https://crates.io/crates/luminance">lumin
 to struggle too much. With <a href="https://crates.io/crates/luminance-front">luminance-front</a>, you will notice that the platform crate is still up
 to us to decide. So if we want to be able to work for any platform crates, we need to constrain
 the platform with the backend type <a href="https://crates.io/crates/luminance-front">luminance-front</a> would have selected for us. We can do that
-with <code>luminance_front::Backend</code>. If <code>C</code> is the type of the platform (in our case it’s <code>GlfwSurface</code>
-but it’s a good practice to be able to adapt to any), then the following is required to perform
-<a href="https://crates.io/crates/luminance">luminance</a> operations:</p>
+with <code>luminance_front::Backend</code>. If <code>C</code> is the type of the platform (in our case it’s the one from
+<code>GlfwSurface</code> but it’s a good practice to be able to adapt to any), then the following is required
+to perform <a href="https://crates.io/crates/luminance">luminance</a> operations:</p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
@@ -1281,14 +1293,11 @@ struct Obj {
 }
 
 impl Obj {
-  fn to_tess&lt;C&gt;(
-    self,
-    surface: &amp;mut C,
-  ) -&gt; Result&lt;Tess&lt;Vertex, VertexIndex, (), Interleaved&gt;, TessError&gt;
+  fn to_tess&lt;C&gt;(self, ctxt: &amp;mut C) -&gt; Result&lt;Tess&lt;Vertex, VertexIndex, (), Interleaved&gt;, TessError&gt;
   where
     C: GraphicsContext&lt;Backend = Backend&gt;,
   {
-    surface
+    ctxt
       .new_tess()
       .set_mode(Mode::Triangle)
       .set_vertices(self.vertices)
@@ -1578,7 +1587,7 @@ we’re done.</p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>  let program = surface
+</span>  let program = ctxt
     .new_shader_program::&lt;VertexSemantics, (), ShaderInterface&gt;()
     .from_strings(VS_STR, None, None, FS_STR)
     .unwrap()
@@ -1602,7 +1611,7 @@ its documentation if you’re interested, though.</p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>    let render = surface
+</span>    let render = ctxt
       .new_pipeline_gate()
       .pipeline(
         &amp;back_buffer,
@@ -1625,7 +1634,7 @@ its documentation if you’re interested, though.</p>
 <blockquote>
 <p><em>Why the <code>.into()</code> call</em>?</p>
 </blockquote>
-<p>Because of <a href="https://crates.io/crates/cgmath">cgmath</a>’s type that must be converted to [<code>M44</code>].</p>
+<p>Because of <a href="https://crates.io/crates/cgmath">cgmath</a>’s type that must be converted to the right array type of our 4×4 matrix.</p>
 <p>If you compile and run with the following
 <a href="https://phaazon.net/media/uploads/suzanne.obj">suzanne.obj</a> file, you should see this:</p>
 <p><img src="imgs/suzanne_flat.png" alt="" /></p>
@@ -1841,14 +1850,11 @@ struct Obj {
 }
 
 impl Obj {
-  fn to_tess&lt;C&gt;(
-    self,
-    surface: &amp;mut C,
-  ) -&gt; Result&lt;Tess&lt;Vertex, VertexIndex, (), Interleaved&gt;, TessError&gt;
+  fn to_tess&lt;C&gt;(self, ctxt: &amp;mut C) -&gt; Result&lt;Tess&lt;Vertex, VertexIndex, (), Interleaved&gt;, TessError&gt;
   where
     C: GraphicsContext&lt;Backend = Backend&gt;,
   {
-    surface
+    ctxt
       .new_tess()
       .set_mode(Mode::Triangle)
       .set_vertices(self.vertices)
@@ -1934,24 +1940,26 @@ fn main() {
   }
 }
 
-fn main_loop(mut surface: GlfwSurface) {
+fn main_loop(surface: GlfwSurface) {
   let path = env::args()
     .skip(1)
     .next()
     .expect(&quot;first argument must be the path of the .obj file to view&quot;);
   println!(&quot;loading {}&quot;, path);
 
-  let mesh = Obj::load(path).unwrap().to_tess(&amp;mut surface).unwrap();
-
+  let mut ctxt = surface.context;
+  let events = surface.events_rx;
+  let back_buffer = ctxt.back_buffer().expect(&quot;back buffer&quot;);
   let start_t = Instant::now();
 
-  let mut program = surface
+  let mesh = Obj::load(path).unwrap().to_tess(&amp;mut ctxt).unwrap();
+
+  let mut program = ctxt
     .new_shader_program::&lt;VertexSemantics, (), ShaderInterface&gt;()
     .from_strings(VS_STR, None, None, FS_STR)
     .unwrap()
     .ignore_warnings();
 
-  let back_buffer = surface.back_buffer().unwrap();
   let [width, height] = back_buffer.size();
   let projection = perspective(FOVY, width as f32 / height as f32, Z_NEAR, Z_FAR);
 
@@ -1959,8 +1967,8 @@ fn main_loop(mut surface: GlfwSurface) {
 
   'app: loop {
     // handle events
-    surface.window.glfw.poll_events();
-    for (_, event) in surface.events_rx.try_iter() {
+    ctxt.window.glfw.poll_events();
+    for (_, event) in glfw::flush_messages(&amp;events) {
       match event {
         WindowEvent::Close | WindowEvent::Key(Key::Escape, _, Action::Release, _) =&gt; break 'app,
         _ =&gt; (),
@@ -1972,25 +1980,27 @@ fn main_loop(mut surface: GlfwSurface) {
     let t = start_t.elapsed().as_millis() as f32 * 1e-3;
     let color = [t.cos(), t.sin(), 0.5, 1.];
 
-    let back_buffer = surface.back_buffer().unwrap();
-    let render = surface.new_pipeline_gate().pipeline(
-      &amp;back_buffer,
-      &amp;PipelineState::default().set_clear_color(color),
-      |_, mut shd_gate| {
-        shd_gate.shade(&amp;mut program, |mut iface, uni, mut rdr_gate| {
-          iface.set(&amp;uni.projection, projection.into());
-          iface.set(&amp;uni.view, view.into());
+    let render = ctxt
+      .new_pipeline_gate()
+      .pipeline(
+        &amp;back_buffer,
+        &amp;PipelineState::default().set_clear_color(color),
+        |_, mut shd_gate| {
+          shd_gate.shade(&amp;mut program, |mut iface, uni, mut rdr_gate| {
+            iface.set(&amp;uni.projection, projection.into());
+            iface.set(&amp;uni.view, view.into());
 
-          rdr_gate.render(&amp;RenderState::default(), |mut tess_gate| {
-            tess_gate.render(&amp;mesh)
+            rdr_gate.render(&amp;RenderState::default(), |mut tess_gate| {
+              tess_gate.render(&amp;mesh)
+            })
           })
-        })
-      },
-    ).assume();
+        },
+      )
+      .assume();
 
     // swap buffer chains
     if render.is_ok() {
-      surface.window.swap_buffers();
+      ctxt.window.swap_buffers();
     } else {
       break 'app;
     }

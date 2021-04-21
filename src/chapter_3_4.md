@@ -260,7 +260,7 @@ All we have to do now is to change the type of our [`Program`] to use the unifor
 we’re done.
 
 ```rust
-  let program = surface
+  let program = ctxt
     .new_shader_program::<VertexSemantics, (), ShaderInterface>()
     .from_strings(VS_STR, None, None, FS_STR)
     .unwrap()

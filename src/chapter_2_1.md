@@ -182,7 +182,7 @@ Then:
 
 ```rust
   // at the beginning of main_loop
-  let triangle = surface
+  let triangle = ctxt
     .new_tess()
     .set_vertices(&VERTICES[..])
     .set_mode(Mode::Triangle)

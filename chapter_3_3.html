@@ -218,9 +218,9 @@ still need to have to include <a href="https://crates.io/crates/luminance">lumin
 to struggle too much. With <a href="https://crates.io/crates/luminance-front">luminance-front</a>, you will notice that the platform crate is still up
 to us to decide. So if we want to be able to work for any platform crates, we need to constrain
 the platform with the backend type <a href="https://crates.io/crates/luminance-front">luminance-front</a> would have selected for us. We can do that
-with <code>luminance_front::Backend</code>. If <code>C</code> is the type of the platform (in our case it’s <code>GlfwSurface</code>
-but it’s a good practice to be able to adapt to any), then the following is required to perform
-<a href="https://crates.io/crates/luminance">luminance</a> operations:</p>
+with <code>luminance_front::Backend</code>. If <code>C</code> is the type of the platform (in our case it’s the one from
+<code>GlfwSurface</code> but it’s a good practice to be able to adapt to any), then the following is required
+to perform <a href="https://crates.io/crates/luminance">luminance</a> operations:</p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
@@ -249,14 +249,11 @@ struct Obj {
 }
 
 impl Obj {
-  fn to_tess&lt;C&gt;(
-    self,
-    surface: &amp;mut C,
-  ) -&gt; Result&lt;Tess&lt;Vertex, VertexIndex, (), Interleaved&gt;, TessError&gt;
+  fn to_tess&lt;C&gt;(self, ctxt: &amp;mut C) -&gt; Result&lt;Tess&lt;Vertex, VertexIndex, (), Interleaved&gt;, TessError&gt;
   where
     C: GraphicsContext&lt;Backend = Backend&gt;,
   {
-    surface
+    ctxt
       .new_tess()
       .set_mode(Mode::Triangle)
       .set_vertices(self.vertices)

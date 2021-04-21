@@ -386,7 +386,7 @@ we’re done.</p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>  let program = surface
+</span>  let program = ctxt
     .new_shader_program::&lt;VertexSemantics, (), ShaderInterface&gt;()
     .from_strings(VS_STR, None, None, FS_STR)
     .unwrap()

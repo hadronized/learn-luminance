@@ -173,7 +173,7 @@ definition again:</p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>surface.new_pipeline_gate().pipeline(
+</span>ctxt.new_pipeline_gate().pipeline(
   &amp;back_buffer,
   &amp;PipelineState::default().set_clear_color(color),
   |_, _| Ok(()),
@@ -184,7 +184,7 @@ definition again:</p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>surface.new_pipeline_gate().pipeline(
+</span>ctxt.new_pipeline_gate().pipeline(
   &amp;back_buffer,
   &amp;PipelineState::default().set_clear_color(color),
   |pipeline, mut shd_gate| Ok(()),
@@ -302,7 +302,7 @@ chapter. Let’s focus on the simple stuff first.</p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>  let mut program = surface
+</span>  let mut program = ctxt
     .new_shader_program::&lt;VertexSemantics, (), ()&gt;()
     .from_strings(VS_STR, None, None, FS_STR)
     .unwrap()
@@ -326,7 +326,7 @@ drive behavior with types (the <a href="https://doc.rust-lang.org/1.30.0/book/fi
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>    let render = surface
+</span>    let render = ctxt
       .new_pipeline_gate()
       .pipeline(
         &amp;back_buffer,

@@ -3,10 +3,10 @@
 First thing first: this book is written against this following luminance crate setup:
 
 ```toml
-luminance = "0.42"
+luminance = "0.43"
 luminance-derive = "0.6"
 luminance-front = "0.3"
-luminance-glfw = "0.14"
+luminance-glfw = "0.15"
 luminance-windowing = "0.9"
 ```
 
