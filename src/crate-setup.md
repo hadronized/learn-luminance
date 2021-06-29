@@ -3,11 +3,11 @@
 First thing first: this book is written against this following luminance crate setup:
 
 ```toml
-luminance = "0.43"
-luminance-derive = "0.6"
-luminance-front = "0.3"
-luminance-glfw = "0.15"
-luminance-windowing = "0.9"
+luminance = "0.44"
+luminance-derive = "0.7"
+luminance-front = "0.4"
+luminance-glfw = "0.16"
+luminance-windowing = "0.10"
 ```
 
 If you are using a version from crates.io that is more recent that this current book, feel free to
