@@ -82,10 +82,10 @@ In our case, we don’t want to render anything, we just want to modify the _bac
 color. That is done with the arguments you pass to [`PipelineGate::pipeline`]. The first one is the
 frame buffer to render to. In our case, it’s our _back_ buffer.
 
-The second argument is the _pipeline state_ to use when running our pipeline. Everytime you perform a
-render into a frame buffer, you _need_ to provide such an object, which contains the color to use when
-clearing the framebuffer’s color buffers. It is possible to tell [luminance] not to clear color buffers
-but this is off topic.
+The second argument is the _pipeline state_ ([`PipelineState`] to use when running our pipeline.
+Everytime you perform a render into a frame buffer, you _need_ to provide such an object, which
+contains the color to use when clearing the framebuffer’s color buffers. It is possible to tell
+[luminance] not to clear color buffers but this is off topic.
 
 The third and last argument is a _closure_ you need to pass. That closure will be called as soon as
 the frame buffer is ready to receive a render. All this code is fully _synchronous_ though, so
@@ -190,4 +190,4 @@ fn main_loop(surface: GlfwSurface) {
 [`Render`]: https://docs.rs/luminance/latest/luminance/pipeline/struct.Render.html
 [`assume()`]: https://docs.rs/luminance/latest/luminance/pipeline/struct.Render.html#method.assume
 [`PipelineError`]: https://docs.rs/luminance/latest/luminance/pipeline/enum.PipelineError.html
-
+[`PipelineState`]: https://docs.rs/luminance/latest/luminance/pipeline/struct.PipelineState.html
