@@ -20,10 +20,12 @@ It’s not _some_ kind: it **is** a [`Framebuffer`]. And guess what: you can acc
 So, let’s make our first cool render and make a color-varying background! First, you will need to
 import one symbol from [luminance]: [`GraphicsContext`], which is a trait that allows you to run
 [luminance] code and talk to the GPU. We will also use [`Instant`], from the standard library, to
-handle low-precision yet sufficient time points.
+handle low-precision yet sufficient time points. Add [`PipelineState`] to support graphics
+pipelines: more on that later in this chapter.
 
 ```rust
 use luminance::context::GraphicsContext as _;
+use luminance::pipeline::PipelineState;
 use std::time::Instant;
 ```
 
