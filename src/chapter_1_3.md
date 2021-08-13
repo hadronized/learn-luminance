@@ -154,7 +154,7 @@ fn main_loop(surface: GlfwSurface) {
 
     // rendering code goes here
     // get the current time and create a color based on the time
-    let t = start_t.elapsed().as_millis() as f32 * 1e-3;
+    let t = start_t.elapsed().as_secs_f32();
     let color = [t.cos(), t.sin(), 0.5, 1.];
 
     let render = ctxt
