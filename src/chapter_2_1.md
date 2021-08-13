@@ -30,7 +30,7 @@ to worry about those, because a crate exists to automatically implement such a t
 First thing first: add [luminance-derive] to your project’s `[dependencies]` section:
 
 ```toml
-luminance-derive = "0.6"
+luminance-derive = "0.7"
 ```
 
 Simple. One last thing: when you will use the `Vertex` derive annotation, you will have to provide
