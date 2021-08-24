@@ -20,10 +20,12 @@ It’s not _some_ kind: it **is** a [`Framebuffer`]. And guess what: you can acc
 So, let’s make our first cool render and make a color-varying background! First, you will need to
 import one symbol from [luminance]: [`GraphicsContext`], which is a trait that allows you to run
 [luminance] code and talk to the GPU. We will also use [`Instant`], from the standard library, to
-handle low-precision yet sufficient time points.
+handle low-precision yet sufficient time points. Add [`PipelineState`] to support graphics
+pipelines: more on that later in this chapter.
 
 ```rust
 use luminance::context::GraphicsContext as _;
+use luminance::pipeline::PipelineState;
 use std::time::Instant;
 ```
 
@@ -48,7 +50,7 @@ As you can see, getting the _back_ buffer is piece of cake. Now let’s handle t
 ```rust
     // rendering code goes here
     // get the current time and create a color based on the time
-    let t = start_t.elapsed().as_millis() as f32 * 1e-3;
+    let t = start_t.elapsed().as_secs_f32();
     let color = [t.cos(), t.sin(), 0.5, 1.];
 
     let render = ctxt
@@ -152,7 +154,7 @@ fn main_loop(surface: GlfwSurface) {
 
     // rendering code goes here
     // get the current time and create a color based on the time
-    let t = start_t.elapsed().as_millis() as f32 * 1e-3;
+    let t = start_t.elapsed().as_secs_f32();
     let color = [t.cos(), t.sin(), 0.5, 1.];
 
     let render = ctxt
