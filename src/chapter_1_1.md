@@ -6,6 +6,7 @@ You’ll need some prerequisites:
 | ------------------------------ | ----------------------------------------------- |
 | `rustup`                       | [https://rustup.rs](https://rustup.rs)          |
 | An up to date `rustc` compiler | `rustup update stable && rustup default stable` |
+| CMake                          | [https://cmake.org/download/](https://cmake.org/download/)  |
 
 Let’s create a new _Rust_ project in your `~/dev` directory, for instance. We’ll name the project
 `luminance-hello-world`.
