@@ -233,7 +233,7 @@ clash with types):</p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>#[derive(Vertex)]
+</span>#[derive(Clone, Copy, Debug, Vertex)]
 #[vertex(sem = &quot;VertexSemantics&quot;)]
 pub struct Vertex {
   #[allow(dead_code)]
