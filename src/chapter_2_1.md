@@ -97,7 +97,7 @@ And then define your `Vertex` type (it’s possible to use the same typename bec
 clash with types):
 
 ```rust
-#[derive(Vertex)]
+#[derive(Copy, Clone, Debug, Vertex)]
 #[vertex(sem = "VertexSemantics")]
 pub struct Vertex {
   #[allow(dead_code)]
