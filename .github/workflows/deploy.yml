@@ -10,9 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: Install dependencies
-        run: |
-          cargo update
-          cargo install mdbook
+        run: cargo install mdbook
       - name: Cleanup GitHub Pages
         run: |
           git switch gh-pages
