@@ -8,31 +8,26 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
+        with:
+          ref: gh-pages
+          ssh-key: ${{ secrets.GH_PAGES_DEPLOY_KEY }}
       - name: Install dependencies
-        run: |
-          cargo update
-          cargo install mdbook
+        run: cargo install mdbook
       - name: Cleanup GitHub Pages
         run: |
-          git switch gh-pages
+          git fetch origin
           git rm -rf .
+          echo Restoring
           git restore --source=origin/master . # restore as if we were on master
-          git remote add upstream git@github.com:$GITHUB_REPOSITORY.git
-          echo "Adding upstream = github.com:$GITHUB_REPOSITORY.git"
       - name: Build
         run: |
           mdbook build
           cp -rv book/* .
       - name: Deploy
-        env:
-          GH_PAGES_SEC_KEY: ${{ secrets.GH_PAGES_SEC_KEY }}
         run: |
-          git branch
           git add * || true # add all the changes
           git config --local user.name "$GITHUB_ACTOR"
           git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
           git commit -am "Deploy to GitHub Pages."
-          echo "$GH_PAGES_SEC_KEY" > sec_key.rsa
-          chmod 600 sec_key.rsa
-          GIT_SSH_COMMAND="ssh -i sec_key.rsa" git push upstream gh-pages
+          git push origin gh-pages
